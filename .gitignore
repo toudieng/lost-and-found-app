@@ -1,0 +1,12 @@
+# Dossiers et fichiers Python (Django)
+__pycache__/
+*.pyc
+.env
+db.sqlite3
+
+# Dossiers et fichiers Node.js (Next.js)
+node_modules/
+.next/
+
+# Autres fichiers et dossiers à ignorer
+.DS_Store
