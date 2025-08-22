@@ -1,6 +1,5 @@
 from django.apps import AppConfig
 
-
 class ObjetsConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'objets'
+    name = 'backend.objets'
