@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'backend.users',
     'backend.objets',
      'frontend',
+      'widget_tweaks',
 ]
 
 MIDDLEWARE = [

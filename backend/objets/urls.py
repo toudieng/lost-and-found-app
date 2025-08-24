@@ -1,6 +1,9 @@
 from django.urls import path
-from . import views
+
+from backend.objets import views
+
 
 urlpatterns = [
-    path('', views.liste_objets, name='liste_objets'),
+   path('', views.liste_objets, name='liste_objets')
+
 ]

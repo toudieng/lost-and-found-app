@@ -26,6 +26,8 @@ class Declaration(models.Model):
     date_declaration = models.DateTimeField(auto_now_add=True)
     est_perdu = models.BooleanField(default=True)
     lieu = models.CharField(max_length=200, blank=True, null=True)
+    description = models.TextField(blank=True, null=True)  # description optionnelle
+    image = models.ImageField(upload_to='declarations/', blank=True, null=True)  # image optionnelle
 
     def __str__(self):
         return f"Déclaration de {self.citoyen} - {self.objet}"
