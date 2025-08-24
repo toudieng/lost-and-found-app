@@ -5,17 +5,21 @@ from .models import Objet
 
 
 def declarer_objet(request):
-    if request.method == "POST":
-        form = DeclarationForm(request.POST)
+    if request.method == 'POST':
+        form = DeclarationForm(request.POST, request.FILES)
         if form.is_valid():
+            objet_nom = form.cleaned_data['objet']  # le nom de l'objet saisi
+            # Vérifier si l'objet existe déjà ou le créer
+            objet, created = Objet.objects.get_or_create(nom=objet_nom)
+            
             declaration = form.save(commit=False)
-            declaration.citoyen = request.user 
+            declaration.objet = objet
+            declaration.citoyen = request.user
             declaration.save()
-            return redirect('mes_declarations')  
+            return redirect('home')
     else:
         form = DeclarationForm()
-
-    return render(request, "objets/declaration_form.html", {"form": form})
+    return render(request, 'frontend/declarer_objet.html', {'form': form})
 
 def liste_objets(request):
     objets = Objet.objects.all()
