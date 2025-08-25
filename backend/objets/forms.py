@@ -32,7 +32,8 @@ class DeclarationForm(forms.ModelForm):
 
     class Meta:
         model = Declaration
-        fields = ['objet', 'description', 'image', 'est_perdu', 'lieu']
+        # retirer 'objet' ici pour éviter l'erreur
+        fields = ['description', 'image', 'est_perdu', 'lieu']
         widgets = {
             'lieu': forms.TextInput(
                 attrs={
