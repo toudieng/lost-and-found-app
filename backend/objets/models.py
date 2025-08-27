@@ -12,6 +12,8 @@ class Objet(models.Model):
         default="perdu",
         verbose_name="État"
     )
+    # Optionnel : identifiant unique
+    code_unique = models.CharField(max_length=50, unique=True, null=True, blank=True, verbose_name="Code unique")
 
     def __str__(self):
         return self.nom

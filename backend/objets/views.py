@@ -7,25 +7,26 @@ from .models import Objet, Declaration
 
 @login_required(login_url='login') 
 def declarer_objet(request):
+    """
+    Vue permettant à un citoyen de déclarer un objet (perdu ou trouvé).
+    """
     if request.method == 'POST':
         form = DeclarationForm(request.POST, request.FILES)
         if form.is_valid():
-            # Récupérer le nom de l'objet saisi
-            nom_objet = form.cleaned_data['nom_objet'].strip()
-
-            # Vérifier si l'objet existe déjà sinon le créer
+            # Récupérer ou créer l'objet selon le nom
+            nom_objet = form.cleaned_data['nom_objet'].strip().lower()  
             objet_instance, created = Objet.objects.get_or_create(nom=nom_objet)
 
-            # Créer la déclaration mais ne pas la sauvegarder immédiatement
+            # Créer la déclaration associée
             declaration = form.save(commit=False)
             declaration.objet = objet_instance
-            declaration.citoyen = request.user  # associer à l’utilisateur connecté
+            declaration.citoyen = request.user  
             declaration.save()
 
-            messages.success(request, "Votre déclaration a été enregistrée avec succès ✅.")
-            return redirect('liste_objets')  # tu peux mettre 'home' ou une page dédiée
+            messages.success(request, "✅ Votre déclaration a été enregistrée avec succès.")
+            return redirect('liste_objets')  
         else:
-            messages.error(request, "Une erreur est survenue. Vérifiez le formulaire.")
+            messages.error(request, "⚠️ Erreur : vérifiez les informations saisies.")
     else:
         form = DeclarationForm()
 
