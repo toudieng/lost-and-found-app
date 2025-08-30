@@ -22,7 +22,7 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("", include("frontend.urls")),
-    path('', include('backend.users.urls')),       # <-- URLs de l’app users
+    path('', include('backend.users.urls')),      
     path('objects/', include('backend.objets.urls')),
 ]
 if settings.DEBUG:
