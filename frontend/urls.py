@@ -23,4 +23,5 @@ urlpatterns = [
     path("dashboard/admin/utilisateurs/", views.gerer_utilisateurs, name="gerer_utilisateurs"),
     path("dashboard/admin/stats/", views.voir_stats, name="voir_stats"),
      path('dashboard/admin/commissariats/ajouter_commissariat/', views.ajouter_commissariat, name='ajouter_commissariat'),
+     path("creer_policier/", views.creer_policier, name="creer_policier"),
 ]

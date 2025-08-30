@@ -6,9 +6,12 @@ from django.contrib.auth.decorators import login_required
 from  backend.users.forms import CommissariatForm
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib import messages
-
-
-
+import random, string
+from django.core.mail import send_mail
+from django.conf import settings
+from django.contrib import messages
+from django.shortcuts import render, redirect
+from backend.users.forms import PolicierForm
 # --- Pages publiques ---
 def home(request):
     return render(request, "frontend/home.html")
@@ -110,3 +113,32 @@ def supprimer_objet(request, objet_id):
         return redirect('liste_objets')  # nom de la vue liste
     # Si quelqu'un accède via GET, rediriger
     return redirect('liste_objets')
+#formulaire de creation de policier par admin
+def creer_policier(request):
+    if request.method == "POST":
+        form = PolicierForm(request.POST)
+        if form.is_valid():
+            # Générer un mot de passe aléatoire
+            password = ''.join(random.choices(string.ascii_letters + string.digits, k=10))
+            
+            policier = form.save(commit=False)
+            policier.set_password(password)
+            policier.save()
+
+            # Envoi du mot de passe par email
+            send_mail(
+                "Création de votre compte Policier",
+                f"Bonjour {policier.first_name},\n\nVotre compte a été créé.\n"
+                f"Identifiant : {policier.username}\nMot de passe : {password}\n\n"
+                "Merci de vous connecter et de changer ce mot de passe.",
+                settings.DEFAULT_FROM_EMAIL,
+                [policier.email],
+                fail_silently=False,
+            )
+
+            messages.success(request, "Policier créé et mot de passe envoyé par email ✅")
+            return redirect("gerer_utilisateurs")  
+    else:
+        form = PolicierForm()
+    
+    return render(request, "frontend/admin/creer_policier.html", {"form": form})

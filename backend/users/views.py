@@ -5,12 +5,13 @@ from django.contrib.auth.decorators import login_required
 from backend.objets.models import Objet
 from .forms import UtilisateurCreationForm
 
-
 def login_view(request):
     if request.method == 'POST':
-        username = request.POST.get('username')
+        email = request.POST.get('email')
         password = request.POST.get('password')
-        user = authenticate(request, username=username, password=password)
+
+        # Authentification par email
+        user = authenticate(request, email=email, password=password)
 
         if user:
             login(request, user)
@@ -25,11 +26,11 @@ def login_view(request):
                     return redirect("home")
             else:
                 return redirect("home")
-
         else:
-            messages.error(request, "Nom d'utilisateur ou mot de passe incorrect.")
-    return render(request, 'users/login.html')
+            messages.error(request, "Adresse e-mail ou mot de passe incorrect.")
 
+    return render(request, 'users/login.html')
+    
 
 def logout_view(request):
     logout(request)

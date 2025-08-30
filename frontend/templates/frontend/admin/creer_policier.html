@@ -1,0 +1,14 @@
+{% extends "frontend/base.html" %}
+
+{% block title %}Créer un policier{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Créer un policier</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Créer</button>
+    </form>
+</div>
+{% endblock %}
