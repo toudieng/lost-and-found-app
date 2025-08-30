@@ -1,0 +1,26 @@
+{% extends "frontend/base.html" %}
+{% load static %}
+
+{% block title %}Ajouter un Commissariat{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4 text-center">➕ Ajouter un Commissariat</h2>
+
+    <!-- Messages -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="card shadow p-4">
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary mt-3">Enregistrer</button>
+            <a href="{% url 'gerer_commissariats' %}" class="btn btn-secondary mt-3">Annuler</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

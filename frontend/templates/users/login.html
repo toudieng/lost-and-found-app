@@ -1,0 +1,47 @@
+{% extends "frontend/base.html" %}
+{% load static %}
+
+{% block title %}Connexion{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-5">
+        <h4 class="mb-3 text-center">🔑 Connexion</h4>
+
+        {% if form.errors %}
+            <div class="alert alert-danger py-2 px-3 small">
+                Nom d'utilisateur ou mot de passe incorrect.
+            </div>
+        {% endif %}
+
+        <form method="POST" novalidate class="small">
+            {% csrf_token %}
+
+            <!-- Username -->
+            <div class="mb-2">
+                <label for="username" class="form-label fw-bold text-dark small">
+                    👤 Nom d'utilisateur
+                </label>
+                <input type="text" class="form-control form-control-sm" id="username" name="username" required>
+            </div>
+
+            <!-- Password -->
+            <div class="mb-2">
+                <label for="password" class="form-label fw-bold text-dark small">
+                    🔒 Mot de passe
+                </label>
+                <input type="password" class="form-control form-control-sm" id="password" name="password" required>
+            </div>
+
+            <!-- Bouton -->
+            <button type="submit" class="btn btn-primary btn-sm w-100 mt-2 fw-bold">
+                ✅ Se connecter
+            </button>
+        </form>
+
+        <p class="mt-3 text-center small">
+            Pas de compte ? <a href="{% url 'register' %}" class="fw-bold">Inscrivez-vous ici</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

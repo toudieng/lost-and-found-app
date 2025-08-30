@@ -1,0 +1,63 @@
+/* Hero Section */
+.hero {
+    background: linear-gradient(rgba(255,255,255,0.85), rgba(255,255,255,0.85)), url("../img/hero-bg.jpg") no-repeat center center;
+    background-size: cover;
+    padding-top: 100px;
+    padding-bottom: 100px;
+}
+
+/* Features Section */
+.features {
+    padding-top: 80px;
+    padding-bottom: 80px;
+}
+.features .card {
+    border-radius: 20px;
+    padding: 30px 20px;
+    margin-bottom: 30px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.features .card:hover {
+    transform: translateY(-10px) rotateZ(1deg);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.18);
+}
+
+/* Partenaires Section */
+.partners {
+    padding-top: 80px;
+    padding-bottom: 80px;
+}
+.partners h2 {
+    color: #6c1e3d;
+    margin-bottom: 30px;
+}
+.partners p {
+    margin-bottom: 50px;
+}
+.partners img {
+    max-height: 80px;
+    object-fit: contain;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.partners img:hover {
+    transform: scale(1.1);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+}
+
+/* Call to Action Section */
+.cta {
+    padding-top: 80px;
+    padding-bottom: 80px;
+}
+.cta .btn {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.cta .btn:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+}
+
+/* Text shadows for hero and CTA headings */
+.hero h1, .cta h2 {
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.15);
+}

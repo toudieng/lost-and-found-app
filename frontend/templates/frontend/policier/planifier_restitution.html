@@ -1,0 +1,69 @@
+{% extends "frontend/base.html" %}
+{% block title %}Planifier une restitution{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white text-center">
+                    <h3 class="mb-0">📍 Planifier une restitution</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <!-- Liste déroulante des objets -->
+                        <div class="mb-3">
+                            <label for="objet" class="form-label fw-semibold">Objet</label>
+                            <select class="form-select" id="objet" name="objet" required>
+                                <option value="" disabled selected>-- Sélectionnez un objet --</option>
+                                {% for objet in objets %}
+                                    {% with declaration=objet.declaration_set.first %}
+                                    {% if declaration and declaration.etat == "perdu" %}
+                                        <option value="{{ objet.id }}">{{ objet.nom }} (Perdu)</option>
+                                    {% elif declaration and declaration.etat == "retrouvé" %}
+                                        <option value="{{ objet.id }}">{{ objet.nom }} (Trouvé)</option>
+                                    {% endif %}
+                                    {% endwith %}
+                                {% empty %}
+                                    <option disabled>Aucun objet disponible</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Date de restitution -->
+                        <div class="mb-3">
+                            <label for="date" class="form-label fw-semibold">Date de restitution</label>
+                            <input type="date" class="form-control" id="date" name="date" required>
+                        </div>
+
+                        <!-- Heure de restitution -->
+                        <div class="mb-3">
+                            <label for="heure" class="form-label fw-semibold">Heure</label>
+                            <input type="time" class="form-control" id="heure" name="heure" required>
+                        </div>
+
+                        <!-- Commissariat -->
+                        <div class="mb-3">
+                            <label for="commissariat" class="form-label fw-semibold">Commissariat</label>
+                            <select class="form-select" id="commissariat" name="commissariat" required>
+                                <option value="" disabled selected>-- Sélectionnez un commissariat --</option>
+                                {% for commissariat in commissariats %}
+                                    <option value="{{ commissariat.id }}">{{ commissariat.nom }}</option>
+                                {% empty %}
+                                    <option disabled>Aucun commissariat disponible</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-success btn-lg w-100">Planifier</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

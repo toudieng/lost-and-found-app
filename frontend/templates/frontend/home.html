@@ -1,0 +1,86 @@
+{% extends 'frontend/base.html' %}
+{% load static %}
+
+{% block title %}Accueil - Objets Perdus{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'frontend/css/home.css' %}">
+{% endblock %}
+
+{% block content %}
+
+
+<section class="hero py-6 text-center">
+    <div class="container">
+        <h1 class="display-3 fw-bold mb-4">📦 Bienvenue sur la plateforme des Objets Perdus</h1>
+        <p class="lead mb-5 fs-5">Déclarez un objet perdu, consultez les objets retrouvés et suivez vos démarches en toute sécurité.</p>
+        <a href="{% url 'liste_objets' %}" class="btn btn-primary btn-lg shadow-lg">Consulter les objets</a>
+    </div>
+</section>
+
+<section class="features py-6">
+    <div class="container">
+        <div class="row text-center g-5">
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-lg">
+                    <div class="card-body">
+                        <i class="bi bi-pencil-square fs-1 text-primary mb-3"></i>
+                        <h5 class="card-title fw-bold">Déclarez un objet perdu</h5>
+                        <p class="card-text text-muted">Remplissez facilement le formulaire pour signaler un objet que vous avez perdu.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-lg">
+                    <div class="card-body">
+                        <i class="bi bi-search fs-1 text-success mb-3"></i>
+                        <h5 class="card-title fw-bold">Consultez les objets retrouvés</h5>
+                        <p class="card-text text-muted">Parcourez la liste des objets retrouvés et contactez le déclarant si nécessaire.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-lg">
+                    <div class="card-body">
+                        <i class="bi bi-check2-circle fs-1 text-warning mb-3"></i>
+                        <h5 class="card-title fw-bold">Suivez vos démarches</h5>
+                        <p class="card-text text-muted">Gardez un œil sur l’état de vos déclarations et notifications directement depuis votre compte.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Partenaires Section -->
+<section class="partners py-6 bg-light text-center">
+    <div class="container">
+        <h2 class="display-6 fw-bold mb-4">Nos Partenaires</h2>
+        <p class="text-muted mb-5">Nous collaborons avec des organismes et entreprises de confiance pour faciliter la restitution des objets perdus.</p>
+        <div class="row justify-content-center align-items-center g-4">
+            <div class="col-4 col-md-2">
+                <img src="{% static 'frontend/img/partner1.png' %}" class="img-fluid" alt="Partenaire 1">
+            </div>
+            <div class="col-4 col-md-2">
+                <img src="{% static 'frontend/img/partner2.png' %}" class="img-fluid" alt="Partenaire 2">
+            </div>
+            <div class="col-4 col-md-2">
+                <img src="{% static 'frontend/img/partner3.png' %}" class="img-fluid" alt="Partenaire 3">
+            </div>
+            <div class="col-4 col-md-2">
+                <img src="{% static 'frontend/img/partner4.png' %}" class="img-fluid" alt="Partenaire 4">
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="cta bg-primary text-white text-center py-6">
+    <div class="container">
+        <h2 class="display-5 mb-3">Vous avez perdu un objet ?</h2>
+        <p class="mb-4 fs-5">Déclarez-le maintenant et augmentez vos chances de le retrouver rapidement.</p>
+        <a href="{% url 'declarer_objet' %}" class="btn btn-light btn-lg shadow-lg">Déclarer un objet perdu</a>
+    </div>
+</section>
+
+{% endblock %}

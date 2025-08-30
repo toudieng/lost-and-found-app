@@ -1,0 +1,73 @@
+{% extends 'frontend/base.html' %}
+{% block title %}Historique des restitutions{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h2 class="text-center mb-4">📜 Historique des restitutions</h2>
+
+    {% if restitutions %}
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Objet</th>
+                        <th>État</th>
+                        <th>Date</th>
+                        <th>Heure</th>
+                        <th>Commissariat</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for restitution in restitutions %}
+                    <tr>
+                        <td>{{ restitution.id }}</td>
+                        <td>{{ restitution.objet.nom }}</td>
+                        <td>
+                            {% if restitution.objet.declaration_set.first %}
+                                {% if restitution.objet.declaration_set.first.etat == "perdu" %}
+                                    <span class="badge bg-danger">Perdu</span>
+                                {% else %}
+                                    <span class="badge bg-success">Trouvé</span>
+                                {% endif %}
+                            {% else %}
+                                <span class="badge bg-secondary">Inconnu</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ restitution.date|date:"d/m/Y" }}</td>
+                        <td>{{ restitution.heure|time:"H:i" }}</td>
+                        <td>{{ restitution.commissariat.nom }}</td>
+                        <td>
+                            {% if restitution.est_effectue %}
+                                <span class="badge bg-success">Effectué</span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark">Planifié</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <!-- Optionnel : bouton pour marquer comme effectué ou supprimer -->
+                            {% if not restitution.est_effectue %}
+                            <form action="{% url 'effectuer_restitution' restitution.id %}" method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-success">Marquer effectué</button>
+                            </form>
+                            {% endif %}
+                            <form action="{% url 'supprimer_restitution' restitution.id %}" method="post" style="display:inline;" onsubmit="return confirm('Voulez-vous vraiment supprimer cette restitution ?');">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-danger">Supprimer</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-info text-center">
+            Aucun historique de restitutions trouvé.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

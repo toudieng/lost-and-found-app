@@ -1,0 +1,39 @@
+{% extends "frontend/base.html" %}
+{% block title %}Objets déclarés{% endblock %}
+
+{% block content %}
+<h2>📋 Liste des objets déclarés</h2>
+<table class="table table-striped align-middle">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Nom</th>
+      <th>Description</th>
+      <th>État</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for objet in objets %}
+    <tr>
+      <td>{{ objet.id }}</td>
+      <td>{{ objet.nom }}</td>
+      <td>{{ objet.description }}</td>
+      <td>{{ objet.etat }}</td>
+      <td>
+        <a href="{% url 'maj_objet' objet.id %}" class="btn btn-sm btn-warning">Mettre à jour</a>
+
+        <!-- Formulaire de suppression -->
+        <form action="{% url 'supprimer_objet' objet.id %}" method="post" style="display:inline;" onsubmit="return confirm('Voulez-vous vraiment supprimer cet objet ?');">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-sm btn-danger">Supprimer</button>
+        </form>
+
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="5" class="text-center">Aucun objet déclaré.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

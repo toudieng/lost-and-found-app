@@ -1,0 +1,27 @@
+{% extends "frontend/base.html" %}
+{% block title %}Gérer les commissariats{% endblock %}
+
+{% block content %}
+<h2>🏢 Gestion des Commissariats</h2>
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Nom</th>
+      <th>Adresse</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for c in commissariats %}
+    <tr>
+      <td>{{ c.id }}</td>
+      <td>{{ c.nom }}</td>
+      <td>{{ c.adresse }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="3">Aucun commissariat enregistré.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+<a href="ajouter_commissariat" class="btn btn-primary">➕ Ajouter un commissariat</a>
+{% endblock %}
