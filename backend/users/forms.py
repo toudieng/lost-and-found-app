@@ -2,11 +2,11 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from .models import Utilisateur, Commissariat
 
-
 # Formulaire pour créer un utilisateur
 
 class UtilisateurCreationForm(UserCreationForm):
     telephone = forms.CharField(required=False)
+
 
     class Meta:
         model = Utilisateur
