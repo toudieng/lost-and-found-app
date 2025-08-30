@@ -83,12 +83,23 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#     }
+# }
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'lost_and_found_db',     # Nom de ta base
+        'USER': 'postgres',              # Ton user PostgreSQL
+        'PASSWORD': '1111', # Mot de passe
+        'HOST': 'localhost',             # ou IP si serveur distant
+        'PORT': '5432',                  # Port PostgreSQL par défaut
     }
 }
+
 
 
 # Password validation
