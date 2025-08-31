@@ -101,7 +101,6 @@ DATABASES = {
 }
 
 
-
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
@@ -156,6 +155,6 @@ EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = "serignekhadimmbackeba40@gmail.com"
-EMAIL_HOST_PASSWORD = "inconnue"
+EMAIL_HOST_PASSWORD = "kqwf thpl cnyb auax"
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 AUTHENTICATION_BACKENDS = ['backend.users.backends.EmailBackend', 'django.contrib.auth.backends.ModelBackend']

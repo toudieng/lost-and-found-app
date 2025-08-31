@@ -12,6 +12,12 @@ from django.conf import settings
 from django.contrib import messages
 from django.shortcuts import render, redirect
 from backend.users.forms import PolicierForm
+from django.core.mail import send_mail
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect, get_object_or_404
+from django.contrib import messages
+from backend.objets.models import Declaration
+
 # --- Pages publiques ---
 def home(request):
     return render(request, "frontend/home.html")
@@ -61,21 +67,21 @@ def planifier_restitution(request):
 
 
 # --- Dashboard Administrateur ---
-#@staff_member_required
+@login_required(login_url='login')
 def dashboard_admin(request):
     return render(request, "frontend/admin/dashboard_admin.html")
 
-#@staff_member_required
+
 def gerer_commissariats(request):
     commissariats = Commissariat.objects.all()
     return render(request, "frontend/admin/gerer_commissariats.html", {"commissariats": commissariats})
 
-#@staff_member_required
+
 def gerer_utilisateurs(request):
     # plus tard tu utiliseras User.objects.all()
     return render(request, "frontend/admin/gerer_utilisateurs.html")
 
-#@staff_member_required
+
 def voir_stats(request):
     # Exemple : nombre d’objets déclarés et restitués
     nb_objets = Objet.objects.count()
@@ -85,7 +91,7 @@ def voir_stats(request):
         "nb_restitutions": nb_restitutions
     })
 
-#@login_required(login_url='login')
+@login_required(login_url='login')
 def ajouter_commissariat(request):
     # Vérifier que l'utilisateur est admin
     if request.user.role != 'admin':
@@ -142,3 +148,66 @@ def creer_policier(request):
         form = PolicierForm()
     
     return render(request, "frontend/admin/creer_policier.html", {"form": form})
+
+
+
+
+@login_required
+def je_le_trouve(request, declaration_id):
+    declaration = get_object_or_404(Declaration, id=declaration_id)
+
+    if declaration.est_perdu:
+        declaration.est_perdu = False  # Marque comme trouvé
+        declaration.trouve_par = request.user
+        declaration.save()
+
+        if declaration.citoyen and declaration.citoyen.email:
+            send_mail(
+                subject=f"[Objet Perdu] Votre objet '{declaration.objet.nom}' a été trouvé !",
+                message=(
+                    f"Bonjour {declaration.citoyen.username},\n\n"
+                    f"L'objet que vous avez déclaré comme perdu a été signalé comme trouvé par {request.user.username} ({request.user.email}).\n"
+                    f"ID de la déclaration : {declaration.id}\n"
+                    f"Consultez les détails ici : http://127.0.0.1:8000/objets/{declaration.id}/\n\n"
+                    f"Merci !"
+                ),
+                from_email=None,
+                recipient_list=[declaration.citoyen.email],
+                fail_silently=False,
+            )
+
+        messages.success(request, f"Merci ! Vous avez signalé que '{declaration.objet.nom}' a été trouvé.")
+    else:
+        messages.error(request, "Cet objet n'est pas déclaré comme perdu.")
+
+    return redirect("liste_objets")
+
+
+@login_required
+def ca_m_appartient(request, declaration_id):
+    declaration = get_object_or_404(Declaration, id=declaration_id)
+
+    if not declaration.est_perdu:
+        declaration.reclame_par = request.user
+        declaration.save()
+
+        if declaration.citoyen and declaration.citoyen.email:
+            send_mail(
+                subject=f"[Objet Trouvé] Votre objet '{declaration.objet.nom}' a été réclamé !",
+                message=(
+                    f"Bonjour {declaration.citoyen.username},\n\n"
+                    f"L'objet que vous avez déclaré comme trouvé a été réclamé par {request.user.username} ({request.user.email}).\n"
+                    f"ID de la déclaration : {declaration.id}\n"
+                    f"Consultez les détails ici : http://127.0.0.1:8000/objets/{declaration.id}/\n\n"
+                    f"Merci !"
+                ),
+                from_email=None,
+                recipient_list=[declaration.citoyen.email],
+                fail_silently=False,
+            )
+
+        messages.success(request, f"Vous avez réclamé l'objet '{declaration.objet.nom}'.")
+    else:
+        messages.error(request, "Cet objet n'est pas déclaré comme trouvé.")
+
+    return redirect("liste_objets")

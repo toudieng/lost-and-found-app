@@ -9,7 +9,8 @@ urlpatterns = [
     path("objets/", views.liste_objets, name="liste_objets"),
     path("objets/<int:pk>/", views.objet_detail, name="objet_detail"),
     path("declarer/", declarer_objet, name="declarer_objet"),
-
+    path('je-le-trouve/<int:declaration_id>/', views.je_le_trouve, name='je_le_trouve'),
+    path('ca-m-appartient/<int:declaration_id>/', views.ca_m_appartient, name='ca_m_appartient'),
     # --- Policier ---
     path("dashboard/policier/", views.dashboard_policier, name="dashboard_policier"),
     path("dashboard/policier/objets/", views.liste_objets_declares, name="liste_objets_declares"),

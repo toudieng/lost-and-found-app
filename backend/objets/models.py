@@ -19,6 +19,7 @@ class Objet(models.Model):
         return self.nom
 
 
+
 class Declaration(models.Model):
     citoyen = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -39,8 +40,25 @@ class Declaration(models.Model):
     description = models.TextField(blank=True, null=True, verbose_name="Description")
     image = models.ImageField(upload_to='declarations/', blank=True, null=True, verbose_name="Image")
 
+    # Suivi de l'interaction pour notifications
+    trouve_par = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True, blank=True,
+        related_name='objets_trouves',
+        verbose_name="Trouvé par"
+    )
+    reclame_par = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True, blank=True,
+        related_name='objets_reclames',
+        verbose_name="Réclamé par"
+    )
+
     def __str__(self):
-        return f"{'Perte' if self.est_perdu else 'Trouvaille'} - {self.objet}"
+        statut = "Perdu" if self.est_perdu else "Trouvé"
+        return f"{statut} - {self.objet.nom if self.objet else 'Objet inconnu'}"
 
 
 class Restitution(models.Model):
