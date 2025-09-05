@@ -64,17 +64,34 @@ from datetime import datetime
 
 @login_required
 
-
 def objets_reclames(request):
+    if not request.user.role == "policier":
+        messages.error(request, "⚠️ Accès réservé aux policiers.")
+        return redirect("home")
+
+    # Récupère uniquement les déclarations avec un objet et un ID valide
+    declarations = Declaration.objects.filter(
+        objet__isnull=False,
+        id__isnull=False,
+        reclame_par__isnull=False
+    ).order_by('-date_declaration')
+
+    return render(request, "frontend/objets/objets_reclames.html", {"declarations": declarations})
+
+
+
+def objets_restitues(request):
     # Vérifie que l'utilisateur est policier
     if not request.user.role == "policier":
         messages.error(request, "⚠️ Accès réservé aux policiers.")
         return redirect("home")
 
-    # Récupère toutes les déclarations où l'objet a été réclamé
-    declarations = Declaration.objects.filter(reclame_par__isnull=False).order_by('-date_declaration')
+    # Tous les objets déjà restitués
+    restitutions = Restitution.objects.select_related('objet', 'citoyen', 'policier', 'commissariat').order_by('-date_restitution')
 
-    return render(request, "frontend/objets/objets_reclames.html", {"declarations": declarations})
+    return render(request, "frontend/objets/objets_restitues.html", {
+        "restitutions": restitutions
+    })
 
 @login_required
 def planifier_restitution(request, declaration_id):

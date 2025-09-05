@@ -17,9 +17,15 @@ urlpatterns = [
     path("dashboard/policier/objets/", views.liste_objets_declares, name="liste_objets_declares"),
     path("dashboard/policier/objets/<int:pk>/maj/", views.maj_objet, name="maj_objet"),
     path("dashboard/policier/restitutions/", views.historique_restitutions, name="historique_restitutions"),
-    path("dashboard/policier/planifier/", views.planifier_restitution, name="planifier_restitution"),
+    path(
+    "dashboard/policier/planifier/<int:declaration_id>/",
+    views.planifier_restitution,
+    name="planifier_restitution"
+),
+
     path('objets/supprimer/<int:objet_id>/', views.supprimer_objet, name='supprimer_objet'),
     path("objets/reclames/", views.objets_reclames, name="objets_reclames"),
+    path("dashboard/policier/objets/restitues/", views.objets_restitues, name="objets_restitues"),
 
     # --- Administrateur ---
     path("dashboard/admin/", views.dashboard_admin, name="dashboard_admin"),
