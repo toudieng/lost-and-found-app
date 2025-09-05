@@ -6,7 +6,8 @@ urlpatterns = [
     # --- Public ---
     path("", views.home, name="home"),
     path("contact/", views.contact, name="contact"),
-    path("objets/", views.liste_objets, name="liste_objets"),
+    path("objets/perdus/", views.objets_perdus, name="objets_perdus"),
+    path("objets/trouves/", views.objets_trouves, name="objets_trouves"),
     path("objets/<int:pk>/", views.objet_detail, name="objet_detail"),
     path("declarer/", declarer_objet, name="declarer_objet"),
     path('je-le-trouve/<int:declaration_id>/', views.je_le_trouve, name='je_le_trouve'),
