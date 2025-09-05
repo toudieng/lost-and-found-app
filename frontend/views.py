@@ -54,9 +54,20 @@ def maj_objet(request, pk):
         return redirect("liste_objets_declares")
     return render(request, "frontend/policier/maj_objet.html", {"objet": objet})
 
+
+
+@login_required
 def historique_restitutions(request):
-    restitutions = Restitution.objects.all()
-    return render(request, "frontend/policier/historique_restitutions.html", {"restitutions": restitutions})
+    # On récupère toutes les restitutions, triées par date décroissante
+    restitutions = Restitution.objects.select_related(
+        'objet', 'citoyen', 'policier', 'commissariat'
+    ).order_by('-date_restitution', '-heure_restitution')
+
+    return render(
+        request,
+        "frontend/policier/historique_restitutions.html",
+        {"restitutions": restitutions}
+    )
 
 
 from datetime import datetime
@@ -95,7 +106,6 @@ def objets_restitues(request):
 
 @login_required
 def planifier_restitution(request, declaration_id):
-    # Récupérer la déclaration correspondante
     declaration = get_object_or_404(Declaration, id=declaration_id)
 
     if request.method == "POST":
@@ -111,19 +121,12 @@ def planifier_restitution(request, declaration_id):
             declaration.objet.etat = "restitué"
             declaration.objet.save()
 
-            messages.success(
-                request,
-                f"La restitution de '{declaration.objet.nom}' a été planifiée avec succès !"
-            )
+            messages.success(request, f"La restitution de '{declaration.objet.nom}' a été planifiée !")
             return redirect("objets_reclames")
     else:
         form = RestitutionForm()
 
-    context = {
-        "declaration": declaration,
-        "form": form,
-    }
-    return render(request, "frontend/policier/planifier_restitution.html", context)
+    return render(request, "frontend/policier/planifier_restitution.html", {"declaration": declaration, "form": form})
 
 
 # --- Dashboard Administrateur ---
@@ -206,46 +209,33 @@ def creer_policier(request):
 def je_le_trouve(request, declaration_id):
     declaration = get_object_or_404(Declaration, id=declaration_id)
 
-    # Vérifie si l'objet est actuellement perdu
-    if declaration.objet.etat == "perdu":
-        declaration.objet.etat = "retrouvé"
-        declaration.objet.save()
-        declaration.trouve_par = request.user
+    if declaration.est_perdu:
+        declaration.est_perdu = False
+        declaration.trouve_par = request.user  # citoyen qui a trouvé
         declaration.save()
 
-        # Notification par email au citoyen qui a perdu l'objet
         if declaration.citoyen and declaration.citoyen.email:
             send_mail(
-                subject=f"[Objet Perdu] Votre objet '{declaration.objet.nom}' a été trouvé !",
-                message=(
-                    f"Bonjour {declaration.citoyen.username},\n\n"
-                    f"L'objet que vous avez déclaré comme perdu a été signalé comme trouvé par {request.user.username} ({request.user.email}).\n"
-                    f"ID de la déclaration : {declaration.id}\n"
-                    f"Consultez les détails ici : http://127.0.0.1:8000/objets/{declaration.id}/\n\n"
-                    "Merci !"
-                ),
-                from_email=None,
+                subject=f"[Objet Perdu] Votre objet {declaration.objet.nom} a été retrouvé",
+                message=f"Bonjour {declaration.citoyen.username},\n\nL'objet que vous avez déclaré perdu a été trouvé. Un policier planifiera la restitution.",
+                from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=[declaration.citoyen.email],
-                fail_silently=False,
+                fail_silently=True,
             )
 
-        messages.success(request, f"Merci ! Vous avez signalé que '{declaration.objet.nom}' a été trouvé.")
+        messages.success(request, "Merci d'avoir signalé que vous avez trouvé cet objet !")
     else:
-        messages.error(request, "Cet objet n'est pas déclaré comme perdu.")
+        messages.warning(request, "Cet objet a déjà été signalé comme trouvé.")
 
-    return redirect("objets_perdus")
-
-
+    return redirect("objets_trouves")
 @login_required
 def ca_m_appartient(request, declaration_id):
     declaration = get_object_or_404(Declaration, id=declaration_id)
 
-    # Vérifie si l'objet est trouvé
+    # Vérifie si l'objet a été trouvé
     if declaration.objet.etat == "retrouvé":
         declaration.reclame_par = request.user
-        declaration.objet.etat = "restitué"  # marque l'objet comme restitué
-        declaration.objet.save()
-        declaration.save()
+        declaration.save()  # on ne change pas objet.etat
 
         # Notification par email au citoyen qui a trouvé l'objet
         if declaration.citoyen and declaration.citoyen.email:
@@ -258,7 +248,7 @@ def ca_m_appartient(request, declaration_id):
                     f"Consultez les détails ici : http://127.0.0.1:8000/objets/{declaration.id}/\n\n"
                     "Merci !"
                 ),
-                from_email=None,
+                from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=[declaration.citoyen.email],
                 fail_silently=False,
             )
