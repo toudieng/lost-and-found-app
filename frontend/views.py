@@ -67,7 +67,7 @@ def planifier_restitution(request):
 
 
 # --- Dashboard Administrateur ---
-@login_required(login_url='login')
+#@login_required(login_url='login')
 def dashboard_admin(request):
     return render(request, "frontend/admin/dashboard_admin.html")
 
