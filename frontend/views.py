@@ -205,15 +205,19 @@ def creer_policier(request):
 
 # --- Actions citoyen ---
 
+
 @login_required
 def je_le_trouve(request, declaration_id):
     declaration = get_object_or_404(Declaration, id=declaration_id)
 
-    if declaration.est_perdu:
-        declaration.est_perdu = False
-        declaration.trouve_par = request.user  # citoyen qui a trouvé
+    # Vérifie que l'objet est toujours "perdu"
+    if declaration.objet.etat == "perdu":
+        declaration.objet.etat = "retrouvé"       # Objet trouvé, mais pas encore restitué
+        declaration.trouve_par = request.user     # Citoyen qui a trouvé l'objet
+        declaration.objet.save()
         declaration.save()
 
+        # Notification par email au déclarant
         if declaration.citoyen and declaration.citoyen.email:
             send_mail(
                 subject=f"[Objet Perdu] Votre objet {declaration.objet.nom} a été retrouvé",
@@ -225,9 +229,10 @@ def je_le_trouve(request, declaration_id):
 
         messages.success(request, "Merci d'avoir signalé que vous avez trouvé cet objet !")
     else:
-        messages.warning(request, "Cet objet a déjà été signalé comme trouvé.")
+        messages.warning(request, "Cet objet a déjà été signalé comme trouvé ou restitué.")
 
     return redirect("objets_trouves")
+
 @login_required
 def ca_m_appartient(request, declaration_id):
     declaration = get_object_or_404(Declaration, id=declaration_id)
