@@ -6,6 +6,9 @@ from django.conf import settings
 import random, string
 from backend.objets.models import Objet, Declaration, Restitution, Commissariat
 from backend.users.forms import CommissariatForm, PolicierForm
+from backend.objets.forms import RestitutionForm
+
+
 
 
 # --- Pages publiques ---
@@ -34,6 +37,7 @@ def objet_detail(request, pk):
 
 
 # --- Dashboard Policier ---
+@login_required(login_url='login')
 def dashboard_policier(request):
     return render(request, "frontend/policier/dashboard_policier.html")
 
@@ -54,12 +58,13 @@ def historique_restitutions(request):
     restitutions = Restitution.objects.all()
     return render(request, "frontend/policier/historique_restitutions.html", {"restitutions": restitutions})
 
-def planifier_restitution(request):
-    if request.method == "POST":
-        pass
-    return render(request, "frontend/policier/planifier_restitution.html")
 
-#@login_required
+from datetime import datetime
+
+
+@login_required
+
+
 def objets_reclames(request):
     # Vérifie que l'utilisateur est policier
     if not request.user.role == "policier":
@@ -71,23 +76,42 @@ def objets_reclames(request):
 
     return render(request, "frontend/objets/objets_reclames.html", {"declarations": declarations})
 
-#@login_required
-def programmer_restitution(request, declaration_id):
+@login_required
+def planifier_restitution(request, declaration_id):
+    # Récupérer la déclaration correspondante
     declaration = get_object_or_404(Declaration, id=declaration_id)
 
-    if not request.user.role == "policier":
-        messages.error(request, "⚠️ Accès réservé aux policiers.")
-        return redirect("home")
+    if request.method == "POST":
+        form = RestitutionForm(request.POST)
+        if form.is_valid():
+            restitution = form.save(commit=False)
+            restitution.objet = declaration.objet
+            restitution.citoyen = declaration.reclame_par
+            restitution.policier = request.user
+            restitution.save()
 
-    # Marque l'objet comme restitué ou redirige vers un formulaire de restitution
-    declaration.objet.etat = "restitué"
-    declaration.objet.save()
-    messages.success(request, f"✅ Restitution programmée pour '{declaration.objet.nom}'")
-    
-    return redirect("objets_reclames")
+            # Marquer l'objet comme restitué
+            declaration.objet.etat = "restitué"
+            declaration.objet.save()
+
+            messages.success(
+                request,
+                f"La restitution de '{declaration.objet.nom}' a été planifiée avec succès !"
+            )
+            return redirect("objets_reclames")
+    else:
+        form = RestitutionForm()
+
+    context = {
+        "declaration": declaration,
+        "form": form,
+    }
+    return render(request, "frontend/policier/planifier_restitution.html", context)
 
 
 # --- Dashboard Administrateur ---
+
+@login_required(login_url='login')
 def dashboard_admin(request):
     return render(request, "frontend/admin/dashboard_admin.html")
 

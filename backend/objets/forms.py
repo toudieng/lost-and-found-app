@@ -1,4 +1,6 @@
 from django import forms
+
+from backend.users.models import Commissariat
 from .models import Declaration, Objet
 
 
@@ -72,3 +74,18 @@ class DeclarationForm(forms.ModelForm):
             objet.save()
             declaration.save()
         return declaration
+
+class RestitutionForm(forms.Form):
+    date_restitution = forms.DateField(
+        widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+        label="Date de restitution"
+    )
+    heure_restitution = forms.TimeField(
+        widget=forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}),
+        label="Heure de restitution"
+    )
+    commissariat = forms.ModelChoiceField(
+        queryset=Commissariat.objects.all(),
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        empty_label="-- Sélectionnez un commissariat --"
+    )

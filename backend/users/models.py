@@ -12,7 +12,7 @@ class Utilisateur(AbstractUser):
         ('policier', 'Policier'),
         ('citoyen', 'Citoyen'),
     )
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='admin')
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='policier')
     commissariat = models.ForeignKey(
         'Commissariat',
         on_delete=models.SET_NULL,

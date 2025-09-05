@@ -1,0 +1,46 @@
+{% extends "frontend/base.html" %}
+{% load static %}
+
+{% block title %}Objets Réclamés{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/objets.css' %}">
+
+<div class="container mt-5">
+    <h2 class="mb-4 text-center fw-bold">📌 Objets Réclamés</h2>
+    <div class="row">
+        {% for declaration in declarations %}
+            <div class="col-md-6 mb-4">
+                <div class="card shadow-sm h-100 border-0">
+                    {% if declaration.image %}
+                        <img src="{{ declaration.image.url }}" class="card-img-top rounded-top" style="height:200px; object-fit:cover;" alt="Image de {{ declaration.objet.nom }}">
+                    {% else %}
+                        <img src="{% static 'img/default_objet.png' %}" class="card-img-top rounded-top" style="height:200px; object-fit:cover;" alt="Image par défaut">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold">{{ declaration.objet.nom }} 🟡 Réclamé</h5>
+                        <p class="card-text small text-muted">{{ declaration.description|truncatewords:20 }}</p>
+                        <ul class="list-unstyled small">
+                            <li>📍 Lieu: {{ declaration.lieu }}</li>
+                            <li>🕒 Date déclaration: {{ declaration.date_declaration|date:"d/m/Y H:i" }}</li>
+                            <li>🙋 Réclamé par: {{ declaration.reclame_par.username }} ({{ declaration.reclame_par.email }})</li>
+                            {% if declaration.citoyen %}
+                                <li>👤 Déclarant: {{ declaration.citoyen.username }} ({{ declaration.citoyen.email }})</li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                    <div class="card-footer text-end bg-light">
+                        <a href="{% url 'planifier_restitution' declaration.id %}" class="btn btn-sm btn-primary">
+                            📅 Programmer restitution
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info text-center">Aucun objet réclamé pour le moment.</div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
