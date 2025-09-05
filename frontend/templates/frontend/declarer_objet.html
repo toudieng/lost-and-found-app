@@ -16,13 +16,13 @@
             <form method="post" enctype="multipart/form-data" class="small">
                 {% csrf_token %}
 
-                <!-- Objet lié -->
+                <!-- Nom de l'objet -->
                 <div class="mb-3">
-                    <label for="{{ form.objet.id_for_label }}" class="form-label fw-bold">
-                        🏷️ Objet <span class="text-danger">*</span>
+                    <label for="{{ form.nom_objet.id_for_label }}" class="form-label fw-bold">
+                        🏷️ Nom de l'objet <span class="text-danger">*</span>
                     </label>
-                    {{ form.objet|add_class:"form-control form-control-sm" }}
-                    {% for error in form.objet.errors %}
+                    {{ form.nom_objet|add_class:"form-control form-control-sm" }}
+                    {% for error in form.nom_objet.errors %}
                         <div class="text-danger small">{{ error }}</div>
                     {% endfor %}
                 </div>

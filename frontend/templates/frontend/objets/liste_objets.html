@@ -1,0 +1,93 @@
+{% extends "frontend/base.html" %}
+{% load static %}
+{% block title %}Liste des Objets{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/objets.css' %}">
+
+<div class="container mt-5">
+    <h2 class="mb-4 text-center fw-bold">📦 Liste des Objets Déclarés</h2>
+
+    <!-- Objets Perdus -->
+    <h4 class="section-title mt-4">❌ Objets Perdus</h4>
+    <div class="row">
+        {% for objet in objets %}
+            {% with declaration=objet.declaration_set.first %}
+                {% if declaration and declaration.est_perdu %}
+                <div class="col-md-4 mb-4">
+                    <div class="card objet-card shadow-sm h-100 border-0">
+                        {% if declaration.image %}
+                            <img src="{{ declaration.image.url }}" class="card-img-top rounded-top" style="height:200px; object-fit:cover;" alt="Image de {{ objet.nom }}" loading="lazy">
+                        {% else %}
+                            <img src="{% static 'img/default_objet.png' %}" class="card-img-top rounded-top" style="height:200px; object-fit:cover;" alt="Image par défaut" loading="lazy">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold text-danger">🔴 {{ objet.nom }}</h5>
+                            <p class="card-text small text-muted">{{ objet.description|truncatewords:20 }}</p>
+                            <span class="badge bg-danger badge-custom">Perdu</span>
+                        </div>
+                        <div class="card-footer bg-light text-end">
+                            <a href="{% url 'objet_detail' objet.id %}" class="btn btn-sm btn-outline-danger">🔍 Voir détails</a>
+
+                            {% if user.is_authenticated %}
+                                <form method="POST" action="{% url 'je_le_trouve' declaration.id %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-success">🍏 Je l’ai trouvé</button>
+                                </form>
+                            {% else %}
+                                <a href="{% url 'login' %}" class="btn btn-sm btn-outline-secondary">Connectez-vous pour signaler</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            {% endwith %}
+        {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info text-center">Aucun objet perdu trouvé.</div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Objets Trouvés -->
+    <h4 class="section-title mt-5">✅ Objets Trouvés</h4>
+    <div class="row">
+        {% for objet in objets %}
+            {% with declaration=objet.declaration_set.first %}
+                {% if declaration and not declaration.est_perdu %}
+                <div class="col-md-4 mb-4">
+                    <div class="card objet-card shadow-sm h-100 border-0">
+                        {% if declaration.image %}
+                            <img src="{{ declaration.image.url }}" class="card-img-top rounded-top" style="height:200px; object-fit:cover;" alt="Image de {{ objet.nom }}" loading="lazy">
+                        {% else %}
+                            <img src="{% static 'img/default_objet.png' %}" class="card-img-top rounded-top" style="height:200px; object-fit:cover;" alt="Image par défaut" loading="lazy">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold text-success">🟢 {{ objet.nom }}</h5>
+                            <p class="card-text small text-muted">{{ objet.description|truncatewords:20 }}</p>
+                            <span class="badge bg-success badge-custom">Trouvé</span>
+                        </div>
+                        <div class="card-footer bg-light text-end">
+                            <a href="{% url 'objet_detail' objet.id %}" class="btn btn-sm btn-outline-success">🔍 Voir détails</a>
+
+                            {% if user.is_authenticated %}
+                                <form method="POST" action="{% url 'ca_m_appartient' declaration.id %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-primary">💙 Ça m’appartient</button>
+                                </form>
+                            {% else %}
+                                <a href="{% url 'login' %}" class="btn btn-sm btn-primary">💙 Ça m’appartient</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            {% endwith %}
+        {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info text-center">Aucun objet trouvé.</div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

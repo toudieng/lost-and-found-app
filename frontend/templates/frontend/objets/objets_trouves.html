@@ -9,36 +9,34 @@
 <div class="container mt-5">
     <h2 class="mb-4 text-center fw-bold">✅ Objets Trouvés</h2>
     <div class="row">
-        {% for objet in objets %}
-            {% with declaration=objet.declaration_set.first %}
-                {% if declaration and not declaration.est_perdu %}
-                    <div class="col-md-4 mb-4">
-                        <div class="card objet-card shadow-sm h-100 border-0">
-                            {% if declaration.image %}
-                                <img src="{{ declaration.image.url }}" class="card-img-top rounded-top" style="height:200px; object-fit:cover;" alt="Image de {{ objet.nom }}">
+        {% for declaration in declarations %}
+            {% if declaration.objet.etat == "retrouvé" %}
+                <div class="col-md-4 mb-4">
+                    <div class="card objet-card shadow-sm h-100 border-0">
+                        {% if declaration.image %}
+                            <img src="{{ declaration.image.url }}" class="card-img-top rounded-top" style="height:200px; object-fit:cover;" alt="Image de {{ declaration.objet.nom }}">
+                        {% else %}
+                            <img src="{% static 'img/default_objet.png' %}" class="card-img-top rounded-top" style="height:200px; object-fit:cover;" alt="Image par défaut">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold text-success">🟢 {{ declaration.objet.nom }}</h5>
+                            <p class="card-text small text-muted">{{ declaration.description|truncatewords:20 }}</p>
+                            <span class="badge bg-success">Trouvé</span>
+                        </div>
+                        <div class="card-footer bg-light text-end">
+                            <a href="{% url 'objet_detail' declaration.objet.id %}" class="btn btn-sm btn-outline-success">🔍 Voir détails</a>
+                            {% if user.is_authenticated %}
+                                <form method="POST" action="{% url 'ca_m_appartient' declaration.id %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-primary">💙 Ça m’appartient</button>
+                                </form>
                             {% else %}
-                                <img src="{% static 'img/default_objet.png' %}" class="card-img-top rounded-top" style="height:200px; object-fit:cover;" alt="Image par défaut">
+                                <a href="{% url 'login' %}" class="btn btn-sm btn-primary">💙 Ça m’appartient</a>
                             {% endif %}
-                            <div class="card-body">
-                                <h5 class="card-title fw-bold text-success">🟢 {{ objet.nom }}</h5>
-                                <p class="card-text small text-muted">{{ objet.description|truncatewords:20 }}</p>
-                                <span class="badge bg-success">Trouvé</span>
-                            </div>
-                            <div class="card-footer bg-light text-end">
-                                <a href="{% url 'objet_detail' objet.id %}" class="btn btn-sm btn-outline-success">🔍 Voir détails</a>
-                                {% if user.is_authenticated %}
-                                    <form method="POST" action="{% url 'ca_m_appartient' declaration.id %}" class="d-inline">
-                                        {% csrf_token %}
-                                        <button type="submit" class="btn btn-sm btn-primary">💙 Ça m’appartient</button>
-                                    </form>
-                                {% else %}
-                                    <a href="{% url 'login' %}" class="btn btn-sm btn-primary">💙 Ça m’appartient</a>
-                                {% endif %}
-                            </div>
                         </div>
                     </div>
-                {% endif %}
-            {% endwith %}
+                </div>
+            {% endif %}
         {% empty %}
             <div class="col-12">
                 <div class="alert alert-info text-center">Aucun objet trouvé.</div>
