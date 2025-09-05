@@ -116,9 +116,9 @@ def supprimer_objet(request, objet_id):
     if request.method == "POST":
         objet.delete()
         messages.success(request, "Objet supprimé avec succès.")
-        return redirect('liste_objets')  # nom de la vue liste
-    # Si quelqu'un accède via GET, rediriger
-    return redirect('liste_objets')
+        return redirect('liste_objets_declares')  
+
+    return redirect('liste_objets_declares')
 #formulaire de creation de policier par admin
 def creer_policier(request):
     if request.method == "POST":
