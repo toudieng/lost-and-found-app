@@ -32,18 +32,22 @@ class DeclarationForm(forms.ModelForm):
         label="Photo (facultative)"
     )
 
+    # Nouveau champ pour remplacer est_perdu
+    etat = forms.ChoiceField(
+        choices=[("perdu", "Objet perdu"), ("retrouvé", "Objet trouvé")],
+        widget=forms.RadioSelect,
+        label="Type de déclaration"
+    )
+
     class Meta:
         model = Declaration
-        fields = ['lieu', 'est_perdu', 'description', 'image']
+        fields = ['lieu', 'etat', 'description', 'image']
         widgets = {
             'lieu': forms.TextInput(
                 attrs={
                     'class': 'form-control',
                     'placeholder': "Lieu où l’objet a été perdu/trouvé"
                 }
-            ),
-            'est_perdu': forms.RadioSelect(
-                choices=[(True, 'Objet perdu'), (False, 'Objet trouvé')]
             ),
         }
 
@@ -54,11 +58,10 @@ class DeclarationForm(forms.ModelForm):
         - l'associe à la Déclaration
         - enregistre le citoyen si fourni
         """
-        # Création ou récupération de l'objet
         objet = Objet.objects.create(
             nom=self.cleaned_data['nom_objet'],
             description=self.cleaned_data.get('description', ''),
-            etat="perdu" if self.cleaned_data['est_perdu'] else "retrouvé"
+            etat=self.cleaned_data['etat']  # utilise maintenant le champ etat
         )
 
         declaration = super().save(commit=False)
