@@ -85,11 +85,15 @@ class Declaration(models.Model):
         return f"Déclaration - {self.objet.nom if self.objet else 'Objet inconnu'}"
 
 
+
+
+
 class Restitution(models.Model):
     objet = models.ForeignKey(
-        Objet,
+        'Objet',  
         on_delete=models.CASCADE,
         null=True,
+        related_name="restitutions",  
         verbose_name="Objet restitué"
     )
     citoyen = models.ForeignKey(
@@ -106,16 +110,36 @@ class Restitution(models.Model):
         related_name="policier_restitutions",
         limit_choices_to={'role': 'policier'},
         null=True,
-        verbose_name="Policier"
+        verbose_name="Policier planificateur"
+    )
+    restitué_par = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        limit_choices_to={'role': 'policier'},
+        related_name="restitutions_effectuees",
+        verbose_name="Restitué par"
     )
     commissariat = models.ForeignKey(
-        Commissariat,
+        Commissariat,  # utilisation du modèle importé
         on_delete=models.CASCADE,
         null=True,
         verbose_name="Commissariat"
     )
-    date_restitution = models.DateField(auto_now_add=True, verbose_name="Date de restitution")
-    heure_restitution = models.TimeField(auto_now_add=True, verbose_name="Heure de restitution")
+    date_restitution = models.DateField(
+        auto_now_add=True,
+        verbose_name="Date de restitution"
+    )
+    heure_restitution = models.TimeField(
+        auto_now_add=True,
+        verbose_name="Heure de restitution"
+    )
 
     def __str__(self):
         return f"Restitution de {self.objet} à {self.citoyen}"
+
+    class Meta:
+        verbose_name = "Restitution"
+        verbose_name_plural = "Restitutions"
+        ordering = ['-date_restitution', '-heure_restitution']

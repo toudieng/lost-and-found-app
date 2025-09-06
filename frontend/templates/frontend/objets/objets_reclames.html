@@ -20,11 +20,9 @@
                     <div class="card-body d-flex flex-column">
                         <h5 class="card-title fw-bold">
                             {{ declaration.objet.nom }}
-                            {% if declaration.objet.etat == 'restitué' %}
-                                <span class="badge bg-success">🟢 Restitué</span>
-                            {% else %}
-                                <span class="badge bg-warning text-dark">🟡 Réclamé</span>
-                            {% endif %}
+                            <span class="badge {% if declaration.objet.etat == 'restitué' %}bg-success{% else %}bg-warning text-dark{% endif %}">
+                                {% if declaration.objet.etat == 'restitué' %}🟢 Restitué{% else %}🟡 Réclamé{% endif %}
+                            </span>
                         </h5>
                         <p class="card-text small text-muted">
                             {{ declaration.description|default:"Aucune description"|truncatewords:20 }}
@@ -42,12 +40,24 @@
                             {% endif %}
                         </ul>
                         <div class="mt-auto text-end">
-                            {% if declaration.objet.etat != 'restitué' and declaration.id %}
-                                <a href="{% url 'planifier_restitution' declaration.id %}" class="btn btn-sm btn-primary">
-                                    📅 Programmer restitution
-                                </a>
+                            {% if declaration.objet.etat != 'restitué' %}
+                                {% if declaration.objet.restitutions.exists %}
+                                    {% with restitution=declaration.objet.restitutions.last %}
+                                        {% if restitution.policier == user %}
+                                            <a href="{% url 'marquer_restitue' restitution.id %}" class="btn btn-success btn-sm">
+                                                ✅ Marquer comme Restitué
+                                            </a>
+                                        {% else %}
+                                            <span class="text-muted">Restitution planifiée par un autre policier</span>
+                                        {% endif %}
+                                    {% endwith %}
+                                {% else %}
+                                    <a href="{% url 'planifier_restitution' declaration.id %}" class="btn btn-sm btn-primary">
+                                        📅 Programmer restitution
+                                    </a>
+                                {% endif %}
                             {% else %}
-                                <span class="text-muted">Restitution planifiée</span>
+                                <span class="badge bg-success">🟢 Restitué</span>
                             {% endif %}
                         </div>
                     </div>

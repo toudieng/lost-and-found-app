@@ -17,11 +17,13 @@ urlpatterns = [
     path("dashboard/policier/objets/", views.liste_objets_declares, name="liste_objets_declares"),
     path("dashboard/policier/objets/<int:pk>/maj/", views.maj_objet, name="maj_objet"),
     path("dashboard/policier/restitutions/", views.historique_restitutions, name="historique_restitutions"),
+     path("marquer/<int:restitution_id>/", views.marquer_restitue, name="marquer_restitue"),
     path(
     "dashboard/policier/planifier/<int:declaration_id>/",
     views.planifier_restitution,
     name="planifier_restitution"
 ),
+ path("supprimer/<int:restitution_id>/", views.supprimer_restitution, name="supprimer_restitution"),
 
     path('objets/supprimer/<int:objet_id>/', views.supprimer_objet, name='supprimer_objet'),
     path("objets/reclames/", views.objets_reclames, name="objets_reclames"),

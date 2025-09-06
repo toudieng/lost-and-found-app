@@ -13,6 +13,9 @@
                     <tr>
                         <th>ID</th>
                         <th>Objet</th>
+                        <th>Propriétaire</th>
+                        <th>Restitué par</th>
+                        <th>Policier planificateur</th>
                         <th>État de l'objet</th>
                         <th>Date</th>
                         <th>Heure</th>
@@ -27,6 +30,31 @@
                         <td>{{ restitution.id }}</td>
                         <td>{{ restitution.objet.nom }}</td>
                         <td>
+                            {% if restitution.citoyen %}
+                                {{ restitution.citoyen.username }} ({{ restitution.citoyen.email }})
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if restitution.objet.etat == "restitué" %}
+                                {% if restitution.objet.trouve_par %}
+                                    {{ restitution.objet.trouve_par.username }} ({{ restitution.objet.trouve_par.email|default:"N/A" }})
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if restitution.policier %}
+                                {{ restitution.policier.username }} ({{ restitution.policier.email|default:"N/A" }})
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                        <td>
                             {% if restitution.objet.etat == "perdu" %}
                                 <span class="badge bg-danger">Perdu</span>
                             {% elif restitution.objet.etat == "retrouvé" %}
@@ -39,7 +67,7 @@
                         </td>
                         <td>{{ restitution.date_restitution|date:"d/m/Y" }}</td>
                         <td>{{ restitution.heure_restitution|time:"H:i" }}</td>
-                        <td>{{ restitution.commissariat.nom }}</td>
+                        <td>{{ restitution.commissariat.nom|default:"N/A" }}</td>
                         <td>
                             {% if restitution.objet.etat == "restitué" %}
                                 <span class="badge bg-success">Effectué</span>
@@ -49,7 +77,7 @@
                         </td>
                         <td>
                             {% if restitution.objet.etat != "restitué" %}
-                                <form action="{% url 'effectuer_restitution' restitution.id %}" method="post" style="display:inline;">
+                                <form action="{% url 'marquer_restitue' restitution.id %}" method="post" style="display:inline;">
                                     {% csrf_token %}
                                     <button type="submit" class="btn btn-sm btn-success">Marquer effectué</button>
                                 </form>
