@@ -8,9 +8,6 @@ from backend.objets.models import Objet, Declaration, Restitution, Commissariat
 from backend.users.forms import CommissariatForm, PolicierForm
 from backend.objets.forms import RestitutionForm
 from datetime import datetime
-
-
-
 # --- Pages publiques ---
 def home(request):
     return render(request, "frontend/home.html")
@@ -209,6 +206,10 @@ def marquer_restitue(request, restitution_id):
     )
     return redirect("objets_reclames")
 
+
+
+
+
 # --- Dashboard Administrateur ---
 
 @login_required(login_url='login')
@@ -281,6 +282,11 @@ def creer_policier(request):
         form = PolicierForm()
     
     return render(request, "frontend/admin/creer_policier.html", {"form": form})
+
+
+
+
+
 
 
 # --- Actions citoyen ---

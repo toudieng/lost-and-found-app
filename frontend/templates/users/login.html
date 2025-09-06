@@ -3,45 +3,77 @@
 
 {% block title %}Connexion{% endblock %}
 
+{% block extra_css %}
+<style>
+    .form-container {
+        background: #fff;
+        padding: 2rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .text-error {
+        color: #dc3545;
+        font-size: 0.8rem;
+    }
+
+    .form-title {
+        color: #6c1e3d;
+        font-weight: 700;
+    }
+
+    .btn-submit {
+        background-color: #6c1e3d;
+        border-color: #6c1e3d;
+    }
+
+    .btn-submit:hover {
+        background-color: #53162b;
+        border-color: #53162b;
+    }
+
+    .input-xs {
+        height: 38px;
+        font-size: 0.9rem;
+        padding: 0.375rem 0.75rem;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="row justify-content-center mt-5">
-    <div class="col-md-5">
-        <h4 class="mb-3 text-center">🔑 Connexion</h4>
+    <div class="col-md-5 col-lg-4">
+        <div class="form-container">
+            <h4 class="mb-4 text-center form-title">🔑 Connexion</h4>
 
-        {% if form.errors %}
-            <div class="alert alert-danger py-2 px-3 small">
-                Adresse e-mail ou mot de passe incorrect.
-            </div>
-        {% endif %}
+            {% if form.errors %}
+                <div class="alert alert-danger py-2 px-3 small">
+                    Adresse e-mail ou mot de passe incorrect.
+                </div>
+            {% endif %}
 
-        <form method="POST" novalidate class="small">
-            {% csrf_token %}
+            <form method="POST" novalidate>
+                {% csrf_token %}
 
-            <!-- Email -->
-            <div class="mb-2">
-                <label for="email" class="form-label fw-bold text-dark small">
-                    📧 Adresse e-mail
-                </label>
-                <input type="email" class="form-control form-control-sm" id="email" name="email" required>
-            </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label fw-bold">📧 Adresse e-mail</label>
+                    <input type="email" class="form-control input-xs" id="email" name="email" required>
+                </div>
 
-            <!-- Password -->
-            <div class="mb-2">
-                <label for="password" class="form-label fw-bold text-dark small">
-                    🔒 Mot de passe
-                </label>
-                <input type="password" class="form-control form-control-sm" id="password" name="password" required>
-            </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label fw-bold">🔒 Mot de passe</label>
+                    <input type="password" class="form-control input-xs" id="password" name="password" required>
+                </div>
 
-            <!-- Bouton -->
-            <button type="submit" class="btn btn-primary btn-sm w-100 mt-2 fw-bold">
-                ✅ Se connecter
-            </button>
-        </form>
+                <button type="submit" class="btn btn-submit btn-sm w-100 fw-bold">
+                    ✅ Se connecter
+                </button>
+            </form>
 
-        <p class="mt-3 text-center small">
-            Pas de compte ? <a href="{% url 'register' %}" class="fw-bold">Inscrivez-vous ici</a>
-        </p>
+            <p class="mt-3 text-center small">
+                Pas de compte ? <a href="{% url 'register' %}" class="fw-bold text-decoration-none">Inscrivez-vous ici</a>
+            </p>
+        </div>
     </div>
 </div>
 {% endblock %}
