@@ -135,7 +135,6 @@ def planifier_restitution(request, declaration_id):
         form = RestitutionForm(request.POST)
         if form.is_valid():
             cd = form.cleaned_data
-            # Création de la restitution (⚠️ sans changer le statut)
             restitution = Restitution.objects.create(
                 objet=declaration.objet,
                 citoyen=declaration.reclame_par,
@@ -145,10 +144,7 @@ def planifier_restitution(request, declaration_id):
                 commissariat=cd["commissariat"],
             )
 
-            # ⚠️ NE PAS marquer l'objet comme restitué ici
-            # Ce sera fait quand le policier confirmera la remise effective
-
-            # Préparer les infos du mail
+          
             sujet = f"[Restitution planifiée] {declaration.objet.nom}"
             message = (
                 f"Bonjour,\n\n"
@@ -195,12 +191,10 @@ def planifier_restitution(request, declaration_id):
 def marquer_restitue(request, restitution_id):
     restitution = get_object_or_404(Restitution, id=restitution_id)
 
-    # Seul le policier planificateur peut confirmer la restitution
     if restitution.policier != request.user:
         messages.error(request, "Vous n’êtes pas autorisé à valider cette restitution.")
         return redirect("objets_reclames")
 
-    # Marquer l'objet comme restitué
     objet = restitution.objet
     objet.etat = "restitué"
     objet.save()
@@ -298,9 +292,8 @@ def je_le_trouve(request, declaration_id):
 
     # Vérifie que l'objet est toujours "perdu"
     if declaration.objet.etat == "perdu":
-        declaration.objet.etat = "retrouvé"       # Objet trouvé, mais pas encore restitué
-        declaration.trouve_par = request.user     # Citoyen qui a trouvé l'objet
-        declaration.objet.save()
+        declaration.objet.etat = "retrouvé"       
+        declaration.trouve_par = request.user     
         declaration.save()
 
         # Notification par email au déclarant
