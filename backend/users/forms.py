@@ -1,6 +1,8 @@
-from django import forms
-from django.contrib.auth.forms import UserCreationForm
+from django import forms # pyright: ignore[reportMissingModuleSource]
+from django.contrib.auth.forms import UserCreationForm # pyright: ignore[reportMissingModuleSource]
 from .models import Utilisateur, Commissariat
+
+# Formulaire pour créer un utilisateur citoyen
 class UtilisateurCreationForm(UserCreationForm):
     telephone = forms.CharField(
         required=False,
@@ -24,8 +26,6 @@ class UtilisateurCreationForm(UserCreationForm):
             user.save()
         return user
 
-
-
 # Formulaire pour ajouter un commissariat
 class CommissariatForm(forms.ModelForm):
     class Meta:
@@ -42,17 +42,22 @@ class CommissariatForm(forms.ModelForm):
             }),
         }
 
-
-#  Formulaire spécifique pour créer un policier
+# Formulaire pour créer un policier
 class PolicierForm(forms.ModelForm):
     class Meta:
         model = Utilisateur
         fields = ["email", "first_name", "last_name", "telephone", "commissariat"]
-    
+        widgets = {
+            "email": forms.EmailInput(attrs={'class': 'form-control input-xs'}),
+            "first_name": forms.TextInput(attrs={'class': 'form-control input-xs'}),
+            "last_name": forms.TextInput(attrs={'class': 'form-control input-xs'}),
+            "telephone": forms.TextInput(attrs={'class': 'form-control input-xs'}),
+            "commissariat": forms.Select(attrs={'class': 'form-control input-xs'}),
+        }
 
     def save(self, commit=True):
         user = super().save(commit=False)
-        user.role = "policier"  
+        user.role = "policier"
         if commit:
             user.save()
         return user
