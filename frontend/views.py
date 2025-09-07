@@ -207,6 +207,15 @@ def marquer_restitue(request, restitution_id):
     return redirect("objets_reclames")
 
 
+@login_required(login_url="login")
+def signaler_objets(request):
+    declarations = Declaration.objects.filter(objet__etat="retrouvé")
+
+    return render(
+        request,
+        "frontend/objets/signaler_objets.html",
+        {"declarations": declarations},
+    )
 
 
 

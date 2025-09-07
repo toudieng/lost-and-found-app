@@ -28,6 +28,8 @@ urlpatterns = [
     path('objets/supprimer/<int:objet_id>/', views.supprimer_objet, name='supprimer_objet'),
     path("objets/reclames/", views.objets_reclames, name="objets_reclames"),
     path("dashboard/policier/objets/restitues/", views.objets_restitues, name="objets_restitues"),
+    path("dashboard/policier/signalements/", views.signaler_objets, name="signaler_objets"),
+
 
     # --- Administrateur ---
     path("dashboard/admin/", views.dashboard_admin, name="dashboard_admin"),
