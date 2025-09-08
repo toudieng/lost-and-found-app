@@ -1,4 +1,5 @@
 {% extends "frontend/base.html" %}
+{% load static %}
 
 {% block title %}Planifier une restitution{% endblock %}
 
@@ -14,39 +15,56 @@
                     <form method="post">
                         {% csrf_token %}
 
-                        <!-- Objet pré-rempli -->
+                        <!-- Objet -->
                         <div class="mb-3">
                             <label class="form-label fw-semibold">Objet</label>
-                            <input type="text" class="form-control" value="{{ declaration.objet.nom }}" disabled>
-                            <input type="hidden" name="objet" value="{{ declaration.objet.id }}">
+                            <input type="text" class="form-control" 
+                                   value="{{ restitution.objet.nom }}" disabled>
+                            <input type="hidden" name="objet" value="{{ restitution.objet.id }}">
                         </div>
 
                         <!-- Réclamant -->
                         <div class="mb-3">
                             <label class="form-label fw-semibold">Réclamé par</label>
-                            <input type="text" class="form-control" value="{{ declaration.reclame_par.username }}" disabled>
-                            <input type="hidden" name="citoyen" value="{{ declaration.reclame_par.id }}">
+                            {% if declaration %}
+                                <input type="text" class="form-control" 
+                                       value="{{ declaration.reclame_par.username }}" disabled>
+                                <input type="hidden" name="citoyen" value="{{ declaration.reclame_par.id }}">
+                            {% else %}
+                                <input type="text" class="form-control" 
+                                       value="{{ restitution.citoyen.username }}" disabled>
+                                <input type="hidden" name="citoyen" value="{{ restitution.citoyen.id }}">
+                            {% endif %}
                         </div>
 
                         <!-- Date de restitution -->
                         <div class="mb-3">
                             <label for="date" class="form-label fw-semibold">Date de restitution</label>
-                            <input type="date" class="form-control" id="date" name="date_restitution" required>
+                            <input type="date" class="form-control" id="date" 
+                                   name="date_restitution" 
+                                   value="{{ form.date_restitution.value|default_if_none:'' }}" required>
                         </div>
 
                         <!-- Heure de restitution -->
                         <div class="mb-3">
                             <label for="heure" class="form-label fw-semibold">Heure</label>
-                            <input type="time" class="form-control" id="heure" name="heure_restitution" required>
+                            <input type="time" class="form-control" id="heure" 
+                                   name="heure_restitution" 
+                                   value="{{ form.heure_restitution.value|default_if_none:'' }}" required>
                         </div>
 
                         <!-- Commissariat -->
                         <div class="mb-3">
                             <label for="commissariat" class="form-label fw-semibold">Commissariat</label>
                             <select class="form-select" id="commissariat" name="commissariat" required>
-                                <option value="" disabled selected>-- Sélectionnez un commissariat --</option>
+                                <option value="" disabled {% if not form.commissariat.value %}selected{% endif %}>
+                                    -- Sélectionnez un commissariat --
+                                </option>
                                 {% for commissariat in commissariats %}
-                                    <option value="{{ commissariat.id }}">{{ commissariat.nom }}</option>
+                                    <option value="{{ commissariat.id }}"
+                                        {% if form.commissariat.value == commissariat.id %}selected{% endif %}>
+                                        {{ commissariat.nom }}
+                                    </option>
                                 {% empty %}
                                     <option disabled>Aucun commissariat disponible</option>
                                 {% endfor %}

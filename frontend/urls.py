@@ -19,16 +19,19 @@ urlpatterns = [
     path("dashboard/policier/restitutions/", views.historique_restitutions, name="historique_restitutions"),
      path("marquer/<int:restitution_id>/", views.marquer_restitue, name="marquer_restitue"),
     path(
-    "dashboard/policier/planifier/<int:declaration_id>/",
+    "dashboard/policier/planifier/<int:objet_id>/<str:type_objet>/",
     views.planifier_restitution,
     name="planifier_restitution"
 ),
+# Objets retrouvés en attente de restitution
+    path('objets/retrouves-attente/', views.objets_retrouves_attente, name='objets_retrouves_attente'),
+
  path("supprimer/<int:restitution_id>/", views.supprimer_restitution, name="supprimer_restitution"),
 
     path('objets/supprimer/<int:objet_id>/', views.supprimer_objet, name='supprimer_objet'),
     path("objets/reclames/", views.objets_reclames, name="objets_reclames"),
     path("dashboard/policier/objets/restitues/", views.objets_restitues, name="objets_restitues"),
-    path("dashboard/policier/signalements/", views.signaler_objets, name="signaler_objets"),
+
 
 
     # --- Administrateur ---

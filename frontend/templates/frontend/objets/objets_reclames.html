@@ -1,82 +1,27 @@
 {% extends "frontend/base.html" %}
-{% load static %}
-
-{% block title %}Objets Réclamés{% endblock %}
+{% block title %}Objets à restituer{% endblock %}
 
 {% block content %}
-<link rel="stylesheet" href="{% static 'css/objets.css' %}">
+<div class="container mt-4">
+    <h2 class="fw-bold mb-3">📌 Objets à restituer</h2>
 
-<div class="container mt-5">
-    <h2 class="mb-4 text-center fw-bold">📌 Objets Réclamés</h2>
-    <div class="row g-4">
-        {% for declaration in declarations %}
-            <div class="col-md-6 col-lg-4">
-                <div class="card shadow-sm h-100 border-0 hover-scale">
-                    {% if declaration.image %}
-                        <img src="{{ declaration.image.url }}" class="card-img-top rounded-top" style="height:200px; object-fit:cover;" alt="Image de {{ declaration.objet.nom }}">
-                    {% else %}
-                        <img src="{% static 'img/default_objet.png' %}" class="card-img-top rounded-top" style="height:200px; object-fit:cover;" alt="Image par défaut">
-                    {% endif %}
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title fw-bold">
-                            {{ declaration.objet.nom }}
-                            <span class="badge {% if declaration.objet.etat == 'restitué' %}bg-success{% else %}bg-warning text-dark{% endif %}">
-                                {% if declaration.objet.etat == 'restitué' %}🟢 Restitué{% else %}🟡 Réclamé{% endif %}
-                            </span>
-                        </h5>
-                        <p class="card-text small text-muted">
-                            {{ declaration.description|default:"Aucune description"|truncatewords:20 }}
-                        </p>
-                        <ul class="list-unstyled small mb-3">
-                            <li>📍 Lieu: {{ declaration.lieu|default:"Non précisé" }}</li>
-                            <li>🕒 Date déclaration: {{ declaration.date_declaration|date:"d/m/Y H:i" }}</li>
-                            {% if declaration.reclame_par %}
-                                <li>🙋 Réclamé par: {{ declaration.reclame_par.username }} ({{ declaration.reclame_par.email }})</li>
-                            {% else %}
-                                <li>🙋 Réclamé par: Non disponible</li>
-                            {% endif %}
-                            {% if declaration.citoyen %}
-                                <li>👤 Déclarant: {{ declaration.citoyen.username }} ({{ declaration.citoyen.email }})</li>
-                            {% endif %}
-                        </ul>
-                        <div class="mt-auto text-end">
-                            {% if declaration.objet.etat != 'restitué' %}
-                                {% if declaration.objet.restitutions.exists %}
-                                    {% with restitution=declaration.objet.restitutions.last %}
-                                        {% if restitution.policier == user %}
-                                            <a href="{% url 'marquer_restitue' restitution.id %}" class="btn btn-success btn-sm">
-                                                ✅ Marquer comme Restitué
-                                            </a>
-                                        {% else %}
-                                            <span class="text-muted">Restitution planifiée par un autre policier</span>
-                                        {% endif %}
-                                    {% endwith %}
-                                {% else %}
-                                    <a href="{% url 'planifier_restitution' declaration.id %}" class="btn btn-sm btn-primary">
-                                        📅 Programmer restitution
-                                    </a>
-                                {% endif %}
-                            {% else %}
-                                <span class="badge bg-success">🟢 Restitué</span>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        {% empty %}
-            <div class="col-12">
-                <div class="alert alert-info text-center">Aucun objet réclamé pour le moment.</div>
-            </div>
-        {% endfor %}
-    </div>
+    {% for declaration in declarations %}
+        <div class="card my-2 p-3 shadow-sm">
+            <h5>{{ declaration.objet.nom }}</h5>
+            <p><b>Réclamé par :</b> {{ declaration.reclame_par.username }}</p>
+            <p><b>Lieu :</b> {{ declaration.lieu|default:"Non précisé" }}</p>
+
+            {% if declaration.objet.id in restitutions_dict %}
+                <button class="btn btn-secondary btn-sm" disabled>📅 Planifié</button>
+            {% else %}
+                <a href="{% url 'planifier_restitution' declaration.id 'declaration' %}" 
+                   class="btn btn-primary btn-sm">
+                    📅 Programmer restitution
+                </a>
+            {% endif %}
+        </div>
+    {% empty %}
+        <div class="alert alert-info">Aucun objet réclamé pour le moment.</div>
+    {% endfor %}
 </div>
-
-<style>
-.hover-scale {
-    transition: transform 0.2s;
-}
-.hover-scale:hover {
-    transform: scale(1.03);
-}
-</style>
 {% endblock %}

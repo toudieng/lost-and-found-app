@@ -4,46 +4,45 @@ from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
 from django.conf import settings
 import random, string
+from datetime import datetime
+
 from backend.objets.models import Objet, Declaration, Restitution, Commissariat
 from backend.users.forms import CommissariatForm, PolicierForm
 from backend.objets.forms import RestitutionForm
-from datetime import datetime
-# --- Pages publiques ---
+
+# ======================================================
+#                    PAGES PUBLIQUES
+# ======================================================
+
 def home(request):
     return render(request, "frontend/home.html")
 
 def contact(request):
     return render(request, "frontend/contact.html")
 
-
 @login_required(login_url='login')
 def objets_perdus(request):
-    # Récupère toutes les déclarations des objets perdus
     declarations = Declaration.objects.filter(objet__etat="perdu")
     return render(request, "frontend/objets/objets_perdus.html", {"declarations": declarations})
 
 
-
 @login_required(login_url='login')
 def objets_trouves(request):
-    # Objets retrouvés et non encore revendiqués
     declarations = Declaration.objects.filter(
         objet__etat="retrouvé",
-        proprietaire__isnull=True
+        reclame_par__isnull=True 
     ).order_by('-date_declaration')
+    return render(request, "frontend/objets/objets_trouves.html", {"declarations": declarations})
 
-    return render(
-        request,
-        "frontend/objets/objets_trouves.html",
-        {"declarations": declarations}
-    )
 
 def objet_detail(request, pk):
     objet = get_object_or_404(Objet, pk=pk)
     return render(request, "frontend/objets/objet_detail.html", {"objet": objet})
 
+# ======================================================
+#                  DASHBOARD POLICIER
+# ======================================================
 
-# --- Dashboard Policier ---
 @login_required(login_url='login')
 def dashboard_policier(request):
     return render(request, "frontend/policier/dashboard_policier.html")
@@ -61,20 +60,13 @@ def maj_objet(request, pk):
         return redirect("liste_objets_declares")
     return render(request, "frontend/policier/maj_objet.html", {"objet": objet})
 
-
-
-
 @login_required
 def historique_restitutions(request):
     restitutions = Restitution.objects.select_related(
         'objet', 'citoyen', 'policier', 'commissariat', 'restitué_par'
     ).filter(objet__etat="restitué").order_by('-date_restitution', '-heure_restitution')
 
-    return render(
-        request,
-        "frontend/policier/historique_restitutions.html",
-        {"restitutions": restitutions}
-    )
+    return render(request, "frontend/policier/historique_restitutions.html", {"restitutions": restitutions})
 
 @login_required
 def supprimer_restitution(request, restitution_id):
@@ -82,106 +74,132 @@ def supprimer_restitution(request, restitution_id):
     if restitution.policier != request.user:
         messages.error(request, "Vous n’êtes pas autorisé à supprimer cette restitution.")
         return redirect("historique_restitutions")
-    
     restitution.delete()
     messages.success(request, "La restitution a été supprimée avec succès.")
     return redirect("historique_restitutions")
 
+@login_required
+def objets_restitues(request):
+    if request.user.role != "policier":
+        messages.error(request, "⚠️ Accès réservé aux policiers.")
+        return redirect("home")
 
+    restitutions = Restitution.objects.select_related(
+        'objet', 'citoyen', 'policier', 'commissariat'
+    ).order_by('-date_restitution')
 
-
-
+    return render(request, "frontend/objets/objets_restitues.html", {"restitutions": restitutions})
 @login_required
 def objets_reclames(request):
-    if not request.user.role == "policier":
+    if request.user.role != "policier":
         messages.error(request, "⚠️ Accès réservé aux policiers.")
         return redirect("home")
 
-    # Récupère uniquement les déclarations avec un objet non restitué
+    # Objets réclamés par les citoyens (Déclarations avec un objet trouvé mais non encore restitué)
     declarations = Declaration.objects.filter(
-        objet__isnull=False,
-        id__isnull=False,
-        reclame_par__isnull=False,
-        objet__etat__in=['perdu', 'retrouvé']  # <-- exclut les objets restitués
+        objet__etat="retrouvé",
+        reclame_par__isnull=False
     ).order_by('-date_declaration')
 
-    return render(request, "frontend/objets/objets_reclames.html", {"declarations": declarations})
+    # Vérifier les restitutions existantes pour désactiver le bouton si déjà planifié
+    restitutions = Restitution.objects.filter(
+        restitué_par__isnull=True
+    )
+    restitutions_dict = {r.objet.id: r for r in restitutions}
 
+    return render(request, "frontend/objets/objets_reclames.html", {
+        "declarations": declarations,
+        "restitutions_dict": restitutions_dict,
+    })
 
-
-def objets_restitues(request):
-    # Vérifie que l'utilisateur est policier
-    if not request.user.role == "policier":
+@login_required
+def objets_retrouves_attente(request):
+    if request.user.role != "policier":
         messages.error(request, "⚠️ Accès réservé aux policiers.")
         return redirect("home")
 
-    # Tous les objets déjà restitués
-    restitutions = Restitution.objects.select_related('objet', 'citoyen', 'policier', 'commissariat').order_by('-date_restitution')
+    restitutions = Restitution.objects.filter(
+        restitué_par__isnull=True
+    ).order_by('-date_restitution', '-heure_restitution')
 
-    return render(request, "frontend/objets/objets_restitues.html", {
+    return render(request, "frontend/objets/objets_retrouves_attente.html", {
         "restitutions": restitutions
     })
 
-
 @login_required
-def planifier_restitution(request, declaration_id):
-    declaration = get_object_or_404(Declaration, id=declaration_id)
+def planifier_restitution(request, objet_id, type_objet="declaration"):
+    if request.user.role != "policier":
+        messages.error(request, "⚠️ Accès réservé aux policiers.")
+        return redirect("home")
+
+    declaration = None
+
+    if type_objet == "declaration":
+        declaration = get_object_or_404(Declaration, id=objet_id)
+        restitution, created = Restitution.objects.get_or_create(
+            objet=declaration.objet,
+            citoyen=declaration.reclame_par,
+            defaults={"policier": request.user}
+        )
+    elif type_objet == "restitution":
+        restitution = get_object_or_404(Restitution, id=objet_id)
+    else:
+        messages.error(request, "Type d'objet inconnu pour la restitution.")
+        return redirect("objets_reclames")
+
     commissariats = Commissariat.objects.all()
+
+    initial_data = {
+        "date_restitution": restitution.date_restitution or None,
+        "heure_restitution": restitution.heure_restitution or None,
+        "commissariat": restitution.commissariat
+    }
 
     if request.method == "POST":
         form = RestitutionForm(request.POST)
         if form.is_valid():
             cd = form.cleaned_data
-            restitution = Restitution.objects.create(
-                objet=declaration.objet,
-                citoyen=declaration.reclame_par,
-                policier=request.user,
-                date_restitution=cd["date_restitution"],
-                heure_restitution=cd["heure_restitution"],
-                commissariat=cd["commissariat"],
-            )
+            restitution.policier = request.user
+            restitution.date_restitution = cd["date_restitution"]
+            restitution.heure_restitution = cd["heure_restitution"]
+            restitution.commissariat = cd["commissariat"]
+            restitution.save()
 
-          
-            sujet = f"[Restitution planifiée] {declaration.objet.nom}"
-            message = (
-                f"Bonjour,\n\n"
-                f"La restitution de l'objet '{declaration.objet.nom}' a été planifiée.\n\n"
-                f"📍 Lieu : {cd['commissariat'].nom}\n"
-                f"📅 Date : {cd['date_restitution']}\n"
-                f"⏰ Heure : {cd['heure_restitution']}\n\n"
-                f"Merci de vous présenter muni de vos pièces justificatives."
-            )
-
-            # Envoyer aux deux concernés
             destinataires = []
-            if declaration.reclame_par and declaration.reclame_par.email:
-                destinataires.append(declaration.reclame_par.email)
+            if restitution.citoyen and restitution.citoyen.email:
+                destinataires.append(restitution.citoyen.email)
             if request.user.email:
                 destinataires.append(request.user.email)
 
-            if destinataires:  # envoyer seulement si au moins un email valide
+            if destinataires:
                 send_mail(
-                    sujet,
-                    message,
-                    settings.DEFAULT_FROM_EMAIL,
-                    destinataires,
-                    fail_silently=True,
+                    subject=f"[Restitution planifiée] {restitution.objet.nom}",
+                    message=(
+                        f"La restitution de l'objet '{restitution.objet.nom}' a été planifiée.\n"
+                        f"📍 Commissariat : {restitution.commissariat.nom if restitution.commissariat else 'Non assigné'}\n"
+                        f"📅 Date : {restitution.date_restitution}\n"
+                        f"⏰ Heure : {restitution.heure_restitution}"
+                    ),
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=destinataires,
+                    fail_silently=True
                 )
 
             messages.success(
                 request,
-                f"La restitution de '{declaration.objet.nom}' a été planifiée ✅ "
-                "et les notifications ont été envoyées."
+                f"La restitution de '{restitution.objet.nom}' a été planifiée ✅ et les notifications ont été envoyées."
             )
             return redirect("objets_reclames")
     else:
-        form = RestitutionForm()
+        form = RestitutionForm(initial=initial_data)
 
-    return render(
-        request,
-        "frontend/policier/planifier_restitution.html",
-        {"declaration": declaration, "form": form, "commissariats": commissariats},
-    )
+    return render(request, "frontend/policier/planifier_restitution.html", {
+        "restitution": restitution,
+        "declaration": declaration,  # <-- ajouté pour le template
+        "form": form,
+        "commissariats": commissariats,
+        "type_objet": type_objet
+    })
 
 
 @login_required
@@ -196,30 +214,22 @@ def marquer_restitue(request, restitution_id):
     objet.etat = "restitué"
     objet.save()
 
-    # Renseigner le citoyen qui a trouvé l'objet comme ayant effectué la restitution
-    restitution.restitue_par = objet.trouve_par
-    restitution.save()
+    restitution.restitué_par = request.user
 
-    messages.success(
-        request,
-        f"L'objet '{objet.nom}' a été marqué comme restitué ✅."
-    )
+    try:
+        declaration = Declaration.objects.get(objet=objet, citoyen=restitution.citoyen)
+        declaration.trouve_par = request.user
+        declaration.save()
+    except Declaration.DoesNotExist:
+        pass
+
+    restitution.save()
+    messages.success(request, f"L'objet '{objet.nom}' a été marqué comme restitué ✅.")
     return redirect("objets_reclames")
 
-
-@login_required(login_url="login")
-def signaler_objets(request):
-    declarations = Declaration.objects.filter(objet__etat="retrouvé")
-
-    return render(
-        request,
-        "frontend/objets/signaler_objets.html",
-        {"declarations": declarations},
-    )
-
-
-
-# --- Dashboard Administrateur ---
+# ======================================================
+#                 DASHBOARD ADMINISTRATEUR
+# ======================================================
 
 @login_required(login_url='login')
 def dashboard_admin(request):
@@ -246,16 +256,13 @@ def ajouter_commissariat(request):
         messages.error(request, "⛔ Vous n'avez pas l'autorisation d'ajouter un commissariat.")
         return redirect('home')
 
-    if request.method == 'POST':
-        form = CommissariatForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "✅ Commissariat ajouté avec succès.")
-            return redirect('gerer_commissariats')
-        else:
-            messages.error(request, "❌ Erreur lors de l'ajout du commissariat.")
-    else:
-        form = CommissariatForm()
+    form = CommissariatForm(request.POST or None)
+    if request.method == 'POST' and form.is_valid():
+        form.save()
+        messages.success(request, "✅ Commissariat ajouté avec succès.")
+        return redirect('gerer_commissariats')
+    elif request.method == 'POST':
+        messages.error(request, "❌ Erreur lors de l'ajout du commissariat.")
 
     return render(request, 'frontend/ajouter_commissariat.html', {'form': form})
 
@@ -267,79 +274,63 @@ def supprimer_objet(request, objet_id):
     return redirect('liste_objets_declares')
 
 def creer_policier(request):
-    if request.method == "POST":
-        form = PolicierForm(request.POST)
-        if form.is_valid():
-            password = ''.join(random.choices(string.ascii_letters + string.digits, k=10))
-            policier = form.save(commit=False)
-            policier.set_password(password)
-            policier.save()
+    form = PolicierForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        password = ''.join(random.choices(string.ascii_letters + string.digits, k=10))
+        policier = form.save(commit=False)
+        policier.set_password(password)
+        policier.save()
 
-            send_mail(
-                "Création de votre compte Policier",
-                f"Bonjour {policier.first_name},\n\nVotre compte a été créé.\n"
-                f"Identifiant : {policier.username}\nMot de passe : {password}\n\n"
-                "Merci de vous connecter et de changer ce mot de passe.",
-                settings.DEFAULT_FROM_EMAIL,
-                [policier.email],
-                fail_silently=False,
-            )
+        send_mail(
+            "Création de votre compte Policier",
+            f"Bonjour {policier.first_name},\n\nVotre compte a été créé.\n"
+            f"Identifiant : {policier.username}\nMot de passe : {password}\n\n"
+            "Merci de vous connecter et de changer ce mot de passe.",
+            settings.DEFAULT_FROM_EMAIL,
+            [policier.email],
+            fail_silently=False,
+        )
 
-            messages.success(request, "Policier créé et mot de passe envoyé par email ✅")
-            return redirect("gerer_utilisateurs")  
-    else:
-        form = PolicierForm()
-    
+        messages.success(request, "Policier créé et mot de passe envoyé par email ✅")
+        return redirect("gerer_utilisateurs")
+
     return render(request, "frontend/admin/creer_policier.html", {"form": form})
 
-
-
-
-
-
-
-# --- Actions citoyen ---
-
+# ======================================================
+#                    ACTIONS CITOYEN
+# ======================================================
 
 @login_required
 def je_le_trouve(request, declaration_id):
     declaration = get_object_or_404(Declaration, id=declaration_id)
 
-    # Vérifie que l'objet est toujours "perdu"
     if declaration.objet.etat == "perdu":
-        declaration.objet.etat = "retrouvé"       
-        declaration.trouve_par = request.user     
+        declaration.objet.etat = "retrouvé"
+        declaration.trouve_par = request.user
+        declaration.objet.save()
         declaration.save()
 
-        # Notification par email au déclarant
+        Restitution.objects.create(
+            objet=declaration.objet,
+            citoyen=declaration.citoyen
+        )
+
         if declaration.citoyen and declaration.citoyen.email:
             send_mail(
-                subject=f"[Objet Perdu] Votre objet {declaration.objet.nom} a été retrouvé",
-                message=f"Bonjour {declaration.citoyen.username},\n\nL'objet que vous avez déclaré perdu a été trouvé. Un policier planifiera la restitution.",
+                subject=f"[Objet Retrouvé] Votre objet {declaration.objet.nom} a été trouvé",
+                message=(f"Bonjour {declaration.citoyen.username},\n\n"
+                         "L'objet que vous avez déclaré perdu a été trouvé. "
+                         "Un policier planifiera prochainement la restitution."),
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=[declaration.citoyen.email],
-                fail_silently=True,
+                fail_silently=True
             )
 
-        messages.success(request, "Merci d'avoir signalé que vous avez trouvé cet objet !")
+        messages.success(request, "✅ L’objet a été marqué comme retrouvé et une restitution sera planifiée.")
     else:
-        messages.warning(request, "Cet objet a déjà été signalé comme trouvé ou restitué.")
+        messages.warning(request, "⚠️ Cet objet est déjà retrouvé ou restitué.")
 
-    return redirect("objets_trouves")
-
-@login_required(login_url='login')
-def objets_trouves(request):
-    
-    declarations = Declaration.objects.filter(
-        objet__etat="retrouvé",
-        reclame_par__isnull=True  
-    ).order_by('-date_declaration')
-
-    return render(
-        request,
-        "frontend/objets/objets_trouves.html",
-        {"declarations": declarations}
-    )
+    return redirect("objets_reclames")
 
 @login_required
 def ca_m_appartient(request, declaration_id):
@@ -352,13 +343,11 @@ def ca_m_appartient(request, declaration_id):
         if declaration.citoyen and declaration.citoyen.email:
             send_mail(
                 subject=f"[Objet Trouvé] Votre objet '{declaration.objet.nom}' a été réclamé !",
-                message=(
-                    f"Bonjour {declaration.citoyen.username},\n\n"
-                    f"L'objet que vous avez trouvé a été réclamé par {request.user.username} ({request.user.email}).\n"
-                    f"ID de la déclaration : {declaration.id}\n"
-                    f"Consultez les détails ici : http://127.0.0.1:8000/objets/{declaration.id}/\n\n"
-                    "Merci !"
-                ),
+                message=(f"Bonjour {declaration.citoyen.username},\n\n"
+                         f"L'objet que vous avez trouvé a été réclamé par {request.user.username} ({request.user.email}).\n"
+                         f"ID de la déclaration : {declaration.id}\n"
+                         f"Consultez les détails ici : http://127.0.0.1:8000/objets/{declaration.id}/\n\n"
+                         "Merci !"),
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=[declaration.citoyen.email],
                 fail_silently=False,
