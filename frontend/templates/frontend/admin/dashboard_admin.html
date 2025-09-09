@@ -4,7 +4,6 @@
 
 {% block extra_css %}
 <style>
-
     .sidebar {
         background-color: #343a40;
         color: #fff;
@@ -17,19 +16,21 @@
     .sidebar h4 {
         color: #ffc107;
         margin-bottom: 1.5rem;
+        text-align: center;
     }
 
     .sidebar .nav-link {
         color: #fff;
         margin-bottom: 0.5rem;
         border-radius: 0.25rem;
+        transition: all 0.2s;
     }
 
     .sidebar .nav-link:hover {
         background-color: #495057;
         color: #ffc107;
+        text-decoration: none;
     }
-
 
     .main-content {
         padding: 2rem;
@@ -50,6 +51,11 @@
         .sidebar {
             min-height: auto;
             padding: 1rem;
+            text-align: center;
+        }
+
+        .main-content {
+            padding: 1rem;
         }
     }
 </style>
@@ -58,20 +64,39 @@
 {% block content %}
 <div class="row g-0">
 
+    <!-- Sidebar -->
     <div class="col-md-3 col-lg-2 sidebar">
         <h4>Admin</h4>
         <ul class="nav flex-column">
-            <li class="nav-item"><a class="nav-link" href="{% url 'gerer_commissariats' %}">🏢 Gérer les commissariats</a></li>
-            <li class="nav-item"><a class="nav-link" href="{% url 'gerer_utilisateurs' %}">👥 Gérer les utilisateurs</a></li>
-            <li class="nav-item"><a class="nav-link" href="{% url 'voir_stats' %}">📊 Voir les statistiques</a></li>
-            <li class="nav-item"><a class="nav-link" href="{% url 'creer_policier' %}">👮 Créer un policier</a></li>
+            <li class="nav-item mb-2">
+                <a class="nav-link" href="{% url 'gerer_commissariats' %}">🏢 Gérer les commissariats</a>
+            </li>
+            <li class="nav-item mb-2">
+                <a class="nav-link" href="{% url 'gerer_utilisateurs' %}">👥 Gérer les utilisateurs</a>
+            </li>
+            <li class="nav-item mb-2">
+                <a class="nav-link" href="{% url 'voir_stats' %}">📊 Voir les statistiques</a>
+            </li>
+            <li class="nav-item mb-2">
+                <a class="nav-link" href="{% url 'creer_policier' %}">👮 Créer un policier</a>
+            </li>
         </ul>
     </div>
 
-    
+    <!-- Contenu principal -->
     <div class="col-md-9 col-lg-10 main-content">
-        <h2 class="welcome-title">Bienvenue sur votre espace Administrateur</h2>
-        <p class="welcome-text">Vous pouvez gérer les commissariats, les utilisateurs et consulter les statistiques.</p>
+        <div class="d-flex flex-column gap-3">
+            <h2 class="welcome-title">Bienvenue sur votre espace Administrateur</h2>
+            <p class="welcome-text">
+                Vous pouvez gérer les commissariats, les utilisateurs et consulter les statistiques.
+            </p>
+
+            <!-- Placeholder pour statistiques ou notifications futures -->
+            <div class="card shadow-sm p-3">
+                <h5 class="card-title">📊 Aperçu rapide</h5>
+                <p class="card-text text-muted">Aucune donnée disponible pour le moment.</p>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
