@@ -1,0 +1,39 @@
+{% extends "frontend/base.html" %}
+{% load static %}
+
+{% block title %}Objets Restitués{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/objets.css' %}">
+
+<div class="container mt-5">
+    <h2 class="mb-4 text-center fw-bold">✅ Objets Restitués</h2>
+    <div class="row">
+        {% for restitution in restitutions %}
+            <div class="col-md-6 mb-4">
+                <div class="card shadow-sm h-100 border-0">
+                    {% if restitution.objet.image %}
+                        <img src="{{ restitution.objet.image.url }}" class="card-img-top rounded-top" style="height:200px; object-fit:cover;" alt="Image de {{ restitution.objet.nom }}">
+                    {% else %}
+                        <img src="{% static 'img/default_objet.png' %}" class="card-img-top rounded-top" style="height:200px; object-fit:cover;" alt="Image par défaut">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold">{{ restitution.objet.nom }} ✅ Restitué</h5>
+                        <ul class="list-unstyled small">
+                            <li>📍 Commissariat: {{ restitution.commissariat.nom }}</li>
+                            <li>🕒 Date restitution: {{ restitution.date_restitution|date:"d/m/Y" }}</li>
+                            <li>⏰ Heure restitution: {{ restitution.heure_restitution|time:"H:i" }}</li>
+                            <li>🙋 Réclamé par: {{ restitution.citoyen.username }} ({{ restitution.citoyen.email }})</li>
+                            <li>👮 Restitué par: {{ restitution.policier.username }}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info text-center">Aucun objet restitué pour le moment.</div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

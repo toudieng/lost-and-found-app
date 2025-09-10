@@ -1,0 +1,37 @@
+{% extends "frontend/base.html" %}
+{% block title %}Objets retrouvés en attente{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="fw-bold mb-3">📦 Objets retrouvés (en attente)</h2>
+
+    {% for restitution in restitutions %}
+        <div class="card my-2 p-3 shadow-sm">
+            <h5>{{ restitution.objet.nom }}</h5>
+            <p><b>Déclaré par :</b> {{ restitution.citoyen.username }}</p>
+            <p><b>Commissariat :</b>
+                {% if restitution.commissariat %}
+                    {{ restitution.commissariat.nom }}
+                {% else %}
+                    Non assigné
+                {% endif %}
+            </p>
+
+            {% if restitution.policier %}
+                <span class="badge bg-info">Planifié par {{ restitution.policier.username }}</span>
+            {% else %}
+                <a href="{% url 'planifier_restitution' restitution.id 'restitution' %}" 
+                   class="btn btn-primary btn-sm">
+                    📅 Programmer restitution
+                </a>
+            {% endif %}
+
+            <a href="{% url 'marquer_restitue' restitution.id %}" class="btn btn-success btn-sm">
+                ✅ Marquer comme Restitué
+            </a>
+        </div>
+    {% empty %}
+        <div class="alert alert-info">Aucun objet retrouvé en attente de restitution.</div>
+    {% endfor %}
+</div>
+{% endblock %}
