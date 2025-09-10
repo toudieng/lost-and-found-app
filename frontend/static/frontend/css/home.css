@@ -9,9 +9,11 @@
     padding: 6rem 1rem;
     border-radius: 0 0 2rem 2rem;
 }
+
 .hero .btn {
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
+
 .hero .btn:hover {
     transform: scale(1.05);
     box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.2);
@@ -22,6 +24,7 @@
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     border-radius: 1rem;
 }
+
 .features .card:hover {
     transform: translateY(-8px);
     box-shadow: 0 1rem 2rem rgba(0,0,0,0.15);
@@ -41,6 +44,7 @@
     opacity: 0.8;
     transition: all 0.3s ease;
 }
+
 .partners img:hover {
     filter: grayscale(0%);
     opacity: 1;
@@ -52,9 +56,11 @@
     background: linear-gradient(135deg, #343a40, #6c1e3d);
     border-radius: 1rem;
 }
+
 .cta .btn {
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
+
 .cta .btn:hover {
     transform: scale(1.05);
     box-shadow: 0 0.5rem 1rem rgba(255,255,255,0.3);
