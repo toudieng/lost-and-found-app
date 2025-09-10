@@ -10,16 +10,85 @@
 {% block content %}
 
 
-<section class="hero py-6 text-center">
+<div id="carouselExampleFade" class="carousel slide carousel-fade">
+  <div class="carousel-inner" style="height: 80vh;">
+    <div class="carousel-item active" style="height: 100%;">
+      <img src="{% static 'frontend/images/head2.jpg' %}" class="d-block w-100" style="height: 100%; object-fit: cover;" alt="...">
+      <div class="carousel-caption d-none d-md-block">
+        <h5>Bienvenue sur la plateforme des Objets Perdus</h5>
+        <p>Déclarez un objet perdu, consultez les objets retrouvés et suivez vos démarches en toute sécurité.</p>
+      </div>
+    </div>
+    <div class="carousel-item" style="height: 100%;">
+      <img src="{% static 'frontend/images/head1.jpg' %}" class="d-block w-100" style="height: 100%; object-fit: cover;" alt="...">
+    </div>
+    <div class="carousel-item" style="height: 100%;">
+      <img src="{% static 'frontend/images/head3.jpg' %}" class="d-block w-100" style="height: 100%; object-fit: cover;" alt="...">
+    </div>
+    <div class="carousel-item" style="height: 100%;">
+      <img src="{% static 'frontend/images/head4.jpg' %}" class="d-block w-100" style="height: 100%; object-fit: cover;" alt="...">
+    </div>
+    <div class="carousel-item" style="height: 100%;">
+      <img src="{% static 'frontend/images/head5.jpg' %}" class="d-block w-100" style="height: 100%; object-fit: cover;" alt="...">
+    </div>
+  </div>
+  <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleFade" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Previous</span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleFade" data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Next</span>
+  </button>
+</div>
+<!-- <section class="hero py-6 text-center">
     <div class="container">
         <h1 class="display-3 fw-bold mb-4">📦 Bienvenue sur la plateforme des Objets Perdus</h1>
         <p class="lead mb-5 fs-5">Déclarez un objet perdu, consultez les objets retrouvés et suivez vos démarches en toute sécurité.</p>
         <a href="{% url 'liste_objets' %}" class="btn btn-primary btn-lg shadow-lg">Consulter les objets</a>
     </div>
-</section> 
-<h5 style="text-align: center;background-color:blue;"class="card-title fw-bold">Les diffrentes avantages de notre app</h5>
+</section>  -->
+<br>
+<br>
 
-<section class="features py-6">
+<h5 style="text-align: center;" class="card-title fw-bold">Les diffrentes avantages de notre app</h5>
+
+<div class="container features">
+  <div class="row text-center">
+    
+    <div class="col-md-4">
+      <div class="card p-4">
+        <i class="fa-solid fa-box-open icon-lost"></i>
+        <h3>Déclarer un objet perdu</h3>
+        <p>Remplissez facilement le formulaire pour signaler un objet que vous avez perdu.</p>
+        <button class="btn btn-action-lost">Déclarer un objet</button>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card p-4">
+        <i class="fa-solid fa-magnifying-glass icon-found"></i>
+        <h3>Consulter les objets retrouvés</h3>
+        <p>Parcourez la liste des objets retrouvés et contactez le déclarant si nécessaire.</p>
+        <button class="btn btn-action-found">Consulter les objets</button>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card p-4">
+        <i class="fa-solid fa-folder-open icon-follow"></i>
+        <h3>Suivre vos démarches</h3>
+        <p>Gardez un œil sur l'état de vos déclarations et notifications directement depuis votre compte.</p>
+        <button class="btn btn-action-follow">Suivre mes démarches</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+
+<!-- <section class="features py-6">
     <div class="container">
         <div class="row text-center g-5">
             <div class="col-md-4">
@@ -53,7 +122,7 @@
             </div>
         </div>
     </div>
-</section>
+</section> -->
 <!-- Partenaires Section -->
 <section class="partners py-6 bg-light text-center">
     <div class="container">
