@@ -1,0 +1,130 @@
+/* ============================
+   GLOBAL STYLES
+   ============================ */
+
+/* Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Police & Couleurs */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+    color: #343a40;
+    line-height: 1.6;
+}
+
+/* Liens */
+a {
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: #6c1e3d !important;
+}
+
+/* ============================
+   NAVBAR
+   ============================ */
+.navbar {
+    padding: 1rem 0;
+    font-weight: 500;
+}
+
+.navbar-brand {
+    font-size: 1.4rem;
+}
+
+.navbar .nav-link {
+    margin-left: 1rem;
+    transition: transform 0.2s ease;
+}
+
+.navbar .nav-link:hover {
+    transform: translateY(-2px);
+}
+
+/* ============================
+   BUTTONS
+   ============================ */
+.btn-custom {
+    background-color: #6c1e3d;
+    color: white;
+    border-radius: 0.5rem;
+    padding: 0.6rem 1.2rem;
+    transition: all 0.3s ease;
+    border: none;
+}
+
+.btn-custom:hover {
+    background-color: #52162f;
+    transform: scale(1.05);
+    box-shadow: 0 0.5rem 1rem rgba(108, 30, 61, 0.3);
+}
+
+/* Bouton secondaire */
+.btn-outline-custom {
+    border: 2px solid #6c1e3d;
+    color: #6c1e3d;
+    border-radius: 0.5rem;
+    padding: 0.6rem 1.2rem;
+    transition: all 0.3s ease;
+    background: transparent;
+}
+
+.btn-outline-custom:hover {
+    background-color: #6c1e3d;
+    color: white;
+}
+
+/* ============================
+   CARDS
+   ============================ */
+.card {
+    border-radius: 1rem;
+    box-shadow: 0 0.25rem 0.75rem rgba(0,0,0,0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 1rem 2rem rgba(0,0,0,0.1);
+}
+
+/* ============================
+   FOOTER
+   ============================ */
+footer {
+    font-size: 0.9rem;
+    color: #555;
+}
+
+footer small {
+    display: block;
+    margin-top: 0.3rem;
+    color: #888;
+}
+
+/* ============================
+   RESPONSIVE
+   ============================ */
+@media (max-width: 768px) {
+    .navbar .nav-link {
+        margin-left: 0;
+        padding: 0.6rem 1rem;
+    }
+
+    .btn-custom,
+    .btn-outline-custom {
+        width: 100%;
+        text-align: center;
+    }
+
+    .card {
+        margin-bottom: 1.5rem;
+    }
+}

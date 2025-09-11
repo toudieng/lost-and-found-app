@@ -1,19 +1,27 @@
 /* ============================
-   Home Page Styles
+   Home Page Styles (amélioré)
    ============================ */
 
 /* Section Hero */
 .hero {
+    position: relative;
     background: linear-gradient(135deg, #6c1e3d, #343a40);
     color: white;
     padding: 6rem 1rem;
     border-radius: 0 0 2rem 2rem;
+    z-index: 1;
 }
-
+.hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.3); /* overlay pour améliorer la lisibilité */
+    border-radius: 0 0 2rem 2rem;
+    z-index: -1;
+}
 .hero .btn {
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
-
 .hero .btn:hover {
     transform: scale(1.05);
     box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.2);
@@ -21,34 +29,37 @@
 
 /* Features */
 .features .card {
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
     border-radius: 1rem;
 }
-
 .features .card:hover {
     transform: translateY(-8px);
     box-shadow: 0 1rem 2rem rgba(0,0,0,0.15);
 }
-
 /* Features Icons */
 .features i {
     display: inline-block;
     padding: 1rem;
     border-radius: 50%;
     background: rgba(108, 30, 61, 0.1);
+    transition: background 0.3s, transform 0.3s, color 0.3s;
+}
+.features .card:hover i {
+    background: #6c1e3d;
+    color: #fff;
+    transform: rotate(10deg) scale(1.1);
 }
 
 /* Partners */
 .partners img {
     filter: grayscale(80%);
     opacity: 0.8;
-    transition: all 0.3s ease;
+    transition: transform 0.4s ease, filter 0.4s ease, opacity 0.4s ease;
 }
-
 .partners img:hover {
     filter: grayscale(0%);
     opacity: 1;
-    transform: scale(1.1);
+    transform: scale(1.15) translateY(-5px);
 }
 
 /* CTA */
@@ -56,25 +67,32 @@
     background: linear-gradient(135deg, #343a40, #6c1e3d);
     border-radius: 1rem;
 }
-
 .cta .btn {
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    animation: pulse 2s infinite;
 }
-
 .cta .btn:hover {
-    transform: scale(1.05);
+    transform: scale(1.08);
     box-shadow: 0 0.5rem 1rem rgba(255,255,255,0.3);
+}
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
 }
 
 /* Responsive ajustements */
 @media (max-width: 768px) {
     .hero {
         padding: 4rem 1rem;
+        text-align: center;
     }
     .hero h1 {
         font-size: 2rem;
     }
     .cta h2 {
         font-size: 1.75rem;
+    }
+    .features .card {
+        text-align: center;
     }
 }
