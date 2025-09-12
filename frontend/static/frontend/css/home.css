@@ -1,31 +1,58 @@
-/* Hero Section */
-/* .hero {
-    background: linear-gradient(rgba(255,255,255,0.85), rgba(255,255,255,0.85)), url("../img/hero-bg.jpg") no-repeat center center;
+/* =========================
+   SECTION HERO
+========================= */
+.hero {
+    background: linear-gradient(rgba(255,255,255,0.85), rgba(255,255,255,0.85)), 
+                url("../img/hero-bg.jpg") no-repeat center center;
     background-size: cover;
-    padding-top: 100px;
-    padding-bottom: 100px;
-} */
-
-.hero .btn:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.2);
+    padding: 100px 0;
 }
 
-/* Features */
+.hero h1 {
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.15);
+}
+
+/* =========================
+   SECTION FEATURES
+========================= */
+.features {
+    padding: 80px 0;
+}
+
 .features .card {
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    border-radius: 1rem;
+    border-radius: 20px;
+    padding: 30px 20px;
+    margin-bottom: 30px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    text-align: center;
 }
 
 .features .card:hover {
     transform: translateY(-10px) rotateZ(1deg);
     box-shadow: 0 12px 30px rgba(0,0,0,0.18);
-} */
+}
 
-/* Partenaires Section */
-/* .partners {
-    padding-top: 80px;
-    padding-bottom: 80px;
+/* Icônes */
+.features .card i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+.features .card .icon-lost {
+    color: #d9534f; /* rouge perte */
+}
+.features .card .icon-found {
+    color: #5cb85c; /* vert retrouvé */
+}
+.features .card .icon-follow {
+    color: #0275d8; /* bleu suivi */
+}
+
+/* =========================
+   SECTION PARTENAIRES
+========================= */
+.partners {
+    padding: 80px 0;
+    text-align: center;
 }
 .partners h2 {
     color: #6c1e3d;
@@ -44,12 +71,17 @@
     opacity: 1;
     transform: scale(1.1);
     box-shadow: 0 5px 15px rgba(0,0,0,0.15);
-} */
+}
 
-/* Call to Action Section */
-/* .cta {
-    padding-top: 80px;
-    padding-bottom: 80px;
+/* =========================
+   SECTION CALL TO ACTION
+========================= */
+.cta {
+    padding: 80px 0;
+    text-align: center;
+}
+.cta h2 {
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.15);
 }
 
 .cta .btn {
@@ -59,67 +91,4 @@
 .cta .btn:hover {
     transform: translateY(-3px) scale(1.05);
     box-shadow: 0 8px 20px rgba(0,0,0,0.25);
-} */
-
-/* Text shadows for hero and CTA headings */
-/* .hero h1, .cta h2 {
-    text-shadow: 1px 1px 4px rgba(0,0,0,0.15);
-} */
-
-
-
-
-
-
-
-
-
-
-.btn {
-  padding: 10px 20px;
-  border-radius: 5px;
-  font-weight: bold;
-  color: white;
-  text-decoration: none;
-  transition: background-color 0.3s ease;
-}
-
-.btn-action-lost {
-  background-color: #f44336; /* Une couleur rouge pour "perdu" */
-}
-
-.btn-action-found {
-  background-color: #4CAF50; /* Une couleur verte pour "retrouvé" */
-}
-
-.btn-action-follow {
-  background-color: #2196F3; /* Une couleur bleue pour "suivre" */
-}
-
-.btn:hover {
-  opacity: 0.8;
-}
-
-.card i {
-  font-size: 3rem; /* Ajustez la taille selon vos préférences */
-  margin-bottom: 1rem;
-}
-
-.icon-lost {
-  color: #d9534f; /* Une couleur qui suggère la perte */
-}
-
-/* Nouvelle version - plus spécifique */
-.features .card i {
-  font-size: 3rem; 
-  margin-bottom: 1rem;
-}
-.features .card .icon-lost {
-  color: #d9534f;
-}
-.features .card .icon-found {
-  color: #5cb85c;
-}
-.features .card .icon-follow {
-  color: #0275d8;
 }

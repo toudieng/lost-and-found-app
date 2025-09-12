@@ -6,30 +6,6 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'frontend/css/home.css' %}">
 
-<style>
-/* Hero personnalisé */
-.hero {
-    padding: 5rem 1rem;
-    border-radius: 0.5rem;
-    background: var(--bs-body-bg);
-    transition: background 0.4s, color 0.4s;
-}
-
-/* Features cards */
-.features .card {
-    transition: transform 0.3s, box-shadow 0.3s;
-}
-.features .card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
-}
-
-/* CTA section */
-.cta {
-    background-color: var(--bs-primary);
-    transition: background-color 0.4s, color 0.4s;
-}
-</style>
 {% endblock %}
 
 {% block content %}
@@ -78,6 +54,7 @@
 
 <h5 style="text-align: center;" class="card-title fw-bold">Les diffrentes avantages de notre app</h5>
 
+
 <div class="container features">
   <div class="row text-center">
     
@@ -110,6 +87,7 @@
 
   </div>
 </div>
+
 
 
 
