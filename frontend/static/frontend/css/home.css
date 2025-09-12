@@ -2,23 +2,21 @@
    SECTION HERO
 ========================= */
 .hero {
-    background: linear-gradient(rgba(255,255,255,0.85), rgba(255,255,255,0.85)), 
-                url("../img/hero-bg.jpg") no-repeat center center;
-    background-size: cover;
-    padding: 100px 0;
+    background: linear-gradient(135deg, #6c1e3d, #343a40);
+    color: white;
+    padding: 6rem 1rem;
+    border-radius: 0 0 2rem 2rem;
 }
 
-.hero h1 {
-    text-shadow: 1px 1px 4px rgba(0,0,0,0.15);
+.hero .btn {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.hero .btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.2);
 }
 
-/* =========================
-   SECTION FEATURES
-========================= */
-.features {
-    padding: 80px 0;
-}
-
+/* Features */
 .features .card {
     border-radius: 20px;
     padding: 30px 20px;
@@ -26,7 +24,6 @@
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     text-align: center;
 }
-
 .features .card:hover {
     transform: translateY(-10px) rotateZ(1deg);
     box-shadow: 0 12px 30px rgba(0,0,0,0.18);
@@ -63,9 +60,8 @@
 .partners img {
     filter: grayscale(80%);
     opacity: 0.8;
-    transition: all 0.3s ease;
+    transition: transform 0.4s ease, filter 0.4s ease, opacity 0.4s ease;
 }
-
 .partners img:hover {
     filter: grayscale(0%);
     opacity: 1;
@@ -83,12 +79,32 @@
 .cta h2 {
     text-shadow: 1px 1px 4px rgba(0,0,0,0.15);
 }
-
 .cta .btn {
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    animation: pulse 2s infinite;
+}
+.cta .btn:hover {
+    transform: scale(1.08);
+    box-shadow: 0 0.5rem 1rem rgba(255,255,255,0.3);
+}
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
 }
 
-.cta .btn:hover {
-    transform: translateY(-3px) scale(1.05);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+/* Responsive ajustements */
+@media (max-width: 768px) {
+    .hero {
+        padding: 4rem 1rem;
+        text-align: center;
+    }
+    .hero h1 {
+        font-size: 2rem;
+    }
+    .cta h2 {
+        font-size: 1.75rem;
+    }
+    .features .card {
+        text-align: center;
+    }
 }
