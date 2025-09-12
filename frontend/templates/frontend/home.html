@@ -6,10 +6,19 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'frontend/css/home.css' %}">
 
+<style>
+
+#page-bg {
+    transition: background-color 0.5s ease;
+}
+</style>
 {% endblock %}
 
 {% block content %}
 
+<div id="page-bg">
+
+<!-- Carousel -->
 <div id="carouselExampleFade" class="carousel slide carousel-fade">
   <div class="carousel-inner" style="height: 80vh;">
     <div class="carousel-item active" style="height: 100%;">
@@ -41,29 +50,29 @@
     <span class="visually-hidden">Next</span>
   </button>
 </div>
-<!-- <section class="hero py-6 text-center">
+
+<!-- Hero Section -->
+<section class="hero py-6 text-center">
     <div class="container">
         <h1 class="display-3 fw-bold mb-4">📦 Bienvenue sur la plateforme des Objets Perdus</h1>
         <p class="lead mb-5 fs-5">Déclarez un objet perdu, consultez les objets retrouvés et suivez vos démarches en toute sécurité.</p>
         <a href="{% url 'objets_perdus' %}" class="btn btn-danger btn-lg shadow-lg me-3">❌ Voir les objets perdus</a>
         <a href="{% url 'objets_trouves' %}" class="btn btn-success btn-lg shadow-lg">✅ Voir les objets trouvés</a>
     </div>
-</section>  -->
-<br>
-<br>
+</section>  
 
-<h5 style="text-align: center;" class="card-title fw-bold">Les diffrentes avantages de notre app</h5>
+<br><br>
 
+<h5 style="text-align: center;" class="card-title fw-bold">Les différents avantages de notre app</h5>
 
 <div class="container features">
   <div class="row text-center">
-    
     <div class="col-md-4">
       <div class="card p-4">
         <i class="fa-solid fa-box-open icon-lost"></i>
         <h3>Déclarer un objet perdu</h3>
         <p>Remplissez facilement le formulaire pour signaler un objet que vous avez perdu.</p>
-        <button class="btn btn-action-lost">Déclarer un objet</button>
+        <a href="{% url 'declarer_objet' %}" class="btn btn-action-lost">Déclarer un objet</a>
       </div>
     </div>
 
@@ -72,7 +81,7 @@
         <i class="fa-solid fa-magnifying-glass icon-found"></i>
         <h3>Consulter les objets retrouvés</h3>
         <p>Parcourez la liste des objets retrouvés et contactez le déclarant si nécessaire.</p>
-        <button class="btn btn-action-found">Consulter les objets</button>
+        <a href="{% url 'objets_trouves' %}" class="btn btn-action-found">Consulter les objets</a>
       </div>
     </div>
 
@@ -81,51 +90,11 @@
         <i class="fa-solid fa-folder-open icon-follow"></i>
         <h3>Suivre vos démarches</h3>
         <p>Gardez un œil sur l'état de vos déclarations et notifications directement depuis votre compte.</p>
-        <button class="btn btn-action-follow">Suivre mes démarches</button>
       </div>
     </div>
-
   </div>
 </div>
 
-
-
-
-<!-- <section class="features py-6">
-    <div class="container">
-        <div class="row text-center g-5">
-            <div class="col-md-4">
-                <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-body">
-                        <i class="bi bi-pencil-square fs-1 text-primary mb-3"></i>
-                        <h5 class="card-title fw-bold">Déclarez un objet perdu</h5>
-                        <p class="card-text text-muted">Remplissez facilement un formulaire pour signaler vos objets perdus.</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-body">
-                        <i class="bi bi-search fs-1 text-success mb-3"></i>
-                        <h5 class="card-title fw-bold">Consultez les objets retrouvés</h5>
-                        <p class="card-text text-muted">Accédez à la liste des objets retrouvés et retrouvez facilement vos affaires.</p>
-                    </div>
-                </div>
-            </div>
-                           
-            <div class="col-md-4">
-                <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-body">
-                        <i class="bi bi-check2-circle fs-1 text-warning mb-3"></i>
-                        <h5 class="card-title fw-bold">Suivez vos démarches</h5>
-                        <p class="card-text text-muted">Suivez l’état de vos déclarations et recevez des notifications en temps réel.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section> -->
 <!-- Partenaires Section -->
 <section class="partners py-6 bg-light text-center">
     <div class="container">
@@ -149,7 +118,7 @@
 </section>
 
 <!-- 📦 CTA -->
-<section class="cta text-white text-center py-6 rounded shadow-lg">
+<section class="cta text-white text-center py-6 rounded shadow-lg" style="background-color: #6c1e3d;">
     <div class="container">
         <h2 class="display-5 mb-3">Vous avez perdu un objet ?</h2>
         <p class="mb-4 fs-5">Déclarez-le dès maintenant et augmentez vos chances de le retrouver rapidement.</p>
@@ -158,5 +127,11 @@
         </a>
     </div>
 </section>
+
+</div> 
+
+{% endblock %}
+
+{% block extra_js %}
 
 {% endblock %}
