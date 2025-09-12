@@ -108,3 +108,31 @@
         text-align: center;
     }
 }
+/* Bouton CTA Sky Blue */
+.btn-cta {
+    background-color: #87CEEB; /* Sky Blue */
+    color: #fff; /* Texte blanc */
+    border-radius: 0.5rem;
+    transition: transform 0.2s, box-shadow 0.2s, background-color 0.3s;
+}
+
+.btn-cta:hover {
+    background-color: #00BFFF; /* Deep Sky Blue pour hover */
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+/* =========================
+   CAROUSEL
+========================= */
+.carousel-inner img {
+    width: 100%;
+    max-height: 40vh; /* réduit la hauteur globale */
+    object-fit: cover;
+}
+
+/* Responsive : encore plus petit sur mobile */
+@media (max-width: 768px) {
+    .carousel-inner img {
+        max-height: 30vh;
+    }
+}

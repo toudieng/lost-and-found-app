@@ -2,98 +2,187 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Lost & Found{% endblock %}</title>
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-    <link rel="icon" href="{% static 'images/favicon.png' %}">
-    <style>
-        /* Transition douce pour le changement de fond */
-        body {
-            transition: background-color 0.5s ease;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}Lost & Found{% endblock %}</title>
+
+<!-- Bootstrap -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- Bootstrap Icons -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<!-- CSS global -->
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+<style>
+/* Corps */
+body {
+    background: linear-gradient(135deg, #f5f5f5, #e0e0e0);
+    transition: background 0.5s ease, color 0.5s ease;
+    color: #212529;
+}
+body.dark-mode {
+    background: linear-gradient(135deg, #121212, #2c2c2c);
+    color: #f5f5f5;
+}
+
+/* Navbar */
+.navbar-custom {
+    background: linear-gradient(90deg, #1a1a1a, #2c2c2c);
+}
+.navbar-custom .nav-link,
+.navbar-custom .dropdown-item {
+    color: #ddd !important;
+    padding: 0.5rem 0.8rem;
+}
+.navbar-custom .nav-link.active,
+.navbar-custom .nav-link:hover,
+.navbar-custom .dropdown-item:hover {
+    color: #ffc107 !important;
+}
+
+/* Footer */
+footer {
+    background: #1a1a1a;
+    color: #bbb;
+}
+footer a { color: #ffc107; }
+footer a:hover { text-decoration: underline; }
+
+/* Icône utilisateur responsive */
+@media (max-width: 768px) { #userLinksDesktop { display: none; } }
+@media (min-width: 769px) { #userDropdownMobile { display: none; } }
+
+/* Hero */
+.hero {
+    background: linear-gradient(135deg, #6c1e3d, #343a40);
+    color: white;
+    padding: 6rem 1rem;
+    border-radius: 0 0 2rem 2rem;
+    text-align: center;
+}
+.hero h1 { font-size: 2.5rem; }
+.hero p.lead { font-size: 1.25rem; }
+.hero .btn { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.hero .btn:hover { transform: scale(1.05); box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.2); }
+
+/* Features / Avantages */
+.features .card {
+    border-radius: 20px;
+    padding: 30px 20px;
+    margin-bottom: 30px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    text-align: center;
+}
+.features .card:hover {
+    transform: translateY(-10px) rotateZ(1deg);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.18);
+}
+.features .card i { font-size: 3rem; margin-bottom: 1rem; }
+.features .card .icon-lost { color: #d9534f; } /* rouge */
+.features .card .icon-found { color: #5cb85c; } /* vert */
+.features .card .icon-follow { color: #0275d8; } /* bleu */
+
+/* Partenaires */
+.partners { padding: 80px 0; text-align: center; }
+.partners h2 { color: #6c1e3d; margin-bottom: 30px; }
+.partners img {
+    filter: grayscale(80%);
+    opacity: 0.8;
+    transition: transform 0.4s ease, filter 0.4s ease, opacity 0.4s ease;
+}
+.partners img:hover {
+    filter: grayscale(0%);
+    opacity: 1;
+    transform: scale(1.1);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+}
+
+/* Section CTA finale */
+.cta {
+    padding: 80px 0;
+    text-align: center;
+    background-color: #6c1e3d;
+    color: white;
+    border-radius: 1rem;
+}
+.cta h2 { text-shadow: 1px 1px 4px rgba(0,0,0,0.15); }
+.cta .btn { transition: transform 0.2s ease, box-shadow 0.2s ease; animation: pulse 2s infinite; }
+.cta .btn:hover { transform: scale(1.08); box-shadow: 0 0.5rem 1rem rgba(255,255,255,0.3); }
+@keyframes pulse { 0%,100%{transform:scale(1);}50%{transform:scale(1.05);} }
+
+/* Responsive */
+@media (max-width: 768px) {
+    .hero { padding: 4rem 1rem; }
+    .hero h1 { font-size: 2rem; }
+    .cta h2 { font-size: 1.75rem; }
+    .features .card { text-align: center; }
+}
+</style>
 </head>
 <body class="d-flex flex-column min-vh-100">
 
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark shadow-sm fixed-top" id="main-navbar" style="background-color:#000000;">
-        <div class="container">
-            <a class="navbar-brand fw-bold d-flex align-items-center" href="{% url 'home' %}">
-                <i class="bi bi-search me-2"></i> Lost & Found
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark navbar-custom shadow-sm fixed-top">
+    <div class="container-fluid px-2 d-flex justify-content-between align-items-center">
+        <a class="navbar-brand fw-bold" href="{% url 'home' %}">Lost & Found</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-end" id="navbarContent">
+            <ul class="navbar-nav align-items-center">
+                <li class="nav-item"><a class="nav-link" href="#about">À propos</a></li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'contact' %}active{% endif %}" href="{% url 'contact' %}">
+                        <i class="bi bi-envelope me-1"></i> Contact
+                    </a>
+                </li>
 
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto align-items-center">
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.resolver_match.url_name == 'contact' %}active{% endif %}" href="{% url 'contact' %}">
-                            <i class="bi bi-envelope me-1"></i> Contact
+                {% if user.is_authenticated %}
+                    <li class="nav-item ms-2">
+                        <a class="btn btn-sm btn-warning fw-bold" href="{% url 'logout' %}">
+                            <i class="bi bi-box-arrow-right me-1"></i> Déconnexion
                         </a>
                     </li>
-
-                    {% if user.is_authenticated %}
-                        <li class="nav-item">
-                            <a class="btn btn-sm btn-warning fw-bold ms-2" href="{% url 'logout' %}">
-                                <i class="bi bi-box-arrow-right me-1"></i> Déconnexion
-                            </a>
-                        </li>
-                    {% else %}
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.resolver_match.url_name == 'login' %}active{% endif %}" href="{% url 'login' %}">
-                                <i class="bi bi-box-arrow-in-right me-1"></i> Connexion
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="btn btn-sm btn-light ms-2" href="{% url 'register' %}">
-                                <i class="bi bi-person-plus-fill me-1"></i> Inscription
-                            </a>
-                        </li>
-                    {% endif %}
-
-                    <!-- Bouton changer le background -->
-                    <li class="nav-item ms-3">
-                        <button id="bg-btn" class="btn btn-sm btn-primary fw-bold">🎨 Changer fond</button>
+                {% else %}
+                    <li class="nav-item ms-2">
+                        <a class="btn btn-sm btn-light fw-bold" href="{% url 'login' %}">
+                            <i class="bi bi-box-arrow-in-right me-1"></i> Connexion
+                        </a>
                     </li>
-                </ul>
-            </div>
+                    <li class="nav-item ms-2">
+                        <a class="btn btn-sm btn-light fw-bold" href="{% url 'register' %}">
+                            <i class="bi bi-person-plus-fill me-1"></i> Inscription
+                        </a>
+                    </li>
+                {% endif %}
+
+                <li class="nav-item ms-2">
+                    <button id="bg-btn" class="btn btn-sm btn-primary fw-bold">🎨 Thème</button>
+                </li>
+            </ul>
         </div>
-    </nav>
+    </div>
+</nav>
 
-    <!-- Espace pour éviter chevauchement navbar fixe -->
-    <div style="margin-top: 70px;"></div>
+<div style="margin-top: 70px;"></div>
 
-    <!-- Contenu principal -->
-    <main class="container my-4 flex-grow-1">
-        {% block content %}{% endblock %}
-    </main>
+<main class="container my-4 flex-grow-1">
+    {% block content %}{% endblock %}
+</main>
 
-    <!-- Footer -->
-    <footer class="text-center py-3 mt-auto border-top">
-        <p class="mb-0 small">
-            &copy; 2025 Lost&Found - Tous droits réservés |
-            <a href="{% url 'contact' %}" class="text-decoration-none">Nous contacter</a>
-        </p>
-    </footer>
+<footer class="text-center py-3 mt-auto border-top">
+    <p class="mb-0 small">
+        &copy; 2025 Lost&Found - Tous droits réservés |
+        <a href="{% url 'contact' %}" class="text-decoration-none">Nous contacter</a>
+    </p>
+</footer>
 
-    <!-- JS Bootstrap -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const btn = document.getElementById('bg-btn');
+btn.addEventListener('click', () => { document.body.classList.toggle('dark-mode'); });
+</script>
 
-    <!-- Script pour changer le fond -->
-    <script>
-        const btn = document.getElementById('bg-btn');
-        const colors = ['#000000', '#6c1e3d', '#1e6c3d', '#3d1e6c', '#6c3d1e', '#3d6c1e', '#f5f5f5', '#ffcccc', '#ffe6cc', '#ccf5ff'];
-
-        btn.addEventListener('click', () => {
-            const randomColor = colors[Math.floor(Math.random() * colors.length)];
-            document.body.style.backgroundColor = randomColor;
-        });
-    </script>
-
-    {% block extra_js %}{% endblock %}
+{% block extra_js %}{% endblock %}
 </body>
 </html>
