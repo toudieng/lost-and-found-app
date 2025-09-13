@@ -1,55 +1,46 @@
-/* =========================
-   SECTION HERO
-========================= */
-.hero {
-    background: linear-gradient(135deg, #6c1e3d, #343a40);
-    color: white;
-    padding: 6rem 1rem;
-    border-radius: 0 0 2rem 2rem;
+.hero-actions .btn-action {
+    position: relative;
+    display: inline-block;
+    padding: 1rem 2rem;
+    font-size: 1.3rem;
+    font-weight: 700;
+    border-radius: 0.7rem;
+    margin: 0.5rem;
+    color: #fff;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    border: none;
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.3s ease;
 }
 
-.hero h1 {
-    font-size: 2.5rem;
-    font-weight: bold;
+/* Dégradés */
+.btn-action-lost {
+    background: linear-gradient(135deg, #ff5c5c, #e53946);
+}
+.btn-action-found {
+    background: linear-gradient(135deg, #4cd964, #28a745);
 }
 
-.hero p {
-    font-size: 1.2rem;
-    margin-top: 1rem;
+/* Pseudo-éléments simplifiés pour glow */
+.btn-action::after {
+    content: "";
+    position: absolute;
+    inset: 0; /* top:0; left:0; right:0; bottom:0; */
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+    border-radius: 0.7rem;
 }
 
-.hero .btn {
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-.hero .btn:hover {
-    transform: scale(1.05);
-    box-shadow: 0px 4px 10px rgba(0,0,0,0.3);
+.btn-action:hover::after {
+    opacity: 1;
 }
 
-/* =========================
-   FEATURES
-========================= */
-.features .feature-card {
-    border-radius: 1rem;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    margin-bottom: 2rem;
-}
-.features .feature-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0px 8px 20px rgba(0,0,0,0.2);
-}
-.features h3 {
-    color: #6c1e3d;
-    font-weight: bold;
-    margin-bottom: 1rem;
-}
-/* Réduction de la hauteur des carrousels */
-.carousel-img {
-    max-height: 400px;
-    object-fit: cover;
-}
-
-.partner-img {
-    max-height: 150px;
-    object-fit: contain;
+/* Hover effect général */
+.btn-action:hover {
+    transform: scale(1.08);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+    filter: brightness(1.1);
 }
