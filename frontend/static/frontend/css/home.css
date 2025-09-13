@@ -8,131 +8,48 @@
     border-radius: 0 0 2rem 2rem;
 }
 
+.hero h1 {
+    font-size: 2.5rem;
+    font-weight: bold;
+}
+
+.hero p {
+    font-size: 1.2rem;
+    margin-top: 1rem;
+}
+
 .hero .btn {
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 .hero .btn:hover {
     transform: scale(1.05);
-    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.2);
+    box-shadow: 0px 4px 10px rgba(0,0,0,0.3);
 }
 
-/* Features */
-.features .card {
-    border-radius: 20px;
-    padding: 30px 20px;
-    margin-bottom: 30px;
+/* =========================
+   FEATURES
+========================= */
+.features .feature-card {
+    border-radius: 1rem;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    text-align: center;
+    margin-bottom: 2rem;
 }
-.features .card:hover {
-    transform: translateY(-10px) rotateZ(1deg);
-    box-shadow: 0 12px 30px rgba(0,0,0,0.18);
+.features .feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0px 8px 20px rgba(0,0,0,0.2);
 }
-
-/* Icônes */
-.features .card i {
-    font-size: 3rem;
+.features h3 {
+    color: #6c1e3d;
+    font-weight: bold;
     margin-bottom: 1rem;
 }
-.features .card .icon-lost {
-    color: #d9534f; /* rouge perte */
-}
-.features .card .icon-found {
-    color: #5cb85c; /* vert retrouvé */
-}
-.features .card .icon-follow {
-    color: #0275d8; /* bleu suivi */
-}
-
-/* =========================
-   SECTION PARTENAIRES
-========================= */
-.partners {
-    padding: 80px 0;
-    text-align: center;
-}
-.partners h2 {
-    color: #6c1e3d;
-    margin-bottom: 30px;
-}
-
-/* Partners */
-.partners img {
-    filter: grayscale(80%);
-    opacity: 0.8;
-    transition: transform 0.4s ease, filter 0.4s ease, opacity 0.4s ease;
-}
-.partners img:hover {
-    filter: grayscale(0%);
-    opacity: 1;
-    transform: scale(1.1);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
-}
-
-/* =========================
-   SECTION CALL TO ACTION
-========================= */
-.cta {
-    padding: 80px 0;
-    text-align: center;
-}
-.cta h2 {
-    text-shadow: 1px 1px 4px rgba(0,0,0,0.15);
-}
-.cta .btn {
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    animation: pulse 2s infinite;
-}
-.cta .btn:hover {
-    transform: scale(1.08);
-    box-shadow: 0 0.5rem 1rem rgba(255,255,255,0.3);
-}
-@keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-}
-
-/* Responsive ajustements */
-@media (max-width: 768px) {
-    .hero {
-        padding: 4rem 1rem;
-        text-align: center;
-    }
-    .hero h1 {
-        font-size: 2rem;
-    }
-    .cta h2 {
-        font-size: 1.75rem;
-    }
-    .features .card {
-        text-align: center;
-    }
-}
-/* Bouton CTA Sky Blue */
-.btn-cta {
-    background-color: #87CEEB; /* Sky Blue */
-    color: #fff; /* Texte blanc */
-    border-radius: 0.5rem;
-    transition: transform 0.2s, box-shadow 0.2s, background-color 0.3s;
-}
-
-.btn-cta:hover {
-    background-color: #00BFFF; /* Deep Sky Blue pour hover */
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-}
-/* =========================
-   CAROUSEL
-========================= */
-.carousel-inner img {
-    width: 100%;
-    max-height: 40vh; /* réduit la hauteur globale */
+/* Réduction de la hauteur des carrousels */
+.carousel-img {
+    max-height: 400px;
     object-fit: cover;
 }
 
-/* Responsive : encore plus petit sur mobile */
-@media (max-width: 768px) {
-    .carousel-inner img {
-        max-height: 30vh;
-    }
+.partner-img {
+    max-height: 150px;
+    object-fit: contain;
 }
