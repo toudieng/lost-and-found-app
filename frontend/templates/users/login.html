@@ -5,44 +5,68 @@
 
 {% block extra_css %}
 <style>
-    .form-container {
-        background: #fff;
-        padding: 2rem;
-        border-radius: 0.5rem;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    body {
+        background: linear-gradient(135deg, #f5f5f5, #e0e0e0);
     }
 
-    .text-error {
-        color: #dc3545;
-        font-size: 0.8rem;
+    .form-container {
+        background: #fff;
+        padding: 2.5rem 2rem;
+        border-radius: 1rem;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .form-container:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 25px rgba(0,0,0,0.15);
     }
 
     .form-title {
         color: #6c1e3d;
         font-weight: 700;
+        font-size: 1.5rem;
+    }
+
+    .text-error {
+        color: #dc3545;
+        font-size: 0.85rem;
     }
 
     .btn-submit {
         background-color: #6c1e3d;
         border-color: #6c1e3d;
+        transition: all 0.3s ease;
     }
-
     .btn-submit:hover {
         background-color: #53162b;
         border-color: #53162b;
+        transform: translateY(-1px);
     }
 
     .input-xs {
-        height: 38px;
-        font-size: 0.9rem;
+        height: 42px;
+        font-size: 0.95rem;
         padding: 0.375rem 0.75rem;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    .input-xs:focus {
+        border-color: #6c1e3d;
+        box-shadow: 0 0 5px rgba(108,30,61,0.5);
+        outline: none;
+    }
+
+    @media (max-width: 576px) {
+        .form-container {
+            padding: 2rem 1rem;
+        }
+        .form-title { font-size: 1.3rem; }
     }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="row justify-content-center mt-5">
-    <div class="col-md-5 col-lg-4">
+    <div class="col-md-6 col-lg-5 col-xl-4">
         <div class="form-container">
             <h4 class="mb-4 text-center form-title">🔑 Connexion</h4>
 
@@ -54,7 +78,7 @@
 
             <form method="POST" novalidate>
                 {% csrf_token %}
-
+                
                 <div class="mb-3">
                     <label for="email" class="form-label fw-bold">📧 Adresse e-mail</label>
                     <input type="email" class="form-control input-xs" id="email" name="email" required>
@@ -71,7 +95,7 @@
             </form>
 
             <p class="mt-3 text-center small">
-                Pas de compte ? <a href="{% url 'register' %}" class="fw-bold text-decoration-none">Inscrivez-vous ici</a>
+                Pas de compte ? <a href="{% url 'register' %}" class="fw-bold text-decoration-none" style="color:#6c1e3d;">Inscrivez-vous ici</a>
             </p>
         </div>
     </div>

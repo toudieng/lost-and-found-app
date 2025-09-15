@@ -12,16 +12,42 @@
         position: sticky;
         top: 0;
     }
-    .sidebar h4 { color: #ffc107; text-align:center; margin-bottom:1.5rem; }
-    .sidebar .nav-link { color:#adb5bd; border-radius:0.5rem; padding:0.6rem 1rem; }
-    .sidebar .nav-link:hover, .sidebar .nav-link.active {
-        background:#495057; color:#ffc107;
+    .sidebar h4 {
+        color: #ffc107;
+        text-align: center;
+        margin-bottom: 1.5rem;
     }
-    .main-content { padding:2rem; background:#f8f9fa; min-height:100vh; }
-    .welcome-title { color:#6c1e3d; font-weight:700; }
-    .stats-card { border-radius:1rem; padding:1.5rem; background:#fff;
-                  box-shadow:0 4px 12px rgba(0,0,0,0.05); }
-    .stats-icon { font-size:2rem; margin-right:1rem; color:#6c1e3d; }
+    .sidebar .nav-link {
+        color: #adb5bd;
+        border-radius: 0.5rem;
+        padding: 0.6rem 1rem;
+    }
+    .sidebar .nav-link:hover,
+    .sidebar .nav-link.active {
+        background: #495057;
+        color: #ffc107;
+    }
+    .main-content {
+        padding: 2rem;
+        background: #f8f9fa;
+        min-height: 100vh;
+    }
+    .welcome-title {
+        color: #6c1e3d;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    .stats-card {
+        border-radius: 1rem;
+        padding: 1.5rem;
+        background: #fff;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    .stats-icon {
+        font-size: 2rem;
+        margin-right: 1rem;
+        color: #6c1e3d;
+    }
 </style>
 {% endblock %}
 
@@ -33,25 +59,42 @@
     <div class="col-md-4">
         <div class="stats-card d-flex align-items-center">
             <span class="stats-icon">🏢</span>
-            <div><h5 class="mb-0">12</h5><small>Commissariats</small></div>
+            <div>
+                <h5 class="mb-0">{{ nb_commissariats }}</h5>
+                <small>Commissariats</small>
+            </div>
         </div>
     </div>
     <div class="col-md-4">
         <div class="stats-card d-flex align-items-center">
             <span class="stats-icon">👥</span>
-            <div><h5 class="mb-0">48</h5><small>Utilisateurs</small></div>
+            <div>
+                <h5 class="mb-0">{{ nb_utilisateurs }}</h5>
+                <small>Utilisateurs</small>
+            </div>
         </div>
     </div>
     <div class="col-md-4">
         <div class="stats-card d-flex align-items-center">
             <span class="stats-icon">📦</span>
-            <div><h5 class="mb-0">132</h5><small>Objets gérés</small></div>
+            <div>
+                <h5 class="mb-0">{{ nb_objets }}</h5>
+                <small>Objets gérés</small>
+            </div>
         </div>
     </div>
 </div>
 
 <div class="card shadow-sm p-3 mt-4">
     <h5>🔔 Notifications récentes</h5>
-    <p class="text-muted">Aucune notification pour le moment.</p>
+    {% if notifications %}
+        <ul class="list-group list-group-flush">
+            {% for notif in notifications %}
+                <li class="list-group-item">{{ notif.message }} <small class="text-muted">{{ notif.date }}</small></li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="text-muted">Aucune notification pour le moment.</p>
+    {% endif %}
 </div>
 {% endblock %}

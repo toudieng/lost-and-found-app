@@ -9,6 +9,7 @@ from datetime import datetime
 from backend.objets.models import Objet, Declaration, Restitution, Commissariat
 from backend.users.forms import CommissariatForm, PolicierForm
 from backend.objets.forms import RestitutionForm
+from backend.users.models import Utilisateur
 
 # ======================================================
 #                    PAGES PUBLIQUES
@@ -231,9 +232,21 @@ def marquer_restitue(request, restitution_id):
 #                 DASHBOARD ADMINISTRATEUR
 # ======================================================
 
+
 @login_required(login_url='login')
 def dashboard_admin(request):
-    return render(request, "frontend/admin/dashboard_admin.html")
+    # Compter les éléments dans la base de données
+    nb_commissariats = Commissariat.objects.count()
+    nb_utilisateurs = Utilisateur.objects.count()
+    nb_objets = Objet.objects.count()
+
+    context = {
+        'nb_commissariats': nb_commissariats,
+        'nb_utilisateurs': nb_utilisateurs,
+        'nb_objets': nb_objets,
+    }
+
+    return render(request, "frontend/admin/dashboard_admin.html", context)
 
 def gerer_commissariats(request):
     commissariats = Commissariat.objects.all()
@@ -242,13 +255,17 @@ def gerer_commissariats(request):
 def gerer_utilisateurs(request):
     return render(request, "frontend/admin/gerer_utilisateurs.html")
 
+
+@login_required(login_url='login')
 def voir_stats(request):
     nb_objets = Objet.objects.count()
     nb_restitutions = Restitution.objects.count()
-    return render(request, "frontend/admin/voir_stats.html", {
+    context = {
         "nb_objets": nb_objets,
         "nb_restitutions": nb_restitutions
-    })
+    }
+    return render(request, "frontend/admin/voir_stats.html", context)
+
 
 @login_required(login_url='login')
 def ajouter_commissariat(request):
