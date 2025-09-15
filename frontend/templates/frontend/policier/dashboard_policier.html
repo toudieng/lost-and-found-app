@@ -1,52 +1,37 @@
-{% extends "frontend/base.html" %}
-{% load static %}
+{% extends "frontend/base_policier.html" %}
 
 {% block title %}Dashboard Policier{% endblock %}
 
-{% block content %}
-<div class="row g-0">
+{% block sidebar %}
+<h4 class="mb-4">👮 Policier</h4>
+<ul class="nav flex-column">
+    <li class="nav-item mb-2">
+        <a class="nav-link text-white" href="{% url 'historique_restitutions' %}">📂 Historique des restitutions</a>
+    </li>
+    <li class="nav-item mb-2">
+        <a class="nav-link text-white" href="{% url 'objets_reclames' %}">📍 Objets à restituer (réclamés)</a>
+    </li>
+    <li class="nav-item mb-2">
+        <a class="nav-link text-white" href="{% url 'objets_retrouves_attente' %}">📦 Objets retrouvés (en attente)</a>
+    </li>
+</ul>
+{% endblock %}
 
-    <!-- Sidebar -->
-    <div class="col-md-3 col-lg-2 bg-dark text-white vh-100 p-3">
-        <h4 class="mb-4 text-center">👮 Policier</h4>
-        <ul class="nav flex-column">
-            <li class="nav-item mb-2">
-                <a class="nav-link text-white" href="{% url 'historique_restitutions' %}">
-                    📂 Historique des restitutions
-                </a>
-            </li>
-            <li class="nav-item mb-2">
-                <a class="nav-link text-white" href="{% url 'objets_reclames' %}">
-                    📍 Objets à restituer (réclamés)
-                </a>
-            </li>
-            <li class="nav-item mb-2">
-                <a class="nav-link text-white" href="{% url 'objets_retrouves_attente' %}">
-                    📦 Objets retrouvés (en attente)
-                </a>
-            </li>
-        </ul>
+{% block content %}
+<div class="d-flex flex-column gap-3">
+    <h2 class="fw-bold">Bienvenue sur votre espace Policier</h2>
+    <p class="lead">Vous pouvez gérer les objets et programmer les restitutions depuis ce tableau de bord.</p>
+
+    <hr>
+
+    <div class="alert alert-info shadow-sm" role="alert">
+        ✅ Astuce : consultez les sections <strong>Objets à restituer</strong> et 
+        <strong>Objets retrouvés (en attente)</strong> pour planifier ou marquer les restitutions.
     </div>
 
-    <!-- Contenu principal -->
-    <div class="col-md-9 col-lg-10 p-4">
-        <div class="d-flex flex-column gap-3">
-            <h2 class="fw-bold">Bienvenue sur votre espace Policier</h2>
-            <p class="lead">Vous pouvez gérer les objets et programmer les restitutions depuis ce tableau de bord.</p>
-
-            <hr>
-
-            <div class="alert alert-info shadow-sm" role="alert">
-                ✅ Astuce : consultez les sections <strong>Objets à restituer</strong> et 
-                <strong>Objets retrouvés (en attente)</strong> pour planifier ou marquer les restitutions.
-            </div>
-
-            <!-- Placeholder pour statistiques futures -->
-            <div class="card shadow-sm p-3">
-                <h5 class="card-title">📊 Statistiques rapides</h5>
-                <p class="card-text text-muted">Aucune statistique disponible pour le moment.</p>
-            </div>
-        </div>
+    <div class="card shadow-sm p-3">
+        <h5 class="card-title">📊 Statistiques rapides</h5>
+        <p class="card-text text-muted">Aucune statistique disponible pour le moment.</p>
     </div>
 </div>
 {% endblock %}
