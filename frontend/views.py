@@ -195,7 +195,7 @@ def planifier_restitution(request, objet_id, type_objet="declaration"):
 
     return render(request, "frontend/policier/planifier_restitution.html", {
         "restitution": restitution,
-        "declaration": declaration,  # <-- ajouté pour le template
+        "declaration": declaration,  
         "form": form,
         "commissariats": commissariats,
         "type_objet": type_objet
