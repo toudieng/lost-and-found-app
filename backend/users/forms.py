@@ -61,3 +61,39 @@ class PolicierForm(forms.ModelForm):
         if commit:
             user.save()
         return user
+from django import forms
+from django.utils.crypto import get_random_string
+from django.core.mail import send_mail
+from .models import Utilisateur
+
+class AdministrateurCreationForm(forms.ModelForm):
+    class Meta:
+        model = Utilisateur
+        fields = ['email', 'first_name', 'last_name', 'telephone']  # ajout des noms
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.role = 'admin'
+
+        # Génération automatique d'un username valide (prenom.nom ou email)
+        base_username = f"{self.cleaned_data['first_name']}.{self.cleaned_data['last_name']}".lower()
+        username = ''.join(c for c in base_username if c.isalnum() or c in ('@','.','+','-','_'))
+        user.username = username[:150]  # limite Django
+
+        # Mot de passe aléatoire
+        password = get_random_string(10)
+        user.set_password(password)
+
+        if commit:
+            user.save()
+            # Envoi du mot de passe par email
+            send_mail(
+                subject="Vos identifiants administrateur",
+                message=f"Bonjour {user.first_name} {user.last_name},\n\n"
+                        f"Votre compte administrateur a été créé.\n"
+                        f"Email: {user.email}\nMot de passe: {password}\n\nMerci.",
+                from_email="noreply@lostfound.com",
+                recipient_list=[user.email],
+                fail_silently=False,
+            )
+        return user

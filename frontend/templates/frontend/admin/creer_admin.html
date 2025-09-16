@@ -1,0 +1,15 @@
+{% extends "frontend/base.html" %}
+
+{% block title %}Créer un administrateur{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h2 class="mb-4">Créer un nouvel administrateur</h2>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Créer</button>
+    </form>
+</div>
+{% endblock %}

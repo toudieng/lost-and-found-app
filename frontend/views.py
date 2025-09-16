@@ -7,9 +7,12 @@ import random, string
 from datetime import datetime
 
 from backend.objets.models import Objet, Declaration, Restitution, Commissariat
-from backend.users.forms import CommissariatForm, PolicierForm
+from backend.users.forms import CommissariatForm, PolicierForm,AdministrateurCreationForm
 from backend.objets.forms import RestitutionForm
 from backend.users.models import Utilisateur
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.contrib.auth.decorators import user_passes_test
 
 # ======================================================
 #                    PAGES PUBLIQUES
@@ -254,6 +257,22 @@ def gerer_commissariats(request):
 
 def gerer_utilisateurs(request):
     return render(request, "frontend/admin/gerer_utilisateurs.html")
+
+# Vérifie que seul un admin peut créer un autre admin
+def is_admin(user):
+    return user.is_authenticated and user.role == "admin"
+
+@user_passes_test(is_admin)
+def creer_administrateur(request):
+    if request.method == "POST":
+        form = AdministrateurCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Administrateur créé et mot de passe envoyé par email.")
+            return redirect('dashboard_admin')  # page de redirection après création
+    else:
+        form = AdministrateurCreationForm()
+    return render(request, "frontend/admin/creer_admin.html", {"form": form})
 
 
 @login_required(login_url='login')

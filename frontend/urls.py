@@ -41,4 +41,8 @@ urlpatterns = [
     path("dashboard/admin/stats/", views.voir_stats, name="voir_stats"),
      path('dashboard/admin/commissariats/ajouter_commissariat/', views.ajouter_commissariat, name='ajouter_commissariat'),
      path("creer_policier/", views.creer_policier, name="creer_policier"),
+      path('admin/creer/', views.creer_administrateur, name='creer_admin'),
+    path('dashboard/admin/utilisateurs/creer_administrateur/', 
+         views.creer_administrateur, 
+         name='creer_administrateur'),
 ]

@@ -27,7 +27,7 @@ body.dark-mode {
 
 /* Navbar */
 .navbar-custom {
-    background-color: #495057 !important;
+    background: linear-gradient(90deg, #1a1a1a, #2c2c2c);
 }
 .navbar-custom .nav-link,
 .navbar-custom .dropdown-item {
@@ -42,19 +42,15 @@ body.dark-mode {
 
 /* Footer */
 footer {
-    background-color: #495057; 
-    color: #f5f5f5;
-    padding: 1.5rem 0;
-    border-radius: 1rem 1rem 0 0;
+    background: #1a1a1a;
+    color: #bbb;
 }
-footer a {
-    color: #ffc107;
-    text-decoration: none;
-}
-footer a:hover {
-    color: #ffd633;
-    text-decoration: underline;
-}
+footer a { color: #ffc107; }
+footer a:hover { text-decoration: underline; }
+
+/* Icône utilisateur responsive */
+@media (max-width: 768px) { #userLinksDesktop { display: none; } }
+@media (min-width: 769px) { #userDropdownMobile { display: none; } }
 
 /* Hero */
 .hero {
@@ -82,9 +78,9 @@ footer a:hover {
     box-shadow: 0 12px 30px rgba(0,0,0,0.18);
 }
 .features .card i { font-size: 3rem; margin-bottom: 1rem; }
-.features .card .icon-lost { color: #d9534f; }
-.features .card .icon-found { color: #5cb85c; }
-.features .card .icon-follow { color: #0275d8; }
+.features .card .icon-lost { color: #d9534f; } /* rouge */
+.features .card .icon-found { color: #5cb85c; } /* vert */
+.features .card .icon-follow { color: #0275d8; } /* bleu */
 
 /* Partenaires */
 .partners { padding: 80px 0; text-align: center; }
@@ -174,10 +170,10 @@ footer a:hover {
     {% block content %}{% endblock %}
 </main>
 
-<footer class="text-center mt-auto">
+<footer class="text-center py-3 mt-auto border-top">
     <p class="mb-0 small">
         &copy; 2025 Lost&Found - Tous droits réservés |
-        <a href="{% url 'contact' %}">Nous contacter</a>
+        <a href="{% url 'contact' %}" class="text-decoration-none">Nous contacter</a>
     </p>
 </footer>
 
