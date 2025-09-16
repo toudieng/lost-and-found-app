@@ -5,11 +5,12 @@ from django.core.mail import send_mail
 from django.conf import settings
 import random, string
 from datetime import datetime
+from django.utils import timezone
 
 from backend.objets.models import Objet, Declaration, Restitution, Commissariat
 from backend.users.forms import CommissariatForm, PolicierForm,AdministrateurCreationForm
 from backend.objets.forms import RestitutionForm
-from backend.users.models import Utilisateur
+from backend.users.models import Utilisateur, Notification
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import user_passes_test
@@ -48,8 +49,23 @@ def objet_detail(request, pk):
 # ======================================================
 
 @login_required(login_url='login')
+
 def dashboard_policier(request):
-    return render(request, "frontend/policier/dashboard_policier.html")
+    user = request.user
+
+    nb_objets_retrouves = Objet.objects.filter(etat='retrouvé').count()
+    nb_objets_a_restituer = Objet.objects.filter(etat='à restituer').count()
+    nb_restitutions = Restitution.objects.count()
+
+    notifications = user.notifications.order_by('-date')[:5]  # 5 dernières notifications
+
+    return render(request, "frontend/policier/dashboard_policier.html", {
+        "nb_objets_retrouves": nb_objets_retrouves,
+        "nb_objets_a_restituer": nb_objets_a_restituer,
+        "nb_restitutions": nb_restitutions,
+        "notifications": notifications,
+        "year": timezone.now().year,
+    })
 
 def liste_objets_declares(request):
     objets = Objet.objects.all()

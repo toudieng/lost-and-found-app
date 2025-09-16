@@ -13,47 +13,73 @@
     <style>
         body { background: #f8f9fa; font-family: 'Segoe UI', sans-serif; }
 
-        /* Sidebar */
-        .sidebar {
-            background: linear-gradient(180deg, #1a1a1a, #2c2c2c);
-            color: #fff;
-            min-height: 100vh;
-            padding: 2rem 1rem;
-            position: sticky;
-            top: 0;
+        /* Navbar */
+        .navbar {
+            background-color: #343a40;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
         }
-        .sidebar h4 { color: #ffc107; margin-bottom: 1.5rem; text-align: center; }
-        .sidebar .nav-link {
-            color: #ddd;
-            margin-bottom: 0.7rem;
-            border-radius: 0.25rem;
-            transition: all 0.2s ease;
-        }
-        .sidebar .nav-link:hover { background-color: #495057; color: #ffc107; text-decoration: none; }
+        .navbar img.profile-img { width:32px; height:32px; object-fit:cover; }
 
-        /* Contenu principal */
-        .main-content { padding: 2rem; }
+        /* Main content */
+        .main-content { padding: 2rem; min-height: 80vh; }
+
+        /* Footer */
+        footer {
+            background-color: #343a40;
+            color: #fff;
+            text-align: center;
+            padding: 1rem 0;
+            margin-top: 2rem;
+        }
     </style>
 
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-<div class="container-fluid">
-    <div class="row">
-        <!-- Sidebar -->
-        <div class="col-md-3 col-lg-2 sidebar">
-            {% block sidebar %}
-            <!-- La sidebar spécifique au policier sera ici -->
-            {% endblock %}
-        </div>
-
-        <!-- Contenu principal -->
-        <div class="col-md-9 col-lg-10 main-content">
-            {% block content %}
-            {% endblock %}
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand fw-bold" href="#">🚓 Espace Policier</a>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                {% if user.is_authenticated %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="profilDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            {% if user.photo %}
+                                <img src="{{ user.photo.url }}" alt="Profil" class="rounded-circle me-2 profile-img">
+                            {% else %}
+                                <img src="{% static 'images/default-avatar.png' %}" alt="Profil" class="rounded-circle me-2 profile-img">
+                            {% endif %}
+                            {{ user.username }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="profilDropdown">
+                            <li><a class="dropdown-item" href="{% url 'profil_police' %}">👤 Mon Profil</a></li>
+                            <li><a class="dropdown-item" href="{% url 'modifier_profil_police' %}">✏️ Modifier Profil</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="{% url 'logout' %}">🚪 Déconnexion</a></li>
+                        </ul>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="btn btn-outline-light ms-2" href="{% url 'login' %}">🔑 Connexion</a>
+                    </li>
+                {% endif %}
+            </ul>
         </div>
     </div>
+</nav>
+
+<!-- Contenu principal minimal -->
+<div class="container main-content">
+    {% block content %}
+    <!-- Ici rien ou contenu spécifique au profil -->
+    {% endblock %}
 </div>
+
+<!-- Footer -->
+<footer>
+    © {{ current_year }} - Espace Policier
+</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 {% block extra_js %}{% endblock %}

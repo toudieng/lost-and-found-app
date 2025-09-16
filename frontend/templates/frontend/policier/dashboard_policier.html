@@ -1,37 +1,152 @@
 {% extends "frontend/policier/base_policier.html" %}
+{% load static %}
 
 {% block title %}Dashboard Policier{% endblock %}
 
-{% block sidebar %}
-<h4 class="mb-4">👮 Policier</h4>
-<ul class="nav flex-column">
-    <li class="nav-item mb-2">
-        <a class="nav-link text-white" href="{% url 'historique_restitutions' %}">📂 Historique des restitutions</a>
-    </li>
-    <li class="nav-item mb-2">
-        <a class="nav-link text-white" href="{% url 'objets_reclames' %}">📍 Objets à restituer (réclamés)</a>
-    </li>
-    <li class="nav-item mb-2">
-        <a class="nav-link text-white" href="{% url 'objets_retrouves_attente' %}">📦 Objets retrouvés (en attente)</a>
-    </li>
-</ul>
+{% block extra_css %}
+<style>
+    body {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+        background: linear-gradient(180deg, #343a40, #1d1f21);
+        color: #fff;
+        min-height: 100vh;
+        padding: 2rem 1rem;
+        position: sticky;
+        top: 0;
+    }
+    .sidebar h4 {
+        color: #ffc107;
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+    .sidebar .nav-link {
+        color: #adb5bd;
+        border-radius: 0.5rem;
+        padding: 0.6rem 1rem;
+    }
+    .sidebar .nav-link:hover,
+    .sidebar .nav-link.active {
+        background: #495057;
+        color: #ffc107;
+    }
+
+    /* Contenu principal */
+    .main-content {
+        flex: 1 0 auto;
+        padding: 2rem;
+        background: #f8f9fa;
+        min-height: 100vh;
+    }
+
+    .welcome-title {
+        color: #6c1e3d;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .stats-card, .action-card {
+        border-radius: 1rem;
+        padding: 1.5rem;
+        background: #fff;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        transition: transform 0.2s;
+    }
+    .stats-card:hover, .action-card:hover {
+        transform: translateY(-3px);
+    }
+    .stats-icon {
+        font-size: 2rem;
+        color: #6c1e3d;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
-<div class="d-flex flex-column gap-3">
-    <h2 class="fw-bold">Bienvenue sur votre espace Policier</h2>
-    <p class="lead">Vous pouvez gérer les objets et programmer les restitutions depuis ce tableau de bord.</p>
-
-    <hr>
-
-    <div class="alert alert-info shadow-sm" role="alert">
-        ✅ Astuce : consultez les sections <strong>Objets à restituer</strong> et 
-        <strong>Objets retrouvés (en attente)</strong> pour planifier ou marquer les restitutions.
+<div class="row">
+    <!-- Sidebar -->
+    <div class="col-md-3 col-lg-2 sidebar">
+        <h4>👮 Policier</h4>
+        <ul class="nav flex-column">
+            <li class="nav-item mb-2">
+                <a class="nav-link {% if request.resolver_match.url_name == 'historique_restitutions' %}active{% endif %}" href="{% url 'historique_restitutions' %}">📂 Historique des restitutions</a>
+            </li>
+            <li class="nav-item mb-2">
+                <a class="nav-link {% if request.resolver_match.url_name == 'objets_reclames' %}active{% endif %}" href="{% url 'objets_reclames' %}">📍 Objets à restituer (réclamés)</a>
+            </li>
+            <li class="nav-item mb-2">
+                <a class="nav-link {% if request.resolver_match.url_name == 'objets_retrouves_attente' %}active{% endif %}" href="{% url 'objets_retrouves_attente' %}">📦 Objets retrouvés (en attente)</a>
+            </li>
+        </ul>
     </div>
 
-    <div class="card shadow-sm p-3">
-        <h5 class="card-title">📊 Statistiques rapides</h5>
-        <p class="card-text text-muted">Aucune statistique disponible pour le moment.</p>
+    <!-- Contenu principal -->
+    <div class="col-md-9 col-lg-10 main-content">
+        <h2 class="welcome-title">Bienvenue, Policier 👋</h2>
+        <p class="text-muted mb-4">Gérez les objets et planifiez les restitutions depuis ce tableau de bord.</p>
+
+        <!-- Statistiques -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <a href="{% url 'objets_retrouves_attente' %}" class="text-decoration-none">
+                    <div class="stats-card">
+                        <span class="stats-icon">📦</span>
+                        <div>
+                            <h5 class="mb-0">{{ nb_objets_retrouves|default:"0" }}</h5>
+                            <small>Objets retrouvés</small>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a href="{% url 'objets_reclames' %}" class="text-decoration-none">
+                    <div class="stats-card">
+                        <span class="stats-icon">📍</span>
+                        <div>
+                            <h5 class="mb-0">{{ nb_objets_a_restituer|default:"0" }}</h5>
+                            <small>Objets à restituer</small>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a href="{% url 'historique_restitutions' %}" class="text-decoration-none">
+                    <div class="stats-card">
+                        <span class="stats-icon">📂</span>
+                        <div>
+                            <h5 class="mb-0">{{ nb_restitutions|default:"0" }}</h5>
+                            <small>Historique</small>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+
+        <!-- Notifications -->
+        <div class="card shadow-sm p-3">
+            <h5>🔔 Notifications récentes</h5>
+            {% if notifications %}
+                <ul class="list-group list-group-flush">
+                    {% for notif in notifications %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <a href="{{ notif.link }}" class="text-decoration-none">{{ notif.message }}</a>
+                            <small class="text-muted">{{ notif.date|date:"d/m/Y H:i" }}</small>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-muted">Aucune notification pour le moment.</p>
+            {% endif %}
+        </div>
     </div>
 </div>
 {% endblock %}

@@ -91,3 +91,30 @@ def modifier_profil_admin(request):
         form = ProfilForm(instance=user)
 
     return render(request, "frontend/admin/modifier_profil.html", {"form": form})
+
+@login_required
+def profil_police(request):
+    return render(request, "frontend/policier/profil.html")
+
+
+@login_required
+def modifier_profil_police(request):
+    from.forms import ProfilForm  
+
+    user = request.user
+    if request.method == "POST":
+        form = ProfilForm(request.POST, request.FILES, instance=user)
+        if form.is_valid():
+            form.save()
+            return redirect('profil_police')
+    else:
+        form = ProfilForm(instance=user)
+
+    return render(request, "frontend/policier/modifier_profil.html", {"form": form})
+from .models import Notification
+
+def some_view(request):
+    Notification.objects.create(
+        user=request.user,
+        message="Un nouvel objet à restituer a été ajouté."
+    )

@@ -44,3 +44,18 @@ class Commissariat(models.Model):
 
     def __str__(self):
         return self.nom
+
+from django.conf import settings 
+
+class Notification(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,  # fait référence à 'Utilisateur'
+        on_delete=models.CASCADE,
+        related_name="notifications"
+    )
+    message = models.TextField()
+    date = models.DateTimeField(auto_now_add=True)
+    lu = models.BooleanField(default=False)  # si la notification a été lue
+
+    def __str__(self):
+        return f"Notification pour {self.user.username} : {self.message[:30]}"
