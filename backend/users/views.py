@@ -4,7 +4,9 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from backend.objets.models import Objet
 from .forms import UtilisateurCreationForm
-
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+from .forms import ProfilForm
 def login_view(request):
     if request.method == 'POST':
         email = request.POST.get('email')
@@ -71,3 +73,21 @@ def admin_dashboard(request):
         "objets_trouves": objets_trouves,
     }
     return render(request, "frontend/admin_dashboard.html", context)
+
+
+@login_required
+def profil_admin(request):
+    return render(request, "frontend/admin/profil.html", {"user": request.user})
+
+@login_required
+def modifier_profil_admin(request):
+    user = request.user
+    if request.method == "POST":
+        form = ProfilForm(request.POST, request.FILES, instance=user)
+        if form.is_valid():
+            form.save()
+            return redirect("profil_admin")
+    else:
+        form = ProfilForm(instance=user)
+
+    return render(request, "frontend/admin/modifier_profil.html", {"form": form})

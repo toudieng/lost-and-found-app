@@ -131,6 +131,37 @@
     margin-right: 0.5rem;
     font-size: 1.2rem;
 }
+.hero-actions .btn-action {
+    position: relative;
+    display: inline-block;
+    padding: 1rem 2.5rem;
+    font-size: 1.4rem;
+    font-weight: 700;
+    border-radius: 0.7rem;
+    margin: 0.8rem;
+    color: #fff;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+    text-decoration: none; /* enlève le soulignement */
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+/* Couleurs personnalisées */
+.btn-action-lost {
+    background: linear-gradient(135deg, #ff5c5c, #e53946);
+}
+.btn-action-found {
+    background: linear-gradient(135deg, #4cd964, #28a745);
+}
+
+/* Effets hover */
+.btn-action:hover {
+    transform: scale(1.08);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.45);
+    filter: brightness(1.12);
+}
+
 </style>
 {% endblock %}
 
@@ -177,8 +208,12 @@
 <!-- Section 2 : Boutons d'action -->
 <section class="hero-actions">
     <div class="container text-center">
-        <a href="{% url 'objets_perdus' %}" class="btn-action btn-action-lost btn-lg shadow-lg">❌ Voir les objets perdus</a>
-        <a href="{% url 'objets_trouves' %}" class="btn-action btn-action-found btn-lg shadow-lg">✅ Voir les objets trouvés</a>
+        <a href="{% url 'objets_perdus' %}" class="btn-action btn-action-lost">
+            ❌ Voir les objets perdus
+        </a>
+        <a href="{% url 'objets_trouves' %}" class="btn-action btn-action-found">
+            ✅ Voir les objets trouvés
+        </a>
     </div>
 </section>
 

@@ -3,7 +3,7 @@ from django.contrib.auth.models import AbstractUser
 
 
 class Utilisateur(AbstractUser):
-    # On rend 'email' unique et utilisé comme identifiant
+    # Identifiant principal
     email = models.EmailField(unique=True)
     telephone = models.CharField(max_length=20, blank=True, null=True)
 
@@ -13,19 +13,29 @@ class Utilisateur(AbstractUser):
         ('citoyen', 'Citoyen'),
     )
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='policier')
+
     commissariat = models.ForeignKey(
         'Commissariat',
         on_delete=models.SET_NULL,
-        null=True, blank=True,
+        null=True,
+        blank=True,
         related_name='policiers'
+    )
+
+    # 📸 Champ photo de profil
+    photo = models.ImageField(
+        upload_to="photos_profil/",
+        blank=True,
+        null=True,
+        default="photos_profil/default-avatar.png"
     )
 
     # On définit 'email' comme identifiant principal
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["username"] 
+    REQUIRED_FIELDS = ["username"]
 
     def __str__(self):
-        return f"{self.email} ({self.role})"
+        return f"{self.username} ({self.email}) - {self.role}"
 
 
 class Commissariat(models.Model):

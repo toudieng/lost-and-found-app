@@ -1,9 +1,11 @@
-{% extends "base_admin.html" %}
+{% extends "frontend/admin/base_admin.html" %}
+{% load static %}
 
 {% block title %}Dashboard Administrateur{% endblock %}
 
 {% block extra_css %}
 <style>
+    /* Sidebar du dashboard */
     .sidebar {
         background: linear-gradient(180deg, #343a40, #1d1f21);
         color: #fff;
@@ -27,22 +29,27 @@
         background: #495057;
         color: #ffc107;
     }
+
+    /* Contenu principal */
     .main-content {
         padding: 2rem;
         background: #f8f9fa;
         min-height: 100vh;
     }
+
     .welcome-title {
         color: #6c1e3d;
         font-weight: 700;
         margin-bottom: 0.5rem;
     }
+
     .stats-card {
         border-radius: 1rem;
         padding: 1.5rem;
         background: #fff;
         box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     }
+
     .stats-icon {
         font-size: 2rem;
         margin-right: 1rem;
@@ -52,49 +59,73 @@
 {% endblock %}
 
 {% block content %}
-<h2 class="welcome-title">Bienvenue, Administrateur 👋</h2>
-<p class="text-muted">Gérez les commissariats, utilisateurs et consultez les statistiques.</p>
-
-<div class="row g-3">
-    <div class="col-md-4">
-        <div class="stats-card d-flex align-items-center">
-            <span class="stats-icon">🏢</span>
-            <div>
-                <h5 class="mb-0">{{ nb_commissariats }}</h5>
-                <small>Commissariats</small>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="stats-card d-flex align-items-center">
-            <span class="stats-icon">👥</span>
-            <div>
-                <h5 class="mb-0">{{ nb_utilisateurs }}</h5>
-                <small>Utilisateurs</small>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="stats-card d-flex align-items-center">
-            <span class="stats-icon">📦</span>
-            <div>
-                <h5 class="mb-0">{{ nb_objets }}</h5>
-                <small>Objets gérés</small>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="card shadow-sm p-3 mt-4">
-    <h5>🔔 Notifications récentes</h5>
-    {% if notifications %}
-        <ul class="list-group list-group-flush">
-            {% for notif in notifications %}
-                <li class="list-group-item">{{ notif.message }} <small class="text-muted">{{ notif.date }}</small></li>
-            {% endfor %}
+<div class="row">
+    <!-- Sidebar -->
+    <div class="col-md-3 col-lg-2 sidebar">
+        <h4>⚙️ Admin</h4>
+        <ul class="nav flex-column">
+            <li class="nav-item mb-2">
+                <a class="nav-link {% if request.resolver_match.url_name == 'gerer_commissariats' %}active{% endif %}" href="{% url 'gerer_commissariats' %}">🏢 Gérer Commissariats</a>
+            </li>
+            <li class="nav-item mb-2">
+                <a class="nav-link {% if request.resolver_match.url_name == 'gerer_utilisateurs' %}active{% endif %}" href="{% url 'gerer_utilisateurs' %}">👥 Gérer Utilisateurs</a>
+            </li>
+            <li class="nav-item mb-2">
+                <a class="nav-link {% if request.resolver_match.url_name == 'voir_stats' %}active{% endif %}" href="{% url 'voir_stats' %}">📊 Statistiques</a>
+            </li>
+            <li class="nav-item mb-2">
+                <a class="nav-link {% if request.resolver_match.url_name == 'creer_policier' %}active{% endif %}" href="{% url 'creer_policier' %}">👮 Créer Policier</a>
+            </li>
         </ul>
-    {% else %}
-        <p class="text-muted">Aucune notification pour le moment.</p>
-    {% endif %}
+    </div>
+
+    <!-- Contenu principal -->
+    <div class="col-md-9 col-lg-10 main-content">
+        <h2 class="welcome-title">Bienvenue, Administrateur 👋</h2>
+        <p class="text-muted">Gérez les commissariats, utilisateurs et consultez les statistiques.</p>
+
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="stats-card d-flex align-items-center">
+                    <span class="stats-icon">🏢</span>
+                    <div>
+                        <h5 class="mb-0">{{ nb_commissariats }}</h5>
+                        <small>Commissariats</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stats-card d-flex align-items-center">
+                    <span class="stats-icon">👥</span>
+                    <div>
+                        <h5 class="mb-0">{{ nb_utilisateurs }}</h5>
+                        <small>Utilisateurs</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stats-card d-flex align-items-center">
+                    <span class="stats-icon">📦</span>
+                    <div>
+                        <h5 class="mb-0">{{ nb_objets }}</h5>
+                        <small>Objets gérés</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm p-3 mt-4">
+            <h5>🔔 Notifications récentes</h5>
+            {% if notifications %}
+                <ul class="list-group list-group-flush">
+                    {% for notif in notifications %}
+                        <li class="list-group-item">{{ notif.message }} <small class="text-muted">{{ notif.date }}</small></li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-muted">Aucune notification pour le moment.</p>
+            {% endif %}
+        </div>
+    </div>
 </div>
 {% endblock %}

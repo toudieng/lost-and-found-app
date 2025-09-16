@@ -97,3 +97,49 @@ class AdministrateurCreationForm(forms.ModelForm):
                 fail_silently=False,
             )
         return user
+
+from django.core.validators import RegexValidator
+
+class ProfilForm(forms.ModelForm):
+    username = forms.CharField(
+        max_length=150,
+        required=True,
+        validators=[
+            RegexValidator(
+                regex=r'^[\w.@+-]+$',
+                message="Seulement lettres, chiffres et caractères @/./+/-/_ sont autorisés."
+            )
+        ],
+        widget=forms.TextInput(attrs={
+            "class": "form-control",
+            "placeholder": "Nom d'utilisateur",
+        })
+    )
+
+    email = forms.EmailField(
+        required=True,
+        widget=forms.EmailInput(attrs={
+            "class": "form-control",
+            "placeholder": "Adresse email"
+        })
+    )
+
+    telephone = forms.CharField(
+        max_length=20,
+        required=False,
+        widget=forms.TextInput(attrs={
+            "class": "form-control",
+            "placeholder": "Téléphone"
+        })
+    )
+
+    photo = forms.ImageField(
+        required=False,
+        widget=forms.FileInput(attrs={
+            "class": "form-control"
+        })
+    )
+
+    class Meta:
+        model = Utilisateur
+        fields = ["username", "email", "telephone", "photo"]
