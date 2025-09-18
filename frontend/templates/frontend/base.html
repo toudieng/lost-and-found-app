@@ -97,6 +97,52 @@ footer a:hover { text-decoration: underline; }
     transform: scale(1.1);
     box-shadow: 0 5px 15px rgba(0,0,0,0.15);
 }
+/* =========================
+   Section Hero Actions
+========================= */
+.hero-actions {
+    padding: 60px 0;
+    background: #f8f9fa; /* fond clair qui contraste avec les boutons */
+    text-align: center;
+}
+
+.hero-actions h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    color: #343a40;
+}
+
+/* Style des boutons */
+.hero-actions .btn-action {
+    position: relative;
+    display: inline-block;
+    padding: 1rem 2.5rem;
+    font-size: 1.3rem;
+    font-weight: 700;
+    border-radius: 0.7rem;
+    margin: 1rem;
+    color: #fff;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+    text-decoration: none;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+/* Dégradés couleurs */
+.btn-action-lost {
+    background: linear-gradient(135deg, #ff5c5c, #e53946);
+}
+.btn-action-found {
+    background: linear-gradient(135deg, #4cd964, #28a745);
+}
+
+/* Effets hover */
+.hero-actions .btn-action:hover {
+    transform: scale(1.08);
+    box-shadow: 0 6px 22px rgba(0,0,0,0.35);
+    filter: brightness(1.12);
+}
 
 /* =========================
    Section CTA finale simplifiée
