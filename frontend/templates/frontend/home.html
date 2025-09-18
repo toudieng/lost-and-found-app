@@ -72,7 +72,76 @@
     box-shadow: 0 6px 25px rgba(0,0,0,0.45);
     filter: brightness(1.15);
 }
+/* =========================
+   Section CTA finale simplifiée
+========================= */
+.cta {
+    padding: 80px 0;
+    text-align: center;
+    background-color: #ffc107;  /* couleur simple et visible */
+    color: #343a40;             /* texte sombre pour contraste */
+    border-radius: 1rem;
+}
 
+.cta h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.cta p {
+    font-size: 1.25rem;
+    margin-bottom: 2rem;
+}
+
+/* Bouton CTA spécifique */
+.cta .btn-cta {
+    font-weight: 700;
+    font-size: 1.1rem;
+    padding: 0.9rem 2rem;
+    border-radius: 0.6rem;
+    background: #343a40;   /* bouton sombre sur fond clair */
+    color: #fff;
+    transition: all 0.3s ease;
+}
+
+.cta .btn-cta:hover {
+    background: #495057;
+    transform: scale(1.05);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+}
+
+
+.hero-actions .btn-action {
+    position: relative;
+    display: inline-block;
+    padding: 1rem 2.5rem;
+    font-size: 1.4rem;
+    font-weight: 700;
+    border-radius: 0.7rem;
+    margin: 0.8rem;
+    color: #fff;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+    text-decoration: none; /* enlève le soulignement */
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+/* Couleurs personnalisées */
+.btn-action-lost {
+    background: linear-gradient(135deg, #ff5c5c, #e53946);
+}
+.btn-action-found {
+    background: linear-gradient(135deg, #4cd964, #28a745);
+}
+
+/* Effets hover */
+.btn-action:hover {
+    transform: scale(1.08);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.45);
+    filter: brightness(1.12);
+}
 
 </style>
 {% endblock %}
@@ -128,37 +197,43 @@
         </a>
     </div>
 </section>
-
 <!-- Avantages de l'app -->
-<h5 class="text-center fw-bold mb-4">Les différents avantages de notre app</h5>
-<div class="container features">
-  <div class="row text-center">
-    <div class="col-md-4">
-      <div class="card p-4">
-        <i class="fa-solid fa-box-open icon-lost"></i>
-        <h3>Déclarer un objet perdu</h3>
-        <p>Remplissez facilement le formulaire pour signaler un objet que vous avez perdu.</p>
-        <button class="btn btn-action-lost">Déclarer un objet</button>
+<section id="about" class="features-section py-5">
+  <div class="container">
+    <h2 class="text-center fw-bold mb-5">✨ Les avantages de notre plateforme</h2>
+    <div class="row text-center g-4">
+      
+      <!-- Avantage 1 -->
+      <div class="col-md-4">
+        <div class="card shadow-sm p-4 h-100">
+          <i class="fa-solid fa-box-open fa-3x mb-3 text-danger"></i>
+          <h4 class="fw-bold mb-3">Déclarer un objet perdu</h4>
+          <p>Signalez rapidement un objet perdu grâce à un formulaire simple et intuitif.</p>
+        </div>
       </div>
-    </div>
-    <div class="col-md-4">
-      <div class="card p-4">
-        <i class="fa-solid fa-magnifying-glass icon-found"></i>
-        <h3>Consulter les objets retrouvés</h3>
-        <p>Parcourez la liste des objets retrouvés et contactez le déclarant si nécessaire.</p>
-        <button class="btn btn-action-found">Consulter les objets</button>
+
+      <!-- Avantage 2 -->
+      <div class="col-md-4">
+        <div class="card shadow-sm p-4 h-100">
+          <i class="fa-solid fa-magnifying-glass fa-3x mb-3 text-success"></i>
+          <h4 class="fw-bold mb-3">Consulter les objets retrouvés</h4>
+          <p>Accédez à la liste des objets retrouvés et vérifiez si le vôtre est disponible.</p>
+        </div>
       </div>
-    </div>
-    <div class="col-md-4">
-      <div class="card p-4">
-        <i class="fa-solid fa-folder-open icon-follow"></i>
-        <h3>Suivre vos démarches</h3>
-        <p>Gardez un œil sur l'état de vos déclarations et notifications directement depuis votre compte.</p>
-        <button class="btn btn-action-follow">Suivre mes démarches</button>
+
+      <!-- Avantage 3 -->
+      <div class="col-md-4">
+        <div class="card shadow-sm p-4 h-100">
+          <i class="fa-solid fa-folder-open fa-3x mb-3 text-primary"></i>
+          <h4 class="fw-bold mb-3">Suivre vos démarches</h4>
+          <p>Suivez l’avancement de vos déclarations et notifications en temps réel.</p>
+        </div>
       </div>
+
     </div>
   </div>
-</div>
+</section>
+
 
 <!-- Partenaires -->
 <section class="partners py-6 bg-light text-center">
