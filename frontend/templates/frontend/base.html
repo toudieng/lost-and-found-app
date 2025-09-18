@@ -1,3 +1,4 @@
+
 {% load static %}
 <!DOCTYPE html>
 <html lang="fr">
@@ -27,7 +28,7 @@ body.dark-mode {
 
 /* Navbar */
 .navbar-custom {
-    background: linear-gradient(90deg, #1a1a1a, #2c2c2c);
+    background-color: #343a40 !important;
 }
 .navbar-custom .nav-link,
 .navbar-custom .dropdown-item {
@@ -42,8 +43,8 @@ body.dark-mode {
 
 /* Footer */
 footer {
-    background: #1a1a1a;
-    color: #bbb;
+    background-color: #343a40 !important;
+    color: #fff;
 }
 footer a { color: #ffc107; }
 footer a:hover { text-decoration: underline; }
@@ -65,7 +66,7 @@ footer a:hover { text-decoration: underline; }
 .hero .btn { transition: transform 0.2s ease, box-shadow 0.2s ease; }
 .hero .btn:hover { transform: scale(1.05); box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.2); }
 
-/* Features / Avantages */
+/* Features */
 .features .card {
     border-radius: 20px;
     padding: 30px 20px;
@@ -78,9 +79,9 @@ footer a:hover { text-decoration: underline; }
     box-shadow: 0 12px 30px rgba(0,0,0,0.18);
 }
 .features .card i { font-size: 3rem; margin-bottom: 1rem; }
-.features .card .icon-lost { color: #d9534f; } /* rouge */
-.features .card .icon-found { color: #5cb85c; } /* vert */
-.features .card .icon-follow { color: #0275d8; } /* bleu */
+.features .card .icon-lost { color: #d9534f; }
+.features .card .icon-found { color: #5cb85c; }
+.features .card .icon-follow { color: #0275d8; }
 
 /* Partenaires */
 .partners { padding: 80px 0; text-align: center; }
@@ -97,26 +98,45 @@ footer a:hover { text-decoration: underline; }
     box-shadow: 0 5px 15px rgba(0,0,0,0.15);
 }
 
-/* Section CTA finale */
+/* =========================
+   Section CTA finale simplifiée
+========================= */
 .cta {
     padding: 80px 0;
     text-align: center;
-    background-color: #6c1e3d;
-    color: white;
+    background-color: #ffc107;  /* couleur simple et visible */
+    color: #343a40;             /* texte sombre pour contraste */
     border-radius: 1rem;
 }
-.cta h2 { text-shadow: 1px 1px 4px rgba(0,0,0,0.15); }
-.cta .btn { transition: transform 0.2s ease, box-shadow 0.2s ease; animation: pulse 2s infinite; }
-.cta .btn:hover { transform: scale(1.08); box-shadow: 0 0.5rem 1rem rgba(255,255,255,0.3); }
-@keyframes pulse { 0%,100%{transform:scale(1);}50%{transform:scale(1.05);} }
 
-/* Responsive */
-@media (max-width: 768px) {
-    .hero { padding: 4rem 1rem; }
-    .hero h1 { font-size: 2rem; }
-    .cta h2 { font-size: 1.75rem; }
-    .features .card { text-align: center; }
+.cta h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
 }
+
+.cta p {
+    font-size: 1.25rem;
+    margin-bottom: 2rem;
+}
+
+/* Bouton CTA spécifique */
+.cta .btn-cta {
+    font-weight: 700;
+    font-size: 1.1rem;
+    padding: 0.9rem 2rem;
+    border-radius: 0.6rem;
+    background: #343a40;   /* bouton sombre sur fond clair */
+    color: #fff;
+    transition: all 0.3s ease;
+}
+
+.cta .btn-cta:hover {
+    background: #495057;
+    transform: scale(1.05);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+}
+
 </style>
 </head>
 <body class="d-flex flex-column min-vh-100">
@@ -170,7 +190,7 @@ footer a:hover { text-decoration: underline; }
     {% block content %}{% endblock %}
 </main>
 
-<footer class="text-center py-3 mt-auto border-top">
+<footer class="text-center py-3 mt-auto">
     <p class="mb-0 small">
         &copy; 2025 Lost&Found - Tous droits réservés |
         <a href="{% url 'contact' %}" class="text-decoration-none">Nous contacter</a>
