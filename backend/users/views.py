@@ -38,6 +38,10 @@ def logout_view(request):
     logout(request)
     return redirect('home')
 
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.contrib.auth import login
+from .forms import UtilisateurCreationForm
 
 def register_view(request):
     if request.method == 'POST':
@@ -45,16 +49,24 @@ def register_view(request):
         if form.is_valid():
             user = form.save(commit=False)
 
-            # Forcer le rôle "citoyen" par défaut
+            # Rôle par défaut sécurisé
             user.role = "citoyen"
             user.save()
 
-            messages.success(request, "Compte citoyen créé avec succès ! Vous pouvez vous connecter.")
+            messages.success(request, "✅ Compte citoyen créé avec succès ! Vous pouvez vous connecter.")
+            
+            # 👉 Si tu veux connecter automatiquement :
+            # login(request, user)
+            # return redirect("dashboard")
+
             return redirect('login')
+        else:
+            messages.error(request, "❌ Erreurs dans le formulaire. Merci de corriger.")
     else:
         form = UtilisateurCreationForm()
 
     return render(request, 'users/register.html', {'form': form})
+
 
 
 @login_required
