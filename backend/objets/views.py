@@ -12,16 +12,11 @@ def declarer_objet(request):
             nom_objet = form.cleaned_data['nom_objet'].strip()
             etat = form.cleaned_data['etat']  # "perdu" ou "retrouvé"
 
-            # Création ou récupération de l'objet
-            objet_instance, created = Objet.objects.get_or_create(
+            # On crée toujours un nouvel objet, même si le nom existe déjà
+            objet_instance = Objet.objects.create(
                 nom=nom_objet,
-                defaults={'etat': etat}  # conserve l'état choisi
+                etat=etat
             )
-
-            # Si l'objet existait déjà, on met à jour son état
-            if not created:
-                objet_instance.etat = etat
-                objet_instance.save()
 
             # Création de la déclaration
             declaration = form.save(commit=False)

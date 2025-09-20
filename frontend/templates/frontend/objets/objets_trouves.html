@@ -25,13 +25,13 @@
                         </div>
                         <div class="card-footer bg-light text-end">
                             <a href="{% url 'objet_detail' declaration.objet.id %}" class="btn btn-sm btn-outline-success">🔍 Voir détails</a>
-                            {% if user.is_authenticated %}
+
+                            {# Bouton visible seulement si l'objet n'est pas réclamé et que l'utilisateur courant n'est pas celui qui l'a trouvé #}
+                            {% if user.is_authenticated and declaration.reclame_par is None and declaration.trouve_par != user %}
                                 <form method="POST" action="{% url 'ca_m_appartient' declaration.id %}" class="d-inline">
                                     {% csrf_token %}
                                     <button type="submit" class="btn btn-sm btn-primary">💙 Ça m’appartient</button>
                                 </form>
-                            {% else %}
-                                <a href="{% url 'login' %}" class="btn btn-sm btn-primary">💙 Ça m’appartient</a>
                             {% endif %}
                         </div>
                     </div>

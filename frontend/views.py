@@ -79,14 +79,14 @@ def maj_objet(request, pk):
         objet.save()
         return redirect("liste_objets_declares")
     return render(request, "frontend/policier/maj_objet.html", {"objet": objet})
-
 @login_required
 def historique_restitutions(request):
     restitutions = Restitution.objects.select_related(
-        'objet', 'citoyen', 'policier', 'commissariat', 'restitué_par'
+        'objet', 'citoyen', 'policier', 'commissariat', 'restitue_par'
     ).filter(objet__etat="restitué").order_by('-date_restitution', '-heure_restitution')
 
     return render(request, "frontend/policier/historique_restitutions.html", {"restitutions": restitutions})
+
 
 @login_required
 def supprimer_restitution(request, restitution_id):
@@ -109,6 +109,7 @@ def objets_restitues(request):
     ).order_by('-date_restitution')
 
     return render(request, "frontend/objets/objets_restitues.html", {"restitutions": restitutions})
+
 @login_required
 def objets_reclames(request):
     if request.user.role != "policier":
@@ -123,7 +124,7 @@ def objets_reclames(request):
 
     # Vérifier les restitutions existantes pour désactiver le bouton si déjà planifié
     restitutions = Restitution.objects.filter(
-        restitué_par__isnull=True
+        restitue_par__isnull=True  # <- corrigé ici
     )
     restitutions_dict = {r.objet.id: r for r in restitutions}
 
@@ -132,19 +133,34 @@ def objets_reclames(request):
         "restitutions_dict": restitutions_dict,
     })
 
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from backend.objets.models import Declaration, Restitution
+
 @login_required
 def objets_retrouves_attente(request):
     if request.user.role != "policier":
         messages.error(request, "⚠️ Accès réservé aux policiers.")
         return redirect("home")
 
+    # Déclarations des objets retrouvés mais non encore restitués
+    declarations = Declaration.objects.filter(
+        objet__etat="retrouvé",
+        reclame_par__isnull=False
+    ).order_by('-date_declaration')
+
+    # Restitutions non encore planifiées
     restitutions = Restitution.objects.filter(
-        restitué_par__isnull=True
-    ).order_by('-date_restitution', '-heure_restitution')
+        restitue_par__isnull=True  # <- corrigé ici
+    )
+    restitutions_dict = {r.objet.id: r for r in restitutions}
 
     return render(request, "frontend/objets/objets_retrouves_attente.html", {
-        "restitutions": restitutions
+        "declarations": declarations,
+        "restitutions_dict": restitutions_dict,
     })
+
 
 @login_required
 def planifier_restitution(request, objet_id, type_objet="declaration"):
@@ -402,29 +418,48 @@ def je_le_trouve(request, declaration_id):
     return redirect("objets_reclames")
 
 
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.core.mail import send_mail
+from django.urls import reverse
+from django.conf import settings
+from backend.objets.models import Declaration
+
 @login_required
 def ca_m_appartient(request, declaration_id):
+    # Récupère la déclaration correspondante
     declaration = get_object_or_404(Declaration, id=declaration_id)
 
+    # Vérifie que l'objet est retrouvé et non déjà réclamé
     if declaration.objet.etat == "retrouvé" and declaration.reclame_par is None:
+        # Attribue l'objet à l'utilisateur courant
         declaration.reclame_par = request.user
         declaration.save()
 
+        # Envoi du mail au citoyen ayant déclaré l'objet perdu
         if declaration.citoyen and declaration.citoyen.email:
+            # Génère l'URL absolue pour le détail de l'objet
+            objet_url = request.build_absolute_uri(
+                reverse('objet_detail', args=[declaration.objet.id])
+            )
             send_mail(
                 subject=f"[Objet Trouvé] Votre objet '{declaration.objet.nom}' a été réclamé !",
-                message=(f"Bonjour {declaration.citoyen.username},\n\n"
-                         f"L'objet que vous avez trouvé a été réclamé par {request.user.username} ({request.user.email}).\n"
-                         f"ID de la déclaration : {declaration.id}\n"
-                         f"Consultez les détails ici : http://127.0.0.1:8000/objets/{declaration.id}/\n\n"
-                         "Merci !"),
+                message=(
+                    f"Bonjour {declaration.citoyen.username},\n\n"
+                    f"L'objet que vous avez déclaré perdu a été réclamé par {request.user.username} ({request.user.email}).\n"
+                    f"ID de la déclaration : {declaration.id}\n"
+                    f"Consultez les détails ici : {objet_url}\n\n"
+                    "Merci !"
+                ),
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=[declaration.citoyen.email],
                 fail_silently=False,
             )
 
-        messages.success(request, f"Vous avez réclamé l'objet '{declaration.objet.nom}'.")
+        messages.success(request, f"✅ Vous avez réclamé l'objet '{declaration.objet.nom}'.")
     else:
-        messages.error(request, "Cet objet a déjà été réclamé ou n'est pas trouvé.")
+        # Message d'erreur si l'objet n'est pas retrouvé ou déjà réclamé
+        messages.error(request, "⚠️ Cet objet a déjà été réclamé ou n'est pas retrouvé.")
 
     return redirect("objets_trouves")

@@ -5,13 +5,14 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'frontend/css/details_objet.css' %}">
+
 {% endblock %}
 
 {% block content %}
 <div class="container mt-4">
-    <div class="card">
-        <div class="card-header">
-            <h3>{{ objet.nom }}</h3>
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-light">
+            <h3 class="fw-bold text-center">{{ objet.nom }}</h3>
         </div>
         <div class="card-body">
             {% with declaration=objet.declaration_set.first %}
@@ -23,24 +24,32 @@
                     {% endif %}
 
                     {% if declaration.description %}
-                        <p><strong>Description :</strong> {{ declaration.description }}</p>
+                        <p><span class="info-label">📝 Description :</span> {{ declaration.description }}</p>
                     {% endif %}
 
-                    <p><strong>État :</strong> {{ objet.etat }}</p>
-                    <p><strong>Déclaré par :</strong> {{ declaration.citoyen.username }}</p>
+                    <p><span class="info-label">📌 État :</span> 
+                        <span class="badge 
+                            {% if objet.etat == 'perdu' %}bg-danger
+                            {% elif objet.etat == 'retrouvé' %}bg-warning text-dark
+                            {% else %}bg-success{% endif %}">
+                            {{ objet.etat|capfirst }}
+                        </span>
+                    </p>
+
+                    <p><span class="info-label">🙋 Déclaré par :</span> {{ declaration.citoyen.username }}</p>
+                    
                     {% if declaration.lieu %}
-                        <p><strong>Lieu :</strong> {{ declaration.lieu }}</p>
+                        <p><span class="info-label">📍 Lieu :</span> {{ declaration.lieu }}</p>
                     {% endif %}
-                    <p><strong>Date :</strong> {{ declaration.date_declaration|date:"d/m/Y H:i" }}</p>
+
+                    <p><span class="info-label">📅 Date :</span> {{ declaration.date_declaration|date:"d/m/Y H:i" }}</p>
                 {% else %}
-                    <p>Aucune déclaration trouvée pour cet objet.</p>
+                    <p class="text-muted">Aucune déclaration trouvée pour cet objet.</p>
                 {% endif %}
             {% endwith %}
         </div>
-        <div class="card-footer text-end">
-            <a href="{% url 'objets_perdus' %}" class="btn btn-secondary">Retour à la liste</a>
-    
-
+        <div class="card-footer bg-light text-end">
+            <a href="{% url 'objets_perdus' %}" class="btn btn-outline-secondary">⬅ Retour à la liste</a>
         </div>
     </div>
 </div>
