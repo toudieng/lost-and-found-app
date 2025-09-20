@@ -316,7 +316,7 @@ def ajouter_commissariat(request):
     elif request.method == 'POST':
         messages.error(request, "❌ Erreur lors de l'ajout du commissariat.")
 
-    return render(request, 'frontend/ajouter_commissariat.html', {'form': form})
+    return render(request, 'frontend/admin/ajouter_commissariat.html', {'form': form})
 
 def supprimer_objet(request, objet_id):
     objet = get_object_or_404(Objet, id=objet_id)

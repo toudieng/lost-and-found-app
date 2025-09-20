@@ -1,41 +1,22 @@
 from django import forms # pyright: ignore[reportMissingModuleSource]
 from django.contrib.auth.forms import UserCreationForm # pyright: ignore[reportMissingModuleSource]
 from .models import Utilisateur, Commissariat
-from django import forms
-from django.contrib.auth.forms import UserCreationForm
-from .models import Utilisateur
 
-
-
+# Formulaire pour créer un utilisateur citoyen
 class UtilisateurCreationForm(UserCreationForm):
     telephone = forms.CharField(
         required=False,
-        widget=forms.TextInput(attrs={
-            'class': 'form-control form-input',
-            'placeholder': 'Téléphone'
-        })
+        widget=forms.TextInput(attrs={'class': 'form-control input-xs'})
     )
 
     class Meta:
         model = Utilisateur
         fields = ['username', 'email', 'telephone', 'password1', 'password2']
         widgets = {
-            'username': forms.TextInput(attrs={
-                'class': 'form-control form-input',
-                'placeholder': "Nom d'utilisateur"
-            }),
-            'email': forms.EmailInput(attrs={
-                'class': 'form-control form-input',
-                'placeholder': "Adresse email"
-            }),
-            'password1': forms.PasswordInput(attrs={
-                'class': 'form-control form-input password-input',
-                'placeholder': "Mot de passe"
-            }),
-            'password2': forms.PasswordInput(attrs={
-                'class': 'form-control form-input password-input',
-                'placeholder': "Confirmer le mot de passe"
-            }),
+            'username': forms.TextInput(attrs={'class': 'form-control input-xs'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control input-xs'}),
+            'password1': forms.PasswordInput(attrs={'class': 'form-control input-xs'}),
+            'password2': forms.PasswordInput(attrs={'class': 'form-control input-xs'}),
         }
 
     def save(self, commit=True):
@@ -44,7 +25,6 @@ class UtilisateurCreationForm(UserCreationForm):
         if commit:
             user.save()
         return user
-
 
 # Formulaire pour ajouter un commissariat
 class CommissariatForm(forms.ModelForm):
