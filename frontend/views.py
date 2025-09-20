@@ -352,37 +352,55 @@ def creer_policier(request):
 #                    ACTIONS CITOYEN
 # ======================================================
 
+
+
+
 @login_required
 def je_le_trouve(request, declaration_id):
     declaration = get_object_or_404(Declaration, id=declaration_id)
 
+    # Si l'objet est encore perdu
     if declaration.objet.etat == "perdu":
         declaration.objet.etat = "retrouvé"
-        declaration.trouve_par = request.user
         declaration.objet.save()
+
+        # Ajouter le citoyen à la liste de ceux qui l’ont trouvé
+        declaration.trouve_par.add(request.user)
         declaration.save()
 
-        Restitution.objects.create(
-            objet=declaration.objet,
-            citoyen=declaration.citoyen
-        )
-
+        # Prévenir le propriétaire si email dispo
         if declaration.citoyen and declaration.citoyen.email:
             send_mail(
-                subject=f"[Objet Retrouvé] Votre objet {declaration.objet.nom} a été trouvé",
-                message=(f"Bonjour {declaration.citoyen.username},\n\n"
-                         "L'objet que vous avez déclaré perdu a été trouvé. "
-                         "Un policier planifiera prochainement la restitution."),
+                subject=f"[Objet Retrouvé] Votre objet {declaration.objet.nom} a été signalé comme retrouvé",
+                message=(
+                    f"Bonjour {declaration.citoyen.username},\n\n"
+                    f"L'objet que vous avez déclaré perdu ({declaration.objet.nom}) a été signalé comme retrouvé "
+                    f"par un citoyen. Un policier planifiera prochainement la restitution officielle.\n\n"
+                    "Merci d'utiliser notre plateforme."
+                ),
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=[declaration.citoyen.email],
                 fail_silently=True
             )
 
-        messages.success(request, "✅ L’objet a été marqué comme retrouvé et une restitution sera planifiée.")
-    else:
-        messages.warning(request, "⚠️ Cet objet est déjà retrouvé ou restitué.")
+        messages.success(
+            request,
+            "✅ L’objet a été marqué comme retrouvé. Il reste visible jusqu’à la restitution officielle."
+        )
+
+    # Si déjà retrouvé mais pas encore restitué → on peut juste ajouter le citoyen en plus
+    elif declaration.objet.etat == "retrouvé":
+        if request.user not in declaration.trouve_par.all():
+            declaration.trouve_par.add(request.user)
+            messages.info(request, "ℹ️ Votre signalement a été ajouté. L’objet est déjà signalé comme retrouvé.")
+        else:
+            messages.warning(request, "⚠️ Vous avez déjà signalé cet objet.")
+
+    else:  # état = "restitué"
+        messages.warning(request, "⚠️ Cet objet a déjà été restitué, vous ne pouvez plus le signaler.")
 
     return redirect("objets_reclames")
+
 
 @login_required
 def ca_m_appartient(request, declaration_id):

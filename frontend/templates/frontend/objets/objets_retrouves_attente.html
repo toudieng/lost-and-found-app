@@ -1,37 +1,57 @@
 {% extends "frontend/policier/base_policier.html" %}
-{% block title %}Objets retrouvés en attente{% endblock %}
+{% block title %}Objets Retrouvés en Attente{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
-    <h2 class="fw-bold mb-3">📦 Objets retrouvés (en attente)</h2>
+    <h2 class="fw-bold mb-4 text-primary">📦 Objets retrouvés (en attente)</h2>
 
-    {% for restitution in restitutions %}
-        <div class="card my-2 p-3 shadow-sm">
-            <h5>{{ restitution.objet.nom }}</h5>
-            <p><b>Déclaré par :</b> {{ restitution.citoyen.username }}</p>
-            <p><b>Commissariat :</b>
-                {% if restitution.commissariat %}
-                    {{ restitution.commissariat.nom }}
-                {% else %}
-                    Non assigné
-                {% endif %}
-            </p>
+    <div class="row">
+        {% for restitution in restitutions %}
+            <div class="col-md-6 mb-3">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold text-dark">
+                            {{ restitution.objet.nom }}
+                            <span class="badge bg-warning text-dark">En attente</span>
+                        </h5>
 
-            {% if restitution.policier %}
-                <span class="badge bg-info">Planifié par {{ restitution.policier.username }}</span>
-            {% else %}
-                <a href="{% url 'planifier_restitution' restitution.id 'restitution' %}" 
-                   class="btn btn-primary btn-sm">
-                    📅 Programmer restitution
-                </a>
-            {% endif %}
+                        <p class="mb-1 text-muted">
+                            🙋 <strong>Déclaré par :</strong> {{ restitution.citoyen.username }}
+                        </p>
+                        <p class="mb-2 text-muted">
+                            📍 <strong>Commissariat :</strong>
+                            {% if restitution.commissariat %}
+                                {{ restitution.commissariat.nom }}
+                            {% else %}
+                                <span class="text-danger">Non assigné</span>
+                            {% endif %}
+                        </p>
 
-            <a href="{% url 'marquer_restitue' restitution.id %}" class="btn btn-success btn-sm">
-                ✅ Marquer comme Restitué
-            </a>
-        </div>
-    {% empty %}
-        <div class="alert alert-info">Aucun objet retrouvé en attente de restitution.</div>
-    {% endfor %}
+                        {% if restitution.policier %}
+                            <span class="badge bg-info">📅 Planifié par {{ restitution.policier.username }}</span>
+                        {% else %}
+                            <a href="{% url 'planifier_restitution' restitution.id 'restitution' %}" 
+                               class="btn btn-sm btn-outline-primary">
+                                📅 Programmer restitution
+                            </a>
+                        {% endif %}
+                    </div>
+
+                    <div class="card-footer bg-light text-end">
+                        <a href="{% url 'marquer_restitue' restitution.id %}" 
+                           class="btn btn-sm btn-success">
+                            ✅ Marquer comme Restitué
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info text-center">
+                    Aucun objet retrouvé en attente de restitution.
+                </div>
+            </div>
+        {% endfor %}
+    </div>
 </div>
 {% endblock %}

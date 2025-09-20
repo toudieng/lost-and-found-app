@@ -2,6 +2,7 @@ from django.db import models
 from django.conf import settings
 from backend.users.models import Commissariat
 
+
 class Objet(models.Model):
     nom = models.CharField(max_length=100, verbose_name="Nom de l'objet")
     description = models.TextField(blank=True, null=True, verbose_name="Description")
@@ -63,15 +64,15 @@ class Declaration(models.Model):
         verbose_name="Image"
     )
 
-    # Suivi des interactions
-    trouve_par = models.ForeignKey(
+    # ✅ Correction ici : plusieurs personnes peuvent signaler
+    trouve_par = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
-        on_delete=models.SET_NULL,
-        null=True,
         blank=True,
         related_name='objets_trouves',
         verbose_name="Trouvé par"
     )
+
+    # Une seule personne peut réclamer
     reclame_par = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
@@ -85,15 +86,12 @@ class Declaration(models.Model):
         return f"Déclaration - {self.objet.nom if self.objet else 'Objet inconnu'}"
 
 
-
-
-
 class Restitution(models.Model):
     objet = models.ForeignKey(
-        'Objet',  
+        Objet,
         on_delete=models.CASCADE,
         null=True,
-        related_name="restitutions",  
+        related_name="restitutions",
         verbose_name="Objet restitué"
     )
     citoyen = models.ForeignKey(
@@ -112,7 +110,7 @@ class Restitution(models.Model):
         null=True,
         verbose_name="Policier planificateur"
     )
-    restitué_par = models.ForeignKey(
+    restitue_par = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         null=True,
@@ -122,7 +120,7 @@ class Restitution(models.Model):
         verbose_name="Restitué par"
     )
     commissariat = models.ForeignKey(
-        Commissariat,  # utilisation du modèle importé
+        Commissariat,
         on_delete=models.CASCADE,
         null=True,
         verbose_name="Commissariat"
@@ -135,6 +133,13 @@ class Restitution(models.Model):
         auto_now_add=True,
         verbose_name="Heure de restitution"
     )
+
+    def save(self, *args, **kwargs):
+        """Quand une restitution est faite, on met à jour l'état de l'objet."""
+        if self.objet:
+            self.objet.etat = "restitué"
+            self.objet.save()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"Restitution de {self.objet} à {self.citoyen}"
