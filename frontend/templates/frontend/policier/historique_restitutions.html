@@ -1,4 +1,3 @@
-
 {% extends 'frontend/policier/base_policier.html' %}
 
 {% block title %}Historique des restitutions{% endblock %}
@@ -15,9 +14,8 @@
                         <th>ID</th>
                         <th>Objet</th>
                         <th>Propriétaire</th>
-                        <th>Trouvé par</th>
+                        <th>Restitué par</th>
                         <th>Policier planificateur</th>
-                        <th>État de l'objet</th>
                         <th>Date</th>
                         <th>Heure</th>
                         <th>Commissariat</th>
@@ -26,68 +24,39 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for r in restitutions %}
+                    {% for restitution in restitutions %}
                     <tr>
-                        <td>{{ r.id }}</td>
-                        <td>{{ r.objet.nom }}</td>
-                        
+                        <td>{{ restitution.id }}</td>
+                        <td>{{ restitution.objet.nom }}</td>
                         <td>
-                            {% if r.citoyen %}
-                                {{ r.citoyen.username }} ({{ r.citoyen.email|default:"N/A" }})
+                            {% if restitution.citoyen %}
+                                {{ restitution.citoyen.username }} ({{ restitution.citoyen.email }})
                             {% else %}
                                 N/A
                             {% endif %}
                         </td>
-                        
                         <td>
-                            {% if r.objet.trouve_par %}
-                                {{ r.objet.trouve_par.username }} ({{ r.objet.trouve_par.email|default:"N/A" }})
+                            {% if restitution.restitue_par %}
+                                {{ restitution.restitue_par.username }} ({{ restitution.restitue_par.email|default:"N/A" }})
                             {% else %}
                                 N/A
                             {% endif %}
                         </td>
-
                         <td>
-                            {% if r.policier %}
-                                {{ r.policier.username }} ({{ r.policier.email|default:"N/A" }})
+                            {% if restitution.policier %}
+                                {{ restitution.policier.username }} ({{ restitution.policier.email|default:"N/A" }})
                             {% else %}
                                 N/A
                             {% endif %}
                         </td>
-
+                        <td>{{ restitution.date_restitution|date:"d/m/Y" }}</td>
+                        <td>{{ restitution.heure_restitution|time:"H:i" }}</td>
+                        <td>{{ restitution.commissariat.nom|default:"N/A" }}</td>
                         <td>
-                            {% if r.objet.etat == "perdu" %}
-                                <span class="badge bg-danger">Perdu</span>
-                            {% elif r.objet.etat == "retrouvé" %}
-                                <span class="badge bg-warning text-dark">Trouvé</span>
-                            {% elif r.objet.etat == "restitué" %}
-                                <span class="badge bg-success">Restitué</span>
-                            {% else %}
-                                <span class="badge bg-secondary">Inconnu</span>
-                            {% endif %}
+                            <span class="badge bg-success">Restitué</span>
                         </td>
-
-                        <td>{{ r.date_restitution|date:"d/m/Y" }}</td>
-                        <td>{{ r.heure_restitution|time:"H:i" }}</td>
-                        <td>{{ r.commissariat.nom|default:"N/A" }}</td>
-
                         <td>
-                            {% if r.objet.etat == "restitué" %}
-                                <span class="badge bg-success">Effectué</span>
-                            {% else %}
-                                <span class="badge bg-warning text-dark">Planifié</span>
-                            {% endif %}
-                        </td>
-
-                        <td>
-                            {% if r.objet.etat != "restitué" %}
-                                <form action="{% url 'marquer_restitue' r.id %}" method="post" style="display:inline;">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-sm btn-success">Marquer effectué</button>
-                                </form>
-                            {% endif %}
-                            <form action="{% url 'supprimer_restitution' r.id %}" method="post" style="display:inline;" 
-                                  onsubmit="return confirm('Voulez-vous vraiment supprimer cette restitution ?');">
+                            <form action="{% url 'supprimer_restitution' restitution.id %}" method="post" style="display:inline;" onsubmit="return confirm('Voulez-vous vraiment supprimer cette restitution ?');">
                                 {% csrf_token %}
                                 <button type="submit" class="btn btn-sm btn-danger">Supprimer</button>
                             </form>

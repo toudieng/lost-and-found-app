@@ -10,13 +10,25 @@ def declarer_objet(request):
         form = DeclarationForm(request.POST, request.FILES)
         if form.is_valid():
             nom_objet = form.cleaned_data['nom_objet'].strip()
-            etat = form.cleaned_data['etat']  # "perdu" ou "retrouvé"
+            etat_form = form.cleaned_data['etat']  # "perdu" ou "trouvé"
+            description = form.cleaned_data.get('description', '')
+            image = form.cleaned_data.get('image')
 
-            # On crée toujours un nouvel objet, même si le nom existe déjà
+            # Déterminer l'état exact pour l'objet
+            if etat_form == "perdu":
+                etat_objet = "perdu"
+            else:
+                etat_objet = "trouvé"
+
+            # Création du nouvel objet
             objet_instance = Objet.objects.create(
                 nom=nom_objet,
-                etat=etat
+                etat=etat_objet,
+                description=description
             )
+            if image:
+                objet_instance.image = image
+                objet_instance.save()
 
             # Création de la déclaration
             declaration = form.save(commit=False)
@@ -26,11 +38,9 @@ def declarer_objet(request):
 
             messages.success(request, "✅ Votre déclaration a été enregistrée avec succès.")
 
-            # Redirection selon le type de l'objet
-            if etat == "perdu":
-                return redirect('objets_perdus')
-            else:
-                return redirect('objets_trouves')
+            # Redirection selon l'état
+            return redirect('objets_perdus' if etat_objet == "perdu" else 'objets_trouves')
+
         else:
             messages.error(request, "⚠️ Erreur : vérifiez les informations saisies.")
     else:

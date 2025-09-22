@@ -1,4 +1,4 @@
-{% extends "frontend/policier/base_policier.html" %}
+{% extends 'frontend/policier/base_policier.html' %}
 {% block title %}Objets à restituer{% endblock %}
 
 {% block content %}
@@ -6,20 +6,44 @@
     <h2 class="fw-bold mb-3">📌 Objets à restituer</h2>
 
     {% for declaration in declarations %}
-        <div class="card my-2 p-3 shadow-sm">
-            <h5>{{ declaration.objet.nom }}</h5>
-            <p><b>Réclamé par :</b> {{ declaration.reclame_par.username }}</p>
-            <p><b>Lieu :</b> {{ declaration.lieu|default:"Non précisé" }}</p>
+        {% if declaration.objet.etat == "reclamé" %}
+            <div class="card my-2 p-3 shadow-sm">
+                <h5>{{ declaration.objet.nom }}</h5>
 
-            {% if declaration.objet.id in restitutions_dict %}
-                <button class="btn btn-secondary btn-sm" disabled>📅 Planifié</button>
-            {% else %}
-                <a href="{% url 'planifier_restitution' declaration.id 'declaration' %}" 
-                   class="btn btn-primary btn-sm">
-                    📅 Programmer restitution
-                </a>
-            {% endif %}
-        </div>
+                <p>
+                    <b>Réclamé par :</b>
+                    {% if declaration.reclame_par %}
+                        {{ declaration.reclame_par.username }}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </p>
+
+                <p>
+                    <b>Lieu :</b> {{ declaration.lieu|default:"Non précisé" }}
+                </p>
+
+                <p>
+                    <b>Trouvé par :</b>
+                    {% if declaration.trouve_par.exists %}
+                        {% for user in declaration.trouve_par.all %}
+                            {{ user.username }}{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </p>
+
+                {% if declaration.objet.id in restitutions_dict %}
+                    <button class="btn btn-secondary btn-sm" disabled>📅 Planifié</button>
+                {% else %}
+                    <a href="{% url 'planifier_restitution' declaration.id 'declaration' %}" 
+                       class="btn btn-primary btn-sm">
+                        📅 Programmer restitution
+                    </a>
+                {% endif %}
+            </div>
+        {% endif %}
     {% empty %}
         <div class="alert alert-info">Aucun objet réclamé pour le moment.</div>
     {% endfor %}

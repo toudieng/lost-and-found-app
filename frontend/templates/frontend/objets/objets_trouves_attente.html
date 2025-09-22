@@ -1,0 +1,76 @@
+{% extends "frontend/policier/base_policier.html" %}
+{% load static %}
+
+{% block title %}Objets Retrouvés en Attente{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="fw-bold mb-4 text-primary">📦 Objets retrouvés (en attente)</h2>
+
+    <div class="row">
+        {% for restitution in restitutions %}
+            {% if restitution.objet.etat == "en_attente" %}
+                <div class="col-md-6 mb-3">
+                    <div class="card shadow-sm border-0 h-100">
+                        {% if restitution.objet.image %}
+                            <img src="{{ restitution.objet.image.url }}" class="card-img-top rounded-top" style="height:200px; object-fit:cover;" alt="Image de {{ restitution.objet.nom }}">
+                        {% else %}
+                            <img src="{% static 'img/default_objet.png' %}" class="card-img-top rounded-top" style="height:200px; object-fit:cover;" alt="Image par défaut">
+                        {% endif %}
+
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold text-dark">
+                                {{ restitution.objet.nom }}
+                                <span class="badge bg-warning text-dark">En attente</span>
+                            </h5>
+
+                            <p class="mb-1 text-muted">
+                                🙋 <strong>Déclaré par :</strong> 
+                                {% if restitution.citoyen %}
+                                    {{ restitution.citoyen.username }}
+                                {% else %}
+                                    Non précisé
+                                {% endif %}
+                            </p>
+
+                            <p class="mb-2 text-muted">
+                                📍 <strong>Lieu :</strong> 
+                                {% if restitution.objet.lieu %}
+                                    {{ restitution.objet.lieu }}
+                                {% else %}
+                                    Non précisé
+                                {% endif %}
+                            </p>
+
+                            {% if restitution.objet.trouve_par.exists %}
+                                <span class="badge bg-info">
+                                    📌 Trouvé par 
+                                    {% for user in restitution.objet.trouve_par.all %}
+                                        {{ user.username }}{% if not forloop.last %}, {% endif %}
+                                    {% endfor %}
+                                </span>
+                            {% endif %}
+                        </div>
+
+                        <div class="card-footer bg-light text-end">
+                            <!-- Bouton Marquer restitué -->
+                            <form method="POST" action="{% url 'marquer_restitue' restitution.id %}" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-success">
+                                    ✅ Marquer restitué
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info text-center">
+                    Aucun objet retrouvé en attente de restitution.
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

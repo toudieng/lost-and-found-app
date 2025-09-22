@@ -1,19 +1,32 @@
 from django.db import models
 from django.conf import settings
+from django.utils import timezone
+import uuid
 from backend.users.models import Commissariat
 
 
+# --- ENUMS pour éviter les listes brutes ---
+class EtatObjet(models.TextChoices):
+    PERDU = "perdu", "Perdu"
+    RETROUVE = "trouvé", "Trouvé"
+    RECLAME = "reclamé", "Réclamé"
+    EN_ATTENTE = "en_attente", "En_attente"
+    RESTITUE = "restitue", "Restitué"
+
+
+class StatutRestitution(models.TextChoices):
+    PLANIFIEE = "planifiee", "Planifiée"
+    EFFECTUEE = "effectuee", "Effectuée"
+
+
+# --- OBJET ---
 class Objet(models.Model):
     nom = models.CharField(max_length=100, verbose_name="Nom de l'objet")
     description = models.TextField(blank=True, null=True, verbose_name="Description")
     etat = models.CharField(
-        max_length=50,
-        choices=[
-            ("perdu", "Perdu"),
-            ("retrouvé", "Retrouvé"),
-            ("restitué", "Restitué")
-        ],
-        default="perdu",
+        max_length=20,
+        choices=EtatObjet.choices,
+        default=EtatObjet.PERDU,
         verbose_name="État"
     )
     code_unique = models.CharField(
@@ -24,10 +37,17 @@ class Objet(models.Model):
         verbose_name="Code unique"
     )
 
+    def save(self, *args, **kwargs):
+        # Générer un code unique s'il n'existe pas déjà
+        if not self.code_unique:
+            self.code_unique = str(uuid.uuid4())[:8].upper()
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f"{self.nom} ({self.get_etat_display()})"
 
 
+# --- DECLARATION ---
 class Declaration(models.Model):
     citoyen = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -43,7 +63,7 @@ class Declaration(models.Model):
         verbose_name="Objet déclaré"
     )
     date_declaration = models.DateTimeField(
-        auto_now_add=True,
+        default=timezone.now,
         verbose_name="Date de déclaration"
     )
     lieu = models.CharField(
@@ -64,11 +84,12 @@ class Declaration(models.Model):
         verbose_name="Image"
     )
 
-    # ✅ Correction ici : plusieurs personnes peuvent signaler
+    # Plusieurs personnes peuvent signaler avoir trouvé
     trouve_par = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
         blank=True,
         related_name='objets_trouves',
+        limit_choices_to={'role': 'citoyen'},
         verbose_name="Trouvé par"
     )
 
@@ -79,6 +100,7 @@ class Declaration(models.Model):
         null=True,
         blank=True,
         related_name='objets_reclames',
+        limit_choices_to={'role': 'citoyen'},
         verbose_name="Réclamé par"
     )
 
@@ -86,6 +108,7 @@ class Declaration(models.Model):
         return f"Déclaration - {self.objet.nom if self.objet else 'Objet inconnu'}"
 
 
+# --- RESTITUTION ---
 class Restitution(models.Model):
     objet = models.ForeignKey(
         Objet,
@@ -126,20 +149,26 @@ class Restitution(models.Model):
         verbose_name="Commissariat"
     )
     date_restitution = models.DateField(
-        auto_now_add=True,
+        default=timezone.now,
         verbose_name="Date de restitution"
     )
     heure_restitution = models.TimeField(
-        auto_now_add=True,
+        default=timezone.now,
         verbose_name="Heure de restitution"
+    )
+    statut = models.CharField(
+        max_length=20,
+        choices=StatutRestitution.choices,
+        default=StatutRestitution.PLANIFIEE,
+        verbose_name="Statut"
     )
 
     def save(self, *args, **kwargs):
-        """Quand une restitution est faite, on met à jour l'état de l'objet."""
-        if self.objet:
-            self.objet.etat = "restitué"
-            self.objet.save()
+        """Met à jour l'état de l'objet seulement si la restitution est effectuée."""
         super().save(*args, **kwargs)
+        if self.objet and self.statut == StatutRestitution.EFFECTUEE:
+            self.objet.etat = EtatObjet.RESTITUE
+            self.objet.save()
 
     def __str__(self):
         return f"Restitution de {self.objet} à {self.citoyen}"

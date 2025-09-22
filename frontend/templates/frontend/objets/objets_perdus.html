@@ -10,63 +10,62 @@
     <h2 class="mb-4 text-center fw-bold">❌ Objets Perdus</h2>
     <div class="row">
         {% for declaration in declarations %}
-            {% if declaration.objet.etat != "restitué" %}
-                <div class="col-md-4 mb-4">
-                    <div class="card objet-card shadow-sm h-100 border-0">
-                        {% if declaration.image %}
-                            <img src="{{ declaration.image.url }}" 
-                                 class="card-img-top rounded-top" 
-                                 style="height:200px; object-fit:cover;" 
-                                 alt="Image de {{ declaration.objet.nom }}">
-                        {% else %}
-                            <img src="{% static 'img/default_objet.png' %}" 
-                                 class="card-img-top rounded-top" 
-                                 style="height:200px; object-fit:cover;" 
-                                 alt="Image par défaut">
+            <div class="col-md-4 mb-4">
+                <div class="card objet-card shadow-sm h-100 border-0">
+                    {% if declaration.image %}
+                        <img src="{{ declaration.image.url }}" 
+                             class="card-img-top rounded-top" 
+                             style="height:200px; object-fit:cover;" 
+                             alt="Image de {{ declaration.objet.nom }}">
+                    {% else %}
+                        <img src="{% static 'img/default_objet.png' %}" 
+                             class="card-img-top rounded-top" 
+                             style="height:200px; object-fit:cover;" 
+                             alt="Image par défaut">
+                    {% endif %}
+                    
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold text-danger">
+                            {% if declaration.objet.etat == "perdu" %}🔴{% endif %}
+                            {% if declaration.objet.etat == "réclamé" %}🟡{% endif %}
+                            {{ declaration.objet.nom }}
+                        </h5>
+                        <p class="card-text small text-muted">
+                            {{ declaration.description|truncatewords:20 }}
+                        </p>
+                        
+                        {% if declaration.objet.etat == "perdu" %}
+                            <span class="badge bg-danger">Perdu</span>
+                        {% elif declaration.objet.etat == "réclamé" %}
+                            <span class="badge bg-warning text-dark">Réclamé</span>
                         {% endif %}
+                    </div>
+                    
+                    <div class="card-footer bg-light text-end">
+                        <a href="{% url 'objet_detail' declaration.objet.id %}" 
+                           class="btn btn-sm btn-outline-danger">🔍 Voir détails</a>
                         
-                        <div class="card-body">
-                            <h5 class="card-title fw-bold text-danger">
-                                {% if declaration.objet.etat == "perdu" %}🔴{% else %}🟡{% endif %} 
-                                {{ declaration.objet.nom }}
-                            </h5>
-                            <p class="card-text small text-muted">
-                                {{ declaration.description|truncatewords:20 }}
-                            </p>
-                            
-                            {% if declaration.objet.etat == "perdu" %}
-                                <span class="badge bg-danger">Perdu</span>
-                            {% elif declaration.objet.etat == "retrouvé" %}
-                                <span class="badge bg-warning text-dark">Retrouvé</span>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="card-footer bg-light text-end">
-                            <a href="{% url 'objet_detail' declaration.objet.id %}" 
-                               class="btn btn-sm btn-outline-danger">🔍 Voir détails</a>
-                            
-                            {% if user.is_authenticated %}
-                                {% if user in declaration.trouve_par.all %}
-                                    <button class="btn btn-sm btn-outline-secondary" disabled>
-                                        ✅ Déjà signalé
-                                    </button>
-                                {% else %}
-                                    <form method="POST" action="{% url 'je_le_trouve' declaration.id %}" class="d-inline">
-                                        {% csrf_token %}
-                                        <button type="submit" class="btn btn-sm btn-success">
-                                            🍏 Je l’ai trouvé
-                                        </button>
-                                    </form>
-                                {% endif %}
+                        {% if user.is_authenticated %}
+                            {% if user in declaration.trouve_par.all %}
+                                <button class="btn btn-sm btn-outline-secondary" disabled>
+                                    ✅ Déjà signalé
+                                </button>
                             {% else %}
-                                <a href="{% url 'login' %}" class="btn btn-sm btn-outline-secondary">
-                                    Connectez-vous
-                                </a>
+                                <form method="POST" action="{% url 'je_le_trouve' declaration.id %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-success">
+                                        🍏 Je l’ai trouvé
+                                    </button>
+                                </form>
                             {% endif %}
-                        </div>
+                        {% else %}
+                            <a href="{% url 'login' %}" class="btn btn-sm btn-outline-secondary">
+                                Connectez-vous
+                            </a>
+                        {% endif %}
                     </div>
                 </div>
-            {% endif %}
+            </div>
         {% empty %}
             <div class="col-12">
                 <div class="alert alert-info text-center">Aucun objet perdu trouvé.</div>

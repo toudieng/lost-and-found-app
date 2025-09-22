@@ -24,7 +24,7 @@ urlpatterns = [
     name="planifier_restitution"
 ),
 # Objets retrouvés en attente de restitution
-    path('objets/retrouves-attente/', views.objets_retrouves_attente, name='objets_retrouves_attente'),
+    path('objets/retrouves-attente/', views.objets_trouves_attente, name='objets_trouves_attente'),
 
  path("supprimer/<int:restitution_id>/", views.supprimer_restitution, name="supprimer_restitution"),
 

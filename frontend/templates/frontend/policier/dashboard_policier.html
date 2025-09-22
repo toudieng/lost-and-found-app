@@ -5,68 +5,30 @@
 
 {% block extra_css %}
 <style>
-    body {
-        display: flex;
-        flex-direction: column;
-        min-height: 100vh;
-    }
+    body { display: flex; flex-direction: column; min-height: 100vh; }
 
     /* Sidebar */
-    .sidebar {
-        background: linear-gradient(180deg, #343a40, #1d1f21);
-        color: #fff;
-        min-height: 100vh;
-        padding: 2rem 1rem;
-        position: sticky;
-        top: 0;
-    }
-    .sidebar h4 {
-        color: #ffc107;
-        text-align: center;
-        margin-bottom: 1.5rem;
-    }
-    .sidebar .nav-link {
-        color: #adb5bd;
-        border-radius: 0.5rem;
-        padding: 0.6rem 1rem;
-    }
+    .sidebar { background: linear-gradient(180deg, #343a40, #1d1f21); color: #fff; min-height: 100vh; padding: 2rem 1rem; position: sticky; top: 0; }
+    .sidebar h4 { color: #ffc107; text-align: center; margin-bottom: 1.5rem; }
+    .sidebar .nav-link { color: #adb5bd; border-radius: 0.5rem; padding: 0.6rem 1rem; transition: all 0.2s; }
     .sidebar .nav-link:hover,
-    .sidebar .nav-link.active {
-        background: #495057;
-        color: #ffc107;
-    }
+    .sidebar .nav-link.active { background: #495057; color: #ffc107; }
 
     /* Contenu principal */
-    .main-content {
-        flex: 1 0 auto;
-        padding: 2rem;
-        background: #f8f9fa;
-        min-height: 100vh;
-    }
+    .main-content { flex: 1 0 auto; padding: 2rem; background: #f8f9fa; min-height: 100vh; }
+    .welcome-title { color: #6c1e3d; font-weight: 700; margin-bottom: 0.5rem; }
 
-    .welcome-title {
-        color: #6c1e3d;
-        font-weight: 700;
-        margin-bottom: 0.5rem;
-    }
+    .stats-card { border-radius: 1rem; padding: 1.5rem; background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 1rem; transition: transform 0.2s; }
+    .stats-card:hover { transform: translateY(-3px); }
+    .stats-icon { font-size: 2.5rem; color: #6c1e3d; display: flex; align-items: center; justify-content: center; width: 3rem; height: 3rem; background: #f0e5f0; border-radius: 50%; }
 
-    .stats-card, .action-card {
-        border-radius: 1rem;
-        padding: 1.5rem;
-        background: #fff;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        transition: transform 0.2s;
-    }
-    .stats-card:hover, .action-card:hover {
-        transform: translateY(-3px);
-    }
-    .stats-icon {
-        font-size: 2rem;
-        color: #6c1e3d;
-    }
+    .notifications-card { border-radius: 1rem; background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 1.5rem; margin-top: 2rem; }
+    .list-group-item { border: none; padding: 0.75rem 1rem; }
+    .list-group-item a { color: #495057; text-decoration: none; }
+    .list-group-item a:hover { text-decoration: underline; }
+    .badge-notif { background-color: #6c1e3d; color: #fff; font-size: 0.75rem; padding: 0.25em 0.5em; border-radius: 0.5rem; }
+
+    .chart-container { background: #fff; padding: 1rem; border-radius: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 2rem; }
 </style>
 {% endblock %}
 
@@ -83,7 +45,7 @@
                 <a class="nav-link {% if request.resolver_match.url_name == 'objets_reclames' %}active{% endif %}" href="{% url 'objets_reclames' %}">📍 Objets à restituer (réclamés)</a>
             </li>
             <li class="nav-item mb-2">
-                <a class="nav-link {% if request.resolver_match.url_name == 'objets_retrouves_attente' %}active{% endif %}" href="{% url 'objets_retrouves_attente' %}">📦 Objets retrouvés (en attente)</a>
+                <a class="nav-link {% if request.resolver_match.url_name == 'objets_trouves_attente' %}active{% endif %}" href="{% url 'objets_trouves_attente' %}">📦 Objets retrouvés (en attente)</a>
             </li>
         </ul>
     </div>
@@ -96,12 +58,12 @@
         <!-- Statistiques -->
         <div class="row g-3 mb-4">
             <div class="col-md-4">
-                <a href="{% url 'objets_retrouves_attente' %}" class="text-decoration-none">
+                <a href="{% url 'objets_trouves_attente' %}" class="text-decoration-none">
                     <div class="stats-card">
                         <span class="stats-icon">📦</span>
                         <div>
-                            <h5 class="mb-0">{{ nb_objets_retrouves|default:"0" }}</h5>
-                            <small>Objets retrouvés</small>
+                            <h5 class="mb-0">{{ nb_objets_trouves|default:"0" }}</h5>
+                            <small class="text-muted">Objets retrouvés</small>
                         </div>
                     </div>
                 </a>
@@ -112,7 +74,7 @@
                         <span class="stats-icon">📍</span>
                         <div>
                             <h5 class="mb-0">{{ nb_objets_a_restituer|default:"0" }}</h5>
-                            <small>Objets à restituer</small>
+                            <small class="text-muted">Objets à restituer</small>
                         </div>
                     </div>
                 </a>
@@ -123,30 +85,77 @@
                         <span class="stats-icon">📂</span>
                         <div>
                             <h5 class="mb-0">{{ nb_restitutions|default:"0" }}</h5>
-                            <small>Historique</small>
+                            <small class="text-muted">Historique</small>
                         </div>
                     </div>
                 </a>
             </div>
         </div>
 
+        <!-- Graphiques -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <h5 class="mb-3">Objets retrouvés par mois</h5>
+                    <canvas id="chartTrouves"></canvas>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <h5 class="mb-3">Objets restitués par mois</h5>
+                    <canvas id="chartRestitues"></canvas>
+                </div>
+            </div>
+        </div>
 
         <!-- Notifications -->
-        <div class="card shadow-sm p-3">
+        <div class="notifications-card">
             <h5>🔔 Notifications récentes</h5>
             {% if notifications %}
-                <ul class="list-group list-group-flush">
+                <ul class="list-group list-group-flush mt-2">
                     {% for notif in notifications %}
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             <a href="{{ notif.link }}" class="text-decoration-none">{{ notif.message }}</a>
-                            <small class="text-muted">{{ notif.date|date:"d/m/Y H:i" }}</small>
+                            <span class="badge-notif">{{ notif.date|date:"d/m/Y H:i" }}</span>
                         </li>
                     {% endfor %}
                 </ul>
             {% else %}
-                <p class="text-muted">Aucune notification pour le moment.</p>
+                <p class="text-muted mt-2">Aucune notification pour le moment.</p>
             {% endif %}
         </div>
     </div>
 </div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const ctxTrouves = document.getElementById('chartTrouves').getContext('2d');
+new Chart(ctxTrouves, {
+    type: 'bar',
+    data: {
+        labels: {{ labels_trouves|safe }},
+        datasets: [{
+            label: 'Objets retrouvés',
+            data: {{ data_trouves|safe }},
+            backgroundColor: '#6c1e3d'
+        }]
+    },
+    options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+});
+
+const ctxRestitues = document.getElementById('chartRestitues').getContext('2d');
+new Chart(ctxRestitues, {
+    type: 'bar',
+    data: {
+        labels: {{ labels_restitues|safe }},
+        datasets: [{
+            label: 'Objets restitués',
+            data: {{ data_restitues|safe }},
+            backgroundColor: '#28a745'
+        }]
+    },
+    options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+});
+</script>
 {% endblock %}
