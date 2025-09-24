@@ -1,0 +1,69 @@
+{% extends "frontend/citoyen/base_citoyen.html" %}
+{% load static %}
+
+{% block title %}Dashboard Citoyen{% endblock %}
+
+{% block extra_css %}
+<style>
+.welcome-title { color: #6c1e3d; font-weight: 700; margin-bottom: 0.5rem; }
+.stats-card { border-radius: 1rem; padding: 1.5rem; background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 1rem; }
+.stats-icon { font-size: 2rem; margin-right: 1rem; color: #6c1e3d; }
+.sidebar-link { display:block; padding:0.5rem 1rem; margin-bottom:0.5rem; background:#f8f9fa; border-radius:0.5rem; text-decoration:none; color:#333; }
+.sidebar-link:hover { background:#6c1e3d; color:#fff; }
+</style>
+{% endblock %}
+
+{% block content %}
+<h2 class="welcome-title">Bienvenue, {{ user.first_name }} 👋</h2>
+<p class="text-muted">Voici un aperçu de vos objets perdus et trouvés.</p>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="stats-card d-flex align-items-center">
+            <span class="stats-icon">📦</span>
+            <div>
+                <h5 class="mb-0">{{ nb_objets_perdus }}</h5>
+                <small>Objets perdus</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stats-card d-flex align-items-center">
+            <span class="stats-icon">🔍</span>
+            <div>
+                <h5 class="mb-0">{{ nb_objets_trouves }}</h5>
+                <small>Objets trouvés</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stats-card d-flex align-items-center">
+            <span class="stats-icon">✅</span>
+            <div>
+                <h5 class="mb-0">{{ nb_objets_restitues }}</h5>
+                <small>Objets restitués</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-4">
+    <a href="{% url 'mes_objets_perdus' %}" class="sidebar-link">📦 Mes objets perdus</a>
+    <a href="{% url 'mes_objets_trouves' %}" class="sidebar-link">🔍 Mes objets trouvés</a>
+    <a href="{% url 'objets_a_reclamer' %}" class="sidebar-link">📌 Objets à réclamer</a>
+    <a href="{% url 'modifier_profil_citoyen' %}" class="sidebar-link">✏️ Modifier mon profil</a>
+</div>
+
+<div class="card shadow-sm p-3 mt-4">
+    <h5>🔔 Notifications récentes</h5>
+    {% if notifications %}
+        <ul class="list-group list-group-flush">
+            {% for notif in notifications %}
+                <li class="list-group-item">{{ notif.objet.nom }} déclaré le {{ notif.date_declaration|date:"d/m/Y H:i" }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="text-muted">Aucune notification pour le moment.</p>
+    {% endif %}
+</div>
+{% endblock %}

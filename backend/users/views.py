@@ -25,7 +25,7 @@ def login_view(request):
                 elif user.role == "policier":
                     return redirect("dashboard_policier")
                 else:  # citoyen
-                    return redirect("home")
+                    return redirect("dashboard_citoyen")
             else:
                 return redirect("home")
         else:
@@ -130,3 +130,34 @@ def some_view(request):
         user=request.user,
         message="Un nouvel objet à restituer a été ajouté."
     )
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .forms import ProfilForm
+
+@login_required
+def profil_citoyen(request):
+    user = request.user
+    if request.method == "POST":
+        form = ProfilForm(request.POST, request.FILES, instance=user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "✅ Votre profil a été mis à jour.")
+            return redirect('profil_citoyen')
+    else:
+        form = ProfilForm(instance=user)
+
+    return render(request, 'frontend/citoyen/profil_citoyen.html', {'form': form})
+
+@login_required
+def modifier_profil_citoyen(request):
+    user = request.user
+    if request.method == "POST":
+        form = ProfilForm(request.POST, request.FILES, instance=user)
+        if form.is_valid():
+            form.save()
+            return redirect("dashboard_citoyen")
+    else:
+        form = ProfilForm(instance=user)
+
+    return render(request, "frontend/modifier_profil_citoyen.html", {"form": form})

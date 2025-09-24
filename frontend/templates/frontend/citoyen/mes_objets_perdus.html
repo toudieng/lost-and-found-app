@@ -1,0 +1,81 @@
+{% extends "frontend/citoyen/base_citoyen.html" %}
+{% load static %}
+
+{% block title %}Mes Objets Perdus{% endblock %}
+
+{% block extra_css %}
+<style>
+.objet-card {
+    border-radius: 1rem;
+    padding: 1rem;
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+}
+.objet-img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 0.5rem;
+    margin-right: 1rem;
+}
+.objet-info h5 {
+    margin: 0;
+    color: #6c1e3d;
+}
+.objet-info p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #555;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<h2 class="welcome-title">Mes objets perdus</h2>
+<p class="text-muted">Tous les objets que vous avez déclarés comme perdus.</p>
+
+{% if objets %}
+    {% for decl in objets %}
+        <div class="objet-card">
+            {% if decl.image %}
+                <img src="{{ decl.image.url }}" alt="Objet" class="objet-img">
+            {% else %}
+                <img src="{% static 'images/default-object.png' %}" alt="Objet" class="objet-img">
+            {% endif %}
+
+            <div class="objet-info">
+                <h5>
+                    {% if decl.objet %}
+                        {{ decl.objet.nom }}
+                    {% else %}
+                        Objet inconnu
+                    {% endif %}
+                </h5>
+
+                <p><strong>État :</strong> 
+                    {% if decl.objet %}
+                        {{ decl.objet.get_etat_display }}
+                    {% else %}
+                        Inconnu
+                    {% endif %}
+                </p>
+
+                <p><strong>Date :</strong> {{ decl.date_declaration|date:"d/m/Y H:i" }}</p>
+
+                {% if decl.lieu %}
+                    <p><strong>Lieu :</strong> {{ decl.lieu }}</p>
+                {% endif %}
+
+                {% if decl.description %}
+                    <p><strong>Description :</strong> {{ decl.description }}</p>
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+{% else %}
+    <p class="text-muted">Vous n'avez déclaré aucun objet perdu pour le moment.</p>
+{% endif %}
+{% endblock %}

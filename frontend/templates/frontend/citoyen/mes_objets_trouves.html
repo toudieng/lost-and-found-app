@@ -1,0 +1,31 @@
+{% extends "frontend/citoyen/base_citoyen.html" %}
+{% load static %}
+
+{% block title %}Mes Objets Trouvés{% endblock %}
+
+{% block content %}
+<h2 class="welcome-title">🔍 Mes objets trouvés</h2>
+<p class="text-muted">Tous les objets que vous avez signalés comme trouvés.</p>
+
+{% if objets %}
+    <div class="row">
+        {% for obj in objets %}
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm">
+                {% if obj.image %}
+                <img src="{{ obj.image.url }}" class="card-img-top" alt="{{ obj.objet.nom }}">
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title">{{ obj.objet.nom }}</h5>
+                    <p class="card-text">{{ obj.description|default:"Aucune description" }}</p>
+                    <p><small class="text-muted">Déclaré le {{ obj.date_declaration|date:"d/m/Y H:i" }}</small></p>
+                    <p><small class="text-muted">État: {{ obj.objet.get_etat_display }}</small></p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <p class="text-muted">Vous n'avez trouvé aucun objet pour le moment.</p>
+{% endif %}
+{% endblock %}

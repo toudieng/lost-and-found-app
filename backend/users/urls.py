@@ -12,6 +12,8 @@ urlpatterns = [
  #profil policier
     path('police/profil/', views.profil_police, name='profil_police'),
     path('police/profil/modifier/', views.modifier_profil_police, name='modifier_profil_police'),
+     path('profil/', views.profil_citoyen, name='profil_citoyen'),
+     path('profil/modifier/', views.modifier_profil_citoyen, name='modifier_profil_citoyen'),
 ]
 
 

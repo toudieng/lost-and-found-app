@@ -1,11 +1,10 @@
 from django import forms
-
 from backend.users.models import Commissariat
-from .models import Declaration, Objet
+from .models import Declaration, Objet, EtatObjet
 
 
 class DeclarationForm(forms.ModelForm):
-    # Champ texte pour saisir le nom de l'objet (lié au modèle Objet)
+    # Champ texte pour saisir le nom de l'objet
     nom_objet = forms.CharField(
         max_length=100,
         widget=forms.TextInput(
@@ -34,12 +33,16 @@ class DeclarationForm(forms.ModelForm):
         label="Photo (facultative)"
     )
 
-    # Nouveau champ pour remplacer est_perdu
+    # Champ pour indiquer si l’objet est perdu ou trouvé
     etat = forms.ChoiceField(
-        choices=[("perdu", "Objet perdu"), ("retrouvé", "Objet trouvé")],
-        widget=forms.RadioSelect,
-        label="Type de déclaration"
-    )
+    choices=[
+        (EtatObjet.PERDU, "Objet perdu"),
+        (EtatObjet.RETROUVE, "Objet trouvé"),  # ✅ correction ici
+    ],
+    widget=forms.RadioSelect,
+    label="Type de déclaration"
+)
+
 
     class Meta:
         model = Declaration
@@ -48,32 +51,37 @@ class DeclarationForm(forms.ModelForm):
             'lieu': forms.TextInput(
                 attrs={
                     'class': 'form-control',
-                    'placeholder': "Lieu où l’objet a été perdu/trouvé"
+                    'placeholder': "Lieu où l’objet a été perdu ou trouvé"
                 }
             ),
         }
 
     def save(self, commit=True, citoyen=None):
         """
-        On surcharge save() :
+        Surcharge de save() :
         - crée un Objet à partir de nom_objet
-        - l'associe à la Déclaration
+        - l’associe à la Déclaration
         - enregistre le citoyen si fourni
         """
+        # Création de l'objet lié
         objet = Objet.objects.create(
             nom=self.cleaned_data['nom_objet'],
             description=self.cleaned_data.get('description', ''),
-            etat=self.cleaned_data['etat']  # utilise maintenant le champ etat
+            etat=self.cleaned_data['etat']
         )
 
+        # Création de la déclaration
         declaration = super().save(commit=False)
-        declaration.objet = objet  # lien avec l’objet créé
-        if citoyen:  # si on passe l’utilisateur connecté
+        declaration.objet = objet
+        if citoyen:
             declaration.citoyen = citoyen
+
         if commit:
             objet.save()
             declaration.save()
+
         return declaration
+
 
 class RestitutionForm(forms.Form):
     date_restitution = forms.DateField(
@@ -87,5 +95,6 @@ class RestitutionForm(forms.Form):
     commissariat = forms.ModelChoiceField(
         queryset=Commissariat.objects.all(),
         widget=forms.Select(attrs={'class': 'form-select'}),
-        empty_label="-- Sélectionnez un commissariat --"
+        empty_label="-- Sélectionnez un commissariat --",
+        label="Commissariat"
     )

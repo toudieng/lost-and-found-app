@@ -45,4 +45,24 @@ urlpatterns = [
     path('dashboard/admin/utilisateurs/creer_administrateur/', 
          views.creer_administrateur, 
          name='creer_administrateur'),
+
+
+
+        
+    # Dashboard principal
+    path('dashboard/citoyen/', views.dashboard_citoyen, name='dashboard_citoyen'),
+
+    # Objets perdus par le citoyen
+    path('mes-objets-perdus/', views.mes_objets_perdus, name='mes_objets_perdus'),
+
+    # Objets trouvés par le citoyen
+    path('mes-objets-trouves/', views.mes_objets_trouves, name='mes_objets_trouves'),
+
+    # Objets à réclamer (restitués ou en attente)
+    path('objets-a-reclamer/', views.objets_a_reclamer, name='objets_a_reclamer'),
+
+    # Planifier restitution pour un objet
+    path('reclamer/<int:restitution_id>/', views.reclamer_objet, name='reclamer_objet'),
 ]
+
+
