@@ -8,34 +8,32 @@
 
 <style>
 /* =========================
-   Boutons hero-actions mis en valeur
+   Boutons hero-actions
 ========================= */
 .hero-actions .btn-action {
     position: relative;
     display: inline-block;
-    padding: 1rem 2rem;
-    font-size: 1.35rem;
+    padding: 1rem 2.5rem;
+    font-size: 1.4rem;
     font-weight: 700;
     border-radius: 0.7rem;
-    margin: 0.5rem;
+    margin: 0.8rem;
     color: #fff;
     text-shadow: 1px 1px 3px rgba(0,0,0,0.4);
-    border: none;
+    text-decoration: none;
     overflow: hidden;
-    z-index: 1;
     cursor: pointer;
     transition: all 0.3s ease;
 }
 
-/* Dégradés */
 .btn-action-lost {
     background: linear-gradient(135deg, #ff5c5c, #e53946);
 }
+
 .btn-action-found {
     background: linear-gradient(135deg, #4cd964, #28a745);
 }
 
-/* Glow radial au hover */
 .btn-action::after {
     content: "";
     position: absolute;
@@ -49,7 +47,6 @@
     pointer-events: none;
 }
 
-/* Shine animé au hover */
 .btn-action::before {
     content: '';
     position: absolute;
@@ -64,22 +61,22 @@
 
 .btn-action:hover::before {
     left: 125%;
-    transition: all 0.7s ease;
 }
 
 .btn-action:hover {
-    transform: scale(1.1);
-    box-shadow: 0 6px 25px rgba(0,0,0,0.45);
-    filter: brightness(1.15);
+    transform: scale(1.08);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.45);
+    filter: brightness(1.12);
 }
+
 /* =========================
-   Section CTA finale simplifiée
+   CTA finale
 ========================= */
 .cta {
     padding: 80px 0;
     text-align: center;
-    background-color: #ffc107;  /* couleur simple et visible */
-    color: #343a40;             /* texte sombre pour contraste */
+    background-color: #495057;
+    color: #fff;
     border-radius: 1rem;
 }
 
@@ -94,92 +91,60 @@
     margin-bottom: 2rem;
 }
 
-/* Bouton CTA spécifique */
 .cta .btn-cta {
     font-weight: 700;
     font-size: 1.1rem;
     padding: 0.9rem 2rem;
     border-radius: 0.6rem;
-    background: #343a40;   /* bouton sombre sur fond clair */
-    color: #fff;
-    transition: all 0.3s ease;
+    background: #ffc107;
+    color: #343a40;
 }
 
 .cta .btn-cta:hover {
-    background: #495057;
+    background: #ffca28;
     transform: scale(1.05);
     box-shadow: 0 8px 25px rgba(0,0,0,0.3);
 }
 
-
-.hero-actions .btn-action {
-    position: relative;
-    display: inline-block;
-    padding: 1rem 2.5rem;
-    font-size: 1.4rem;
-    font-weight: 700;
-    border-radius: 0.7rem;
-    margin: 0.8rem;
-    color: #fff;
-    text-shadow: 1px 1px 3px rgba(0,0,0,0.4);
-    text-decoration: none; /* enlève le soulignement */
-    overflow: hidden;
-    cursor: pointer;
-    transition: all 0.3s ease;
+/* =========================
+   Carousel
+========================= */
+.carousel-inner img {
+    object-fit: cover;
+    height: 80vh;
 }
-
-/* Couleurs personnalisées */
-.btn-action-lost {
-    background: linear-gradient(135deg, #ff5c5c, #e53946);
-}
-.btn-action-found {
-    background: linear-gradient(135deg, #4cd964, #28a745);
-}
-
-/* Effets hover */
-.btn-action:hover {
-    transform: scale(1.08);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.45);
-    filter: brightness(1.12);
-}
-
 </style>
 {% endblock %}
 
 {% block content %}
 
-<!-- Carousel -->
+<!-- Carousel dynamique -->
 <div id="carouselExampleFade" class="carousel slide carousel-fade">
-  <div class="carousel-inner" style="height: 80vh;">
-    <div class="carousel-item active">
-      <img src="{% static 'frontend/images/head1.jpg' %}" class="d-block w-100" style="height: 100%; object-fit: cover;" alt="Slide 1">
-    </div>
-    <div class="carousel-item">
-      <img src="{% static 'frontend/images/head2.jpg' %}" class="d-block w-100" style="height: 100%; object-fit: cover;" alt="Slide 2">
-    </div>
-    <div class="carousel-item">
-      <img src="{% static 'frontend/images/head3.jpg' %}" class="d-block w-100" style="height: 100%; object-fit: cover;" alt="Slide 3">
-    </div>
-    <div class="carousel-item">
-      <img src="{% static 'frontend/images/head4.jpg' %}" class="d-block w-100" style="height: 100%; object-fit: cover;" alt="Slide 4">
-    </div>
-    <div class="carousel-item">
-      <img src="{% static 'frontend/images/head5.jpg' %}" class="d-block w-100" style="height: 100%; object-fit: cover;" alt="Slide 5">
-    </div>
+  <div class="carousel-inner">
+    {% for slide in slides %}
+      <div class="carousel-item {% if forloop.first %}active{% endif %}">
+        <img src="{% static slide.url %}" class="d-block w-100" alt="{{ slide.titre }}">
+        {% if slide.titre or slide.description %}
+        <div class="carousel-caption d-none d-md-block">
+          {% if slide.titre %}<h5>{{ slide.titre }}</h5>{% endif %}
+          {% if slide.description %}<p>{{ slide.description }}</p>{% endif %}
+        </div>
+        {% endif %}
+      </div>
+    {% endfor %}
   </div>
   <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleFade" data-bs-slide="prev">
-    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="carousel-control-prev-icon"></span>
     <span class="visually-hidden">Previous</span>
   </button>
   <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleFade" data-bs-slide="next">
-    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="carousel-control-next-icon"></span>
     <span class="visually-hidden">Next</span>
   </button>
 </div>
 
-
 <!-- Section 1 : Introduction -->
-<section class="hero-intro">
+<section class="hero-intro py-5">
     <div class="container text-center">
         <h1 class="display-3 fw-bold mb-4">📦 Bienvenue sur la plateforme des Objets Perdus</h1>
         <p class="lead mb-5 fs-5">Déclarez un objet perdu, consultez les objets retrouvés et suivez vos démarches en toute sécurité.</p>
@@ -187,7 +152,7 @@
 </section>
 
 <!-- Section 2 : Boutons d'action -->
-<section class="hero-actions">
+<section class="hero-actions py-5">
     <div class="container text-center">
         <a href="{% url 'objets_perdus' %}" class="btn-action btn-action-lost">
             ❌ Voir les objets perdus
@@ -197,13 +162,12 @@
         </a>
     </div>
 </section>
+
 <!-- Avantages de l'app -->
 <section id="about" class="features-section py-5">
   <div class="container">
     <h2 class="text-center fw-bold mb-5">✨ Les avantages de notre plateforme</h2>
     <div class="row text-center g-4">
-      
-      <!-- Avantage 1 -->
       <div class="col-md-4">
         <div class="card shadow-sm p-4 h-100">
           <i class="fa-solid fa-box-open fa-3x mb-3 text-danger"></i>
@@ -211,8 +175,6 @@
           <p>Signalez rapidement un objet perdu grâce à un formulaire simple et intuitif.</p>
         </div>
       </div>
-
-      <!-- Avantage 2 -->
       <div class="col-md-4">
         <div class="card shadow-sm p-4 h-100">
           <i class="fa-solid fa-magnifying-glass fa-3x mb-3 text-success"></i>
@@ -220,8 +182,6 @@
           <p>Accédez à la liste des objets retrouvés et vérifiez si le vôtre est disponible.</p>
         </div>
       </div>
-
-      <!-- Avantage 3 -->
       <div class="col-md-4">
         <div class="card shadow-sm p-4 h-100">
           <i class="fa-solid fa-folder-open fa-3x mb-3 text-primary"></i>
@@ -229,11 +189,9 @@
           <p>Suivez l’avancement de vos déclarations et notifications en temps réel.</p>
         </div>
       </div>
-
     </div>
   </div>
 </section>
-
 
 <!-- Partenaires -->
 <section class="partners py-6 bg-light text-center">
@@ -250,7 +208,7 @@
 </section>
 
 <!-- CTA -->
-<section class="cta text-center">
+<section class="cta text-center py-5">
     <div class="container">
         <h2 class="display-5 mb-3">Vous avez perdu un objet ?</h2>
         <p class="mb-4 fs-5">Déclarez-le dès maintenant et augmentez vos chances de le retrouver rapidement.</p>

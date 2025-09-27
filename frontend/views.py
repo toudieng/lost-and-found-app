@@ -39,8 +39,16 @@ def admin_required(view_func):
 # =============================
 #       PAGES PUBLIQUES
 # =============================
+
 def home(request):
-    return render(request, "frontend/home.html")
+    slides = [
+        {'url': 'frontend/images/head1.jpg', 'titre': 'Bienvenue', 'description': 'Découvrez les objets perdus'},
+        {'url': 'frontend/images/head2.jpg', 'titre': '', 'description': ''},
+        {'url': 'frontend/images/head3.jpg', 'titre': '', 'description': ''},
+        {'url': 'frontend/images/head4.jpg', 'titre': '', 'description': ''},
+        {'url': 'frontend/images/head5.jpg', 'titre': '', 'description': ''},
+    ]
+    return render(request, "frontend/home.html", {'slides': slides})
 
 def contact(request):
     return render(request, "frontend/contact.html")
