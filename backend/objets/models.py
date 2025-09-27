@@ -8,7 +8,7 @@ from backend.users.models import Commissariat
 # --- ENUMS pour éviter les listes brutes ---
 class EtatObjet(models.TextChoices):
     PERDU = "perdu", "Perdu"
-    RETROUVE = "trouvé", "Trouvé"
+    TROUVE = "trouvé", "Trouvé"
     RECLAME = "reclamé", "Réclamé"
     EN_ATTENTE = "en_attente", "En_attente"
     RESTITUE = "restitue", "Restitué"

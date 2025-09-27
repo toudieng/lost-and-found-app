@@ -37,7 +37,7 @@ class DeclarationForm(forms.ModelForm):
     etat = forms.ChoiceField(
     choices=[
         (EtatObjet.PERDU, "Objet perdu"),
-        (EtatObjet.RETROUVE, "Objet trouvé"),  # ✅ correction ici
+        (EtatObjet.TROUVE, "Objet trouvé"),  # ✅ correction ici
     ],
     widget=forms.RadioSelect,
     label="Type de déclaration"

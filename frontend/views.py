@@ -53,7 +53,7 @@ def objets_perdus(request):
 @login_required(login_url='login')
 def objets_trouves(request):
     declarations = Declaration.objects.filter(
-        objet__etat=EtatObjet.RETROUVE,  # ← ici
+        objet__etat=EtatObjet.TROUVE,  # ← ici
         reclame_par__isnull=True
     ).order_by('-date_declaration')
     return render(request, "frontend/objets/objets_trouves.html", {"declarations": declarations})
@@ -483,29 +483,54 @@ def je_le_trouve(request, declaration_id):
     return redirect("objets_perdus")
 
 
+
+from django.shortcuts import get_object_or_404, redirect
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.core.mail import send_mail, BadHeaderError
+from django.urls import reverse
+from backend.objets.models import Declaration, EtatObjet
+from django.conf import settings
+
 @login_required
 def ca_m_appartient(request, declaration_id):
     declaration = get_object_or_404(Declaration, id=declaration_id)
-    if declaration.objet.etat == EtatObjet.RETROUVE and declaration.reclame_par is None:  # ← ici
+
+    # Vérifier que l'objet est bien dans l'état TROUVÉ
+    if declaration.objet.etat == EtatObjet.TROUVE and declaration.reclame_par is None:
+        # Le citoyen actuel devient celui qui réclame l’objet
         declaration.reclame_par = request.user
         declaration.objet.etat = EtatObjet.RECLAME
         declaration.objet.save()
         declaration.save()
 
+        # Notifier par email le citoyen qui avait perdu l’objet
         if declaration.citoyen and declaration.citoyen.email:
-            objet_url = request.build_absolute_uri(reverse('objet_detail', args=[declaration.objet.id]))
-            send_mail(
-                subject=f"[Objet Trouvé] Votre objet '{declaration.objet.nom}' a été réclamé !",
-                message=f"Bonjour {declaration.citoyen.username},\nL'objet a été réclamé par {request.user.username}.\nDétails: {objet_url}",
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[declaration.citoyen.email],
-                fail_silently=False
+            objet_url = request.build_absolute_uri(
+                reverse('objet_detail', args=[declaration.objet.id])
             )
+            try:
+                send_mail(
+                    subject=f"[Objet Trouvé] Votre objet '{declaration.objet.nom}' a été réclamé !",
+                    message=(
+                        f"Bonjour {declaration.citoyen.username},\n\n"
+                        f"L'objet que vous avez déclaré perdu a été retrouvé et réclamé par "
+                        f"{request.user.username}.\n\n"
+                        f"Détails : {objet_url}"
+                    ),
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[declaration.citoyen.email],
+                    fail_silently=False,
+                )
+            except (BadHeaderError, ConnectionError, OSError) as e:
+                # Empêche le plantage si le serveur mail n'est pas disponible
+                messages.warning(request, f"⚠️ Impossible d'envoyer l'email : {e}")
+
         messages.success(request, f"✅ Vous avez réclamé l'objet '{declaration.objet.nom}'.")
     else:
-        messages.error(request, "⚠️ Cet objet a déjà été réclamé ou n'est pas retrouvé.")
-    return redirect("objets_trouves")
+        messages.error(request, "⚠️ Cet objet a déjà été réclamé ou n'est pas encore marqué comme trouvé.")
 
+    return redirect("objets_trouves")
 
 
 

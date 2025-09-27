@@ -13,14 +13,24 @@
             {% if declaration.objet.etat == "trouvé" %}
                 <div class="col-md-4 mb-4">
                     <div class="card objet-card shadow-sm h-100 border-0">
+                        
+                        {# Image de l'objet #}
                         {% if declaration.objet.image %}
-                            <img src="{{ declaration.objet.image.url }}" class="card-img-top rounded-top" style="height:200px; object-fit:cover;" alt="Image de {{ declaration.objet.nom }}">
+                            <img src="{{ declaration.objet.image.url }}" 
+                                 class="card-img-top rounded-top" 
+                                 style="height:200px; object-fit:cover;" 
+                                 alt="Image de {{ declaration.objet.nom }}">
                         {% else %}
-                            <img src="{% static 'img/default_objet.png' %}" class="card-img-top rounded-top" style="height:200px; object-fit:cover;" alt="Image par défaut">
+                            <img src="{% static 'img/default_objet.png' %}" 
+                                 class="card-img-top rounded-top" 
+                                 style="height:200px; object-fit:cover;" 
+                                 alt="Image par défaut">
                         {% endif %}
 
                         <div class="card-body">
-                            <h5 class="card-title fw-bold text-success">🟢 {{ declaration.objet.nom }}</h5>
+                            <h5 class="card-title fw-bold text-success">
+                                🟢 {{ declaration.objet.nom }}
+                            </h5>
                             <p class="card-text small text-muted">
                                 {{ declaration.description|truncatewords:20 }}
                             </p>
@@ -28,24 +38,48 @@
                                 Déclaré le {{ declaration.date_declaration|date:"d/m/Y H:i" }}
                             </p>
 
+                            {# Nombre de signalements #}
                             {% if declaration.trouve_par.count > 0 %}
-                                <span class="badge bg-info">{{ declaration.trouve_par.count }} signalement{% if declaration.trouve_par.count > 1 %}s{% endif %}</span>
+                                <span class="badge bg-info">
+                                    {{ declaration.trouve_par.count }} signalement{% if declaration.trouve_par.count > 1 %}s{% endif %}
+                                </span>
                             {% endif %}
 
+                            {# Si l’objet a été réclamé #}
                             {% if declaration.reclame_par %}
-                                <span class="badge bg-warning text-dark">Réclamé par {{ declaration.reclame_par.username }}</span>
+                                <div class="d-flex align-items-center mt-2">
+                                    {% if declaration.reclame_par.profile.image %}
+                                        <img src="{{ declaration.reclame_par.profile.image.url }}" 
+                                             alt="Photo de {{ declaration.reclame_par.username }}" 
+                                             class="rounded-circle me-2" 
+                                             width="32" height="32">
+                                    {% else %}
+                                        <img src="{% static 'img/default_user.png' %}" 
+                                             alt="Utilisateur par défaut" 
+                                             class="rounded-circle me-2" 
+                                             width="32" height="32">
+                                    {% endif %}
+                                    <span class="badge bg-warning text-dark">
+                                        Réclamé par {{ declaration.reclame_par.username }}
+                                    </span>
+                                </div>
                             {% else %}
                                 <span class="badge bg-success">Trouvé</span>
                             {% endif %}
                         </div>
 
                         <div class="card-footer bg-light text-end">
-                            <a href="{% url 'objet_detail' declaration.objet.id %}" class="btn btn-sm btn-outline-success">🔍 Voir détails</a>
+                            <a href="{% url 'objet_detail' declaration.objet.id %}" 
+                               class="btn btn-sm btn-outline-success">
+                               🔍 Voir détails
+                            </a>
 
                             {% if user.is_authenticated and declaration.reclame_par is None and user not in declaration.trouve_par.all %}
                                 <form method="POST" action="{% url 'ca_m_appartient' declaration.id %}" class="d-inline">
                                     {% csrf_token %}
-                                    <button type="submit" class="btn btn-sm btn-primary">💙 Ça m’appartient</button>
+                                    <button type="submit" class="btn btn-sm btn-primary">
+                                        💙 Ça m’appartient
+                                    </button>
                                 </form>
                             {% endif %}
                         </div>
@@ -54,7 +88,9 @@
             {% endif %}
         {% empty %}
             <div class="col-12">
-                <div class="alert alert-info text-center">Aucun objet trouvé.</div>
+                <div class="alert alert-info text-center">
+                    Aucun objet trouvé.
+                </div>
             </div>
         {% endfor %}
     </div>
