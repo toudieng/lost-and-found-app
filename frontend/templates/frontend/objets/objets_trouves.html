@@ -3,32 +3,67 @@
 
 {% block title %}Objets Trouvés{% endblock %}
 
-{% block content %}
+{% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/objets.css' %}">
+<style>
+.objet-card {
+    border-radius: 1rem;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.objet-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+.card-title {
+    color: #6c1e3d !important;
+}
+.badge-success { background-color: #28a745; }
+.badge-warning { background-color: #ffc107; color: #212529; }
+.btn-outline-success {
+    color: #6c1e3d;
+    border-color: #6c1e3d;
+    font-weight: 600;
+}
+.btn-outline-success:hover {
+    background-color: #6c1e3d;
+    color: #fff;
+}
+.btn-primary {
+    background-color: #6c1e3d;
+    border-color: #6c1e3d;
+}
+.btn-primary:hover {
+    background-color: #53162b;
+    border-color: #53162b;
+}
+</style>
+{% endblock %}
 
+{% block content %}
 <div class="container mt-5">
     <h2 class="mb-4 text-center fw-bold">✅ Objets Trouvés</h2>
-    <div class="row">
+    <div class="row g-4">
         {% for declaration in declarations %}
             {% if declaration.objet.etat == "trouvé" %}
-                <div class="col-md-4 mb-4">
+                <div class="col-md-4">
                     <div class="card objet-card shadow-sm h-100 border-0">
                         
                         {# Image de l'objet #}
                         {% if declaration.objet.image %}
                             <img src="{{ declaration.objet.image.url }}" 
-                                 class="card-img-top rounded-top" 
+                                 class="card-img-top" 
                                  style="height:200px; object-fit:cover;" 
                                  alt="Image de {{ declaration.objet.nom }}">
                         {% else %}
                             <img src="{% static 'img/default_objet.png' %}" 
-                                 class="card-img-top rounded-top" 
+                                 class="card-img-top" 
                                  style="height:200px; object-fit:cover;" 
                                  alt="Image par défaut">
                         {% endif %}
 
                         <div class="card-body">
-                            <h5 class="card-title fw-bold text-success">
+                            <h5 class="card-title fw-bold">
                                 🟢 {{ declaration.objet.nom }}
                             </h5>
                             <p class="card-text small text-muted">
@@ -45,7 +80,7 @@
                                 </span>
                             {% endif %}
 
-                            {# Si l’objet a été réclamé #}
+                            {# Réclamé ou trouvé #}
                             {% if declaration.reclame_par %}
                                 <div class="d-flex align-items-center mt-2">
                                     {% if declaration.reclame_par.profile.image %}
@@ -64,13 +99,13 @@
                                     </span>
                                 </div>
                             {% else %}
-                                <span class="badge bg-success">Trouvé</span>
+                                <span class="badge badge-success mt-2">Trouvé</span>
                             {% endif %}
                         </div>
 
                         <div class="card-footer bg-light text-end">
                             <a href="{% url 'objet_detail' declaration.objet.id %}" 
-                               class="btn btn-sm btn-outline-success">
+                               class="btn btn-sm btn-outline-success me-1">
                                🔍 Voir détails
                             </a>
 

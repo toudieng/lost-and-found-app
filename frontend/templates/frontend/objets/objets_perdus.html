@@ -3,31 +3,65 @@
 
 {% block title %}Objets Perdus{% endblock %}
 
-{% block content %}
+{% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/objets.css' %}">
+<style>
+.objet-card {
+    border-radius: 1rem;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.objet-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+.card-title {
+    color: #6c1e3d !important;
+}
+.badge-danger { background-color: #dc3545; }
+.badge-warning { background-color: #ffc107; color: #212529; }
+.btn-outline-danger {
+    color: #6c1e3d;
+    border-color: #6c1e3d;
+    font-weight: 600;
+}
+.btn-outline-danger:hover {
+    background-color: #6c1e3d;
+    color: #fff;
+}
+.btn-success {
+    background-color: #6c1e3d;
+    border-color: #6c1e3d;
+}
+.btn-success:hover {
+    background-color: #53162b;
+    border-color: #53162b;
+}
+</style>
+{% endblock %}
 
+{% block content %}
 <div class="container mt-5">
     <h2 class="mb-4 text-center fw-bold">❌ Objets Perdus</h2>
-    <div class="row">
+    <div class="row g-4">
         {% for declaration in declarations %}
-            <div class="col-md-4 mb-4">
+            <div class="col-md-4">
                 <div class="card objet-card shadow-sm h-100 border-0">
-                    {% if declaration.image %}
-                        <img src="{{ declaration.image.url }}" 
-                             class="card-img-top rounded-top" 
+                    {% if declaration.objet.image %}
+                        <img src="{{ declaration.objet.image.url }}" 
+                             class="card-img-top" 
                              style="height:200px; object-fit:cover;" 
                              alt="Image de {{ declaration.objet.nom }}">
                     {% else %}
                         <img src="{% static 'img/default_objet.png' %}" 
-                             class="card-img-top rounded-top" 
+                             class="card-img-top" 
                              style="height:200px; object-fit:cover;" 
                              alt="Image par défaut">
                     {% endif %}
                     
                     <div class="card-body">
-                        <h5 class="card-title fw-bold text-danger">
-                            {% if declaration.objet.etat == "perdu" %}🔴{% endif %}
-                            {% if declaration.objet.etat == "réclamé" %}🟡{% endif %}
+                        <h5 class="card-title fw-bold">
+                            {% if declaration.objet.etat == "perdu" %}🔴{% elif declaration.objet.etat == "réclamé" %}🟡{% endif %}
                             {{ declaration.objet.nom }}
                         </h5>
                         <p class="card-text small text-muted">
@@ -35,33 +69,27 @@
                         </p>
                         
                         {% if declaration.objet.etat == "perdu" %}
-                            <span class="badge bg-danger">Perdu</span>
+                            <span class="badge badge-danger">Perdu</span>
                         {% elif declaration.objet.etat == "réclamé" %}
-                            <span class="badge bg-warning text-dark">Réclamé</span>
+                            <span class="badge badge-warning">Réclamé</span>
                         {% endif %}
                     </div>
                     
                     <div class="card-footer bg-light text-end">
                         <a href="{% url 'objet_detail' declaration.objet.id %}" 
-                           class="btn btn-sm btn-outline-danger">🔍 Voir détails</a>
+                           class="btn btn-sm btn-outline-danger me-1">🔍 Voir détails</a>
                         
                         {% if user.is_authenticated %}
                             {% if user in declaration.trouve_par.all %}
-                                <button class="btn btn-sm btn-outline-secondary" disabled>
-                                    ✅ Déjà signalé
-                                </button>
+                                <button class="btn btn-sm btn-outline-secondary" disabled>✅ Déjà signalé</button>
                             {% else %}
                                 <form method="POST" action="{% url 'je_le_trouve' declaration.id %}" class="d-inline">
                                     {% csrf_token %}
-                                    <button type="submit" class="btn btn-sm btn-success">
-                                        🍏 Je l’ai trouvé
-                                    </button>
+                                    <button type="submit" class="btn btn-sm btn-success">🍏 Je l’ai trouvé</button>
                                 </form>
                             {% endif %}
                         {% else %}
-                            <a href="{% url 'login' %}" class="btn btn-sm btn-outline-secondary">
-                                Connectez-vous
-                            </a>
+                            <a href="{% url 'login' %}" class="btn btn-sm btn-outline-secondary">Connectez-vous</a>
                         {% endif %}
                     </div>
                 </div>
