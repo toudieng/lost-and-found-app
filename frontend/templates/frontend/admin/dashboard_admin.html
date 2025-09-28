@@ -5,9 +5,9 @@
 
 {% block extra_css %}
 <style>
-    /* Sidebar du dashboard */
+    /* Sidebar */
     .sidebar {
-        background: linear-gradient(180deg, #343a40, #1d1f21);
+        background: linear-gradient(180deg, #1a237e, #0d1445); /* 🔵 Uniformisation */
         color: #fff;
         min-height: 100vh;
         padding: 2rem 1rem;
@@ -20,13 +20,15 @@
         margin-bottom: 1.5rem;
     }
     .sidebar .nav-link {
-        color: #adb5bd;
+        color: #cfd8dc;
         border-radius: 0.5rem;
         padding: 0.6rem 1rem;
+        font-weight: 500;
+        transition: all 0.2s ease-in-out;
     }
     .sidebar .nav-link:hover,
     .sidebar .nav-link.active {
-        background: #495057;
+        background: rgba(255, 255, 255, 0.15);
         color: #ffc107;
     }
 
@@ -38,7 +40,7 @@
     }
 
     .welcome-title {
-        color: #6c1e3d;
+        color: #1a237e; /* 🔵 Uniformisé */
         font-weight: 700;
         margin-bottom: 0.5rem;
     }
@@ -48,12 +50,21 @@
         padding: 1.5rem;
         background: #fff;
         box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        transition: transform 0.2s ease-in-out;
+    }
+    .stats-card:hover {
+        transform: translateY(-5px);
     }
 
     .stats-icon {
         font-size: 2rem;
         margin-right: 1rem;
-        color: #6c1e3d;
+        color: #1a237e; /* 🔵 Uniformisé */
+    }
+
+    .card h5 {
+        color: #1a237e;
+        font-weight: 600;
     }
 </style>
 {% endblock %}
@@ -84,6 +95,7 @@
         <h2 class="welcome-title">Bienvenue, Administrateur 👋</h2>
         <p class="text-muted">Gérez les commissariats, utilisateurs et consultez les statistiques.</p>
 
+        <!-- Stats -->
         <div class="row g-3">
             <div class="col-md-4">
                 <div class="stats-card d-flex align-items-center">
@@ -114,12 +126,16 @@
             </div>
         </div>
 
+        <!-- Notifications -->
         <div class="card shadow-sm p-3 mt-4">
             <h5>🔔 Notifications récentes</h5>
             {% if notifications %}
                 <ul class="list-group list-group-flush">
                     {% for notif in notifications %}
-                        <li class="list-group-item">{{ notif.message }} <small class="text-muted">{{ notif.date }}</small></li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            {{ notif.message }}
+                            <small class="text-muted">{{ notif.date|date:"d/m/Y H:i" }}</small>
+                        </li>
                     {% endfor %}
                 </ul>
             {% else %}

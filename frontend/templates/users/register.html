@@ -5,6 +5,11 @@
 
 {% block extra_css %}
 <style>
+:root {
+    --main-color: #6c1e3d;   /* 🎨 Couleur principale (menu, boutons, titres) */
+    --main-color-dark: #53162b;
+}
+
 body { background: linear-gradient(135deg, #f5f5f5, #e0e0e0); }
 
 .form-container {
@@ -20,7 +25,7 @@ body { background: linear-gradient(135deg, #f5f5f5, #e0e0e0); }
 }
 
 .form-title { 
-    color: #6c1e3d; 
+    color: var(--main-color); 
     font-weight: 700; 
     font-size: 1.5rem; 
     text-align:center; 
@@ -36,7 +41,7 @@ input, select, textarea {
     transition: border-color 0.3s, box-shadow 0.3s;
 }
 input:focus, select:focus, textarea:focus {
-    border-color: #6c1e3d;
+    border-color: var(--main-color);
     box-shadow: 0 0 5px rgba(108,30,61,0.5);
     outline: none;
 }
@@ -51,19 +56,19 @@ input:focus, select:focus, textarea:focus {
     right: 12px;
     transform: translateY(-50%);
     cursor: pointer;
-    color: #6c1e3d;
+    color: var(--main-color);
 }
 
 .btn-submit {
-    background-color: #6c1e3d;
-    border-color: #6c1e3d;
+    background-color: var(--main-color);
+    border-color: var(--main-color);
     color: #fff;
     font-weight: 700;
     transition: all 0.3s;
 }
 .btn-submit:hover {
-    background-color: #53162b;
-    border-color: #53162b;
+    background-color: var(--main-color-dark);
+    border-color: var(--main-color-dark);
     transform: translateY(-1px);
 }
 
@@ -113,7 +118,7 @@ input:focus, select:focus, textarea:focus {
 
             <p class="mt-3 text-center small">
                 Vous avez déjà un compte ? 
-                <a href="{% url 'login' %}" class="fw-bold" style="color:#6c1e3d;">Connectez-vous ici</a>
+                <a href="{% url 'login' %}" class="fw-bold" style="color:var(--main-color);">Connectez-vous ici</a>
             </p>
         </div>
     </div>
