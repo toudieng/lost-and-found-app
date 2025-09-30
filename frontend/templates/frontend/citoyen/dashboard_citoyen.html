@@ -1,69 +1,169 @@
-{% extends "frontend/citoyen/base_citoyen.html" %}
+{% extends "frontend/base.html" %}
 {% load static %}
 
 {% block title %}Dashboard Citoyen{% endblock %}
 
 {% block extra_css %}
 <style>
-.welcome-title { color: #6c1e3d; font-weight: 700; margin-bottom: 0.5rem; }
-.stats-card { border-radius: 1rem; padding: 1.5rem; background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 1rem; }
-.stats-icon { font-size: 2rem; margin-right: 1rem; color: #6c1e3d; }
-.sidebar-link { display:block; padding:0.5rem 1rem; margin-bottom:0.5rem; background:#f8f9fa; border-radius:0.5rem; text-decoration:none; color:#333; }
-.sidebar-link:hover { background:#6c1e3d; color:#fff; }
+body {
+    display: flex;
+    min-height: 100vh;
+    background: #f8f9fa;
+}
+
+/* Sidebar verticale */
+.sidebar {
+    background: #fff;
+    padding: 2rem 1rem;
+    min-width: 220px;
+    border-right: 1px solid #dee2e6;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.sidebar h4 {
+    color: #6c1e3d;
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.sidebar-link {
+    display:block;
+    padding:0.6rem 1rem;
+    border-radius:0.5rem;
+    text-decoration:none;
+    color:#333;
+    transition: all 0.2s;
+}
+.sidebar-link:hover, .sidebar-link.active {
+    background:#6c1e3d;
+    color:#fff;
+}
+
+/* Contenu principal */
+.main-content {
+    flex: 1;
+    padding: 2rem;
+}
+
+/* Titre de bienvenue */
+.welcome-title {
+    color: #6c1e3d;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+/* Cartes statistiques */
+.stats-card {
+    border-radius: 1rem;
+    padding: 1.5rem;
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: transform 0.2s ease-in-out;
+    margin-bottom: 1rem;
+}
+.stats-card:hover {
+    transform: translateY(-3px);
+}
+.stats-icon {
+    font-size: 2.5rem;
+    color: #6c1e3d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    background: #f0e5f0;
+    border-radius: 50%;
+}
+
+/* Notifications */
+.notifications-card {
+    border-radius: 1rem;
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    padding: 1.5rem;
+    margin-top: 2rem;
+}
+.list-group-item {
+    border: none;
+    padding: 0.75rem 1rem;
+    display: flex;
+    justify-content: space-between;
+}
+.list-group-item span {
+    font-size: 0.85rem;
+    color: #6c1e3d;
+    font-weight: 500;
+}
 </style>
 {% endblock %}
 
 {% block content %}
-<h2 class="welcome-title">Bienvenue, {{ user.first_name }} 👋</h2>
-<p class="text-muted">Voici un aperçu de vos objets perdus et trouvés.</p>
+<div class="d-flex">
+    <!-- Sidebar vertical -->
+    <div class="sidebar">
+        <h4>👤 Citoyen</h4>
+        <a href="{% url 'mes_objets_perdus' %}" class="sidebar-link">📦 Mes objets perdus</a>
+        <a href="{% url 'mes_objets_trouves' %}" class="sidebar-link">🔍 Mes objets trouvés</a>
+        <a href="{% url 'objets_a_reclamer' %}" class="sidebar-link">📌 Objets à réclamer</a>
+        <a href="{% url 'modifier_profil_citoyen' %}" class="sidebar-link">✏️ Modifier mon profil</a>
+    </div>
 
-<div class="row">
-    <div class="col-md-4">
-        <div class="stats-card d-flex align-items-center">
-            <span class="stats-icon">📦</span>
-            <div>
-                <h5 class="mb-0">{{ nb_objets_perdus }}</h5>
-                <small>Objets perdus</small>
+    <!-- Contenu principal -->
+    <div class="main-content">
+        <h2 class="welcome-title">Bienvenue, {{ user.first_name }} 👋</h2>
+        <p class="text-muted">Voici un aperçu de vos objets perdus et trouvés.</p>
+
+        <div class="row">
+            <div class="col-md-4">
+                <div class="stats-card">
+                    <span class="stats-icon">📦</span>
+                    <div>
+                        <h5 class="mb-0">{{ nb_objets_perdus }}</h5>
+                        <small>Objets perdus</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stats-card">
+                    <span class="stats-icon">🔍</span>
+                    <div>
+                        <h5 class="mb-0">{{ nb_objets_trouves }}</h5>
+                        <small>Objets trouvés</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stats-card">
+                    <span class="stats-icon">✅</span>
+                    <div>
+                        <h5 class="mb-0">{{ nb_objets_restitues }}</h5>
+                        <small>Objets restitués</small>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="col-md-4">
-        <div class="stats-card d-flex align-items-center">
-            <span class="stats-icon">🔍</span>
-            <div>
-                <h5 class="mb-0">{{ nb_objets_trouves }}</h5>
-                <small>Objets trouvés</small>
-            </div>
+
+        <div class="notifications-card">
+            <h5>🔔 Notifications récentes</h5>
+            {% if notifications %}
+                <ul class="list-group list-group-flush mt-2">
+                    {% for notif in notifications %}
+                        <li class="list-group-item">
+                            {{ notif.objet.nom }} déclaré le {{ notif.date_declaration|date:"d/m/Y H:i" }}
+                            <span>📌</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-muted mt-2">Aucune notification pour le moment.</p>
+            {% endif %}
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="stats-card d-flex align-items-center">
-            <span class="stats-icon">✅</span>
-            <div>
-                <h5 class="mb-0">{{ nb_objets_restitues }}</h5>
-                <small>Objets restitués</small>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="mt-4">
-    <a href="{% url 'mes_objets_perdus' %}" class="sidebar-link">📦 Mes objets perdus</a>
-    <a href="{% url 'mes_objets_trouves' %}" class="sidebar-link">🔍 Mes objets trouvés</a>
-    <a href="{% url 'objets_a_reclamer' %}" class="sidebar-link">📌 Objets à réclamer</a>
-    <a href="{% url 'modifier_profil_citoyen' %}" class="sidebar-link">✏️ Modifier mon profil</a>
-</div>
-
-<div class="card shadow-sm p-3 mt-4">
-    <h5>🔔 Notifications récentes</h5>
-    {% if notifications %}
-        <ul class="list-group list-group-flush">
-            {% for notif in notifications %}
-                <li class="list-group-item">{{ notif.objet.nom }} déclaré le {{ notif.date_declaration|date:"d/m/Y H:i" }}</li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p class="text-muted">Aucune notification pour le moment.</p>
-    {% endif %}
 </div>
 {% endblock %}

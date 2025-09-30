@@ -54,6 +54,11 @@ urlpatterns = [
 
     # Objets perdus par le citoyen
     path('mes-objets-perdus/', views.mes_objets_perdus, name='mes_objets_perdus'),
+    
+    path('objets_perdus/modifier/<int:declaration_id>/', views.modifier_declaration, name='modifier_declaration'),
+    path('objets_perdus/supprimer/<int:declaration_id>/', views.supprimer_declaration, name='supprimer_declaration'),
+
+
 
     # Objets trouvés par le citoyen
     path('mes-objets-trouves/', views.mes_objets_trouves, name='mes_objets_trouves'),

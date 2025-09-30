@@ -1,3 +1,4 @@
+
 {% extends "frontend/base.html" %}
 {% load widget_tweaks %}
 
@@ -33,9 +34,9 @@ input:focus, select:focus, textarea:focus {
 
 .text-error { color:#dc3545; font-size:0.85rem; }
 
-@media (max-width:576px) { .form-container { padding:1.5rem; } .form-title { font-size:1.3rem; } }
+#preview-image { max-height:200px; margin-top:0.5rem; border-radius:0.5rem; box-shadow:0 4px 10px rgba(0,0,0,0.1); display:block; }
 
-#preview-image { display:none; max-height:200px; margin-top:0.5rem; border-radius:0.5rem; box-shadow:0 4px 10px rgba(0,0,0,0.1); }
+@media (max-width:576px) { .form-container { padding:1.5rem; } .form-title { font-size:1.3rem; } }
 </style>
 {% endblock %}
 
@@ -43,7 +44,9 @@ input:focus, select:focus, textarea:focus {
 <div class="row justify-content-center mt-5">
     <div class="col-md-6 col-lg-5 col-xl-4">
         <div class="form-container">
-            <h4 class="mb-4 form-title">📢 Déclarer un objet</h4>
+            <h4 class="mb-4 form-title">
+                {% if form.instance.pk %}✏️ Modifier l'objet{% else %}📢 Déclarer un objet{% endif %}
+            </h4>
 
             {% if messages %}
                 {% for message in messages %}
@@ -54,31 +57,41 @@ input:focus, select:focus, textarea:focus {
             <form method="post" enctype="multipart/form-data" novalidate>
                 {% csrf_token %}
 
+                <!-- Nom de l'objet -->
                 <div class="mb-3">
                     <label for="{{ form.nom_objet.id_for_label }}" class="form-label fw-bold">🏷️ Nom de l'objet <span class="text-danger">*</span></label>
                     {{ form.nom_objet|add_class:"form-control form-control-sm" }}
                     {% for error in form.nom_objet.errors %}<div class="text-error">{{ error }}</div>{% endfor %}
                 </div>
 
+                <!-- Lieu -->
                 <div class="mb-3">
                     <label for="{{ form.lieu.id_for_label }}" class="form-label fw-bold">📍 Lieu</label>
                     {{ form.lieu|add_class:"form-control form-control-sm" }}
                     {% for error in form.lieu.errors %}<div class="text-error">{{ error }}</div>{% endfor %}
                 </div>
 
+                <!-- Description -->
                 <div class="mb-3">
                     <label for="{{ form.description.id_for_label }}" class="form-label fw-bold">✏️ Description (facultative)</label>
                     {{ form.description|add_class:"form-control form-control-sm" }}
                     {% for error in form.description.errors %}<div class="text-error">{{ error }}</div>{% endfor %}
                 </div>
 
+                <!-- Image avec prévisualisation -->
                 <div class="mb-3">
                     <label for="{{ form.image.id_for_label }}" class="form-label fw-bold">📷 Photo (facultative)</label>
                     {{ form.image|add_class:"form-control form-control-sm" }}
                     {% for error in form.image.errors %}<div class="text-error">{{ error }}</div>{% endfor %}
-                    <img id="preview-image" src="#" alt="Prévisualisation">
+
+                    {% if form.instance.image %}
+                        <img id="preview-image" src="{{ form.instance.image.url }}" alt="Prévisualisation">
+                    {% else %}
+                        <img id="preview-image" src="#" alt="Prévisualisation" style="display:none;">
+                    {% endif %}
                 </div>
 
+                <!-- Type de déclaration -->
                 <div class="mb-4">
                     <label class="form-label fw-bold">📌 Type de déclaration <span class="text-danger">*</span></label>
                     <div>
@@ -93,7 +106,9 @@ input:focus, select:focus, textarea:focus {
                 </div>
 
                 <div class="d-grid">
-                    <button type="submit" class="btn btn-submit fw-bold">✅ Soumettre</button>
+                    <button type="submit" class="btn btn-submit fw-bold">
+                        {% if form.instance.pk %}✅ Mettre à jour{% else %}✅ Soumettre{% endif %}
+                    </button>
                 </div>
             </form>
         </div>
@@ -111,7 +126,10 @@ document.addEventListener("DOMContentLoaded", function() {
             const reader = new FileReader();
             reader.onload = e => { preview.src = e.target.result; preview.style.display="block"; }
             reader.readAsDataURL(file);
-        } else { preview.style.display="none"; }
+        } else {
+            preview.src = "#";
+            preview.style.display="none";
+        }
     });
 });
 </script>

@@ -4,20 +4,17 @@ from django.utils import timezone
 import uuid
 from backend.users.models import Commissariat
 
-
-# --- ENUMS pour éviter les listes brutes ---
+# --- ENUMS ---
 class EtatObjet(models.TextChoices):
     PERDU = "perdu", "Perdu"
     TROUVE = "trouvé", "Trouvé"
     RECLAME = "reclamé", "Réclamé"
-    EN_ATTENTE = "en_attente", "En_attente"
+    EN_ATTENTE = "en_attente", "En attente"
     RESTITUE = "restitue", "Restitué"
-
 
 class StatutRestitution(models.TextChoices):
     PLANIFIEE = "planifiee", "Planifiée"
     EFFECTUEE = "effectuee", "Effectuée"
-
 
 # --- OBJET ---
 class Objet(models.Model):
@@ -29,6 +26,12 @@ class Objet(models.Model):
         default=EtatObjet.PERDU,
         verbose_name="État"
     )
+    image = models.ImageField(
+        upload_to='objets/',
+        blank=True,
+        null=True,
+        verbose_name="Image de l'objet"
+    )
     code_unique = models.CharField(
         max_length=50,
         unique=True,
@@ -38,14 +41,12 @@ class Objet(models.Model):
     )
 
     def save(self, *args, **kwargs):
-        # Générer un code unique s'il n'existe pas déjà
         if not self.code_unique:
             self.code_unique = str(uuid.uuid4())[:8].upper()
         super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.nom} ({self.get_etat_display()})"
-
 
 # --- DECLARATION ---
 class Declaration(models.Model):
@@ -62,29 +63,11 @@ class Declaration(models.Model):
         null=True,
         verbose_name="Objet déclaré"
     )
-    date_declaration = models.DateTimeField(
-        default=timezone.now,
-        verbose_name="Date de déclaration"
-    )
-    lieu = models.CharField(
-        max_length=200,
-        blank=True,
-        null=True,
-        verbose_name="Lieu"
-    )
-    description = models.TextField(
-        blank=True,
-        null=True,
-        verbose_name="Description"
-    )
-    image = models.ImageField(
-        upload_to='declarations/',
-        blank=True,
-        null=True,
-        verbose_name="Image"
-    )
+    date_declaration = models.DateTimeField(default=timezone.now, verbose_name="Date de déclaration")
+    lieu = models.CharField(max_length=200, blank=True, null=True, verbose_name="Lieu")
+    description = models.TextField(blank=True, null=True, verbose_name="Description")
+    image = models.ImageField(upload_to='declarations/', blank=True, null=True, verbose_name="Image")
 
-    # Plusieurs personnes peuvent signaler avoir trouvé
     trouve_par = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
         blank=True,
@@ -93,7 +76,6 @@ class Declaration(models.Model):
         verbose_name="Trouvé par"
     )
 
-    # Une seule personne peut réclamer
     reclame_par = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
@@ -106,7 +88,6 @@ class Declaration(models.Model):
 
     def __str__(self):
         return f"Déclaration - {self.objet.nom if self.objet else 'Objet inconnu'}"
-
 
 # --- RESTITUTION ---
 class Restitution(models.Model):
@@ -148,14 +129,8 @@ class Restitution(models.Model):
         null=True,
         verbose_name="Commissariat"
     )
-    date_restitution = models.DateField(
-        default=timezone.now,
-        verbose_name="Date de restitution"
-    )
-    heure_restitution = models.TimeField(
-        default=timezone.now,
-        verbose_name="Heure de restitution"
-    )
+    date_restitution = models.DateField(default=timezone.now, verbose_name="Date de restitution")
+    heure_restitution = models.TimeField(default=timezone.now, verbose_name="Heure de restitution")
     statut = models.CharField(
         max_length=20,
         choices=StatutRestitution.choices,
@@ -164,7 +139,6 @@ class Restitution(models.Model):
     )
 
     def save(self, *args, **kwargs):
-        """Met à jour l'état de l'objet seulement si la restitution est effectuée."""
         super().save(*args, **kwargs)
         if self.objet and self.statut == StatutRestitution.EFFECTUEE:
             self.objet.etat = EtatObjet.RESTITUE

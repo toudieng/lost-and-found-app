@@ -11,7 +11,7 @@ from django.db.models.functions import TruncMonth
 import calendar, random, string
 
 from backend.objets.models import Objet, Declaration, Restitution, Commissariat, EtatObjet
-from backend.objets.forms import RestitutionForm
+from backend.objets.forms import DeclarationForm, RestitutionForm
 from backend.users.models import Utilisateur, Notification
 from backend.users.forms import CommissariatForm, PolicierForm, AdministrateurCreationForm
 
@@ -53,18 +53,75 @@ def home(request):
 def contact(request):
     return render(request, "frontend/contact.html")
 
-@login_required(login_url='login')
+@login_required
 def objets_perdus(request):
+    # Tous les objets perdus
     declarations = Declaration.objects.filter(objet__etat=EtatObjet.PERDU)
-    return render(request, "frontend/objets/objets_perdus.html", {"declarations": declarations})
 
+    # Filtrer par recherche si paramètre "q" fourni
+    query = request.GET.get('q', '')
+    if query:
+        declarations = declarations.filter(objet__nom__icontains=query)
+
+    return render(request, "frontend/objets/objets_perdus.html", {
+        "declarations": declarations,
+        "query": query
+    })
+
+
+
+
+# --- Modifier une déclaration ---
+@login_required
+def modifier_declaration(request, declaration_id):
+    """Modifier une déclaration existante (nom, description, lieu, image, état)."""
+    declaration = get_object_or_404(Declaration, id=declaration_id, citoyen=request.user)
+    
+    if request.method == 'POST':
+        form = DeclarationForm(request.POST, request.FILES, instance=declaration)
+        if form.is_valid():
+            form.save(commit=True, citoyen=request.user)
+            messages.success(request, "✅ Objet mis à jour avec succès.")
+            return redirect('objets_perdus')
+        else:
+            messages.error(request, "⚠️ Erreur : vérifiez les informations saisies.")
+    else:
+        # Initialiser le champ nom_objet avec le nom de l'objet
+        form = DeclarationForm(instance=declaration, initial={'nom_objet': declaration.objet.nom})
+    
+    return render(request, "frontend/citoyen/modifier_declaration.html", {"form": form})
+
+
+# --- Supprimer une déclaration ---
+@login_required
+def supprimer_declaration(request, declaration_id):
+    declaration = get_object_or_404(Declaration, id=declaration_id, citoyen=request.user)
+    
+    if request.method == 'POST':
+        declaration.objet.delete()  # supprime également l'objet lié
+        declaration.delete()
+        messages.success(request, "✅ Objet supprimé avec succès.")
+        return redirect('objets_perdus')
+    
+    return render(request, "frontend/citoyen/confirmer_suppression.html", {"declaration": declaration})
 @login_required(login_url='login')
+
+
+@login_required
 def objets_trouves(request):
+    query = request.GET.get("q", "")
     declarations = Declaration.objects.filter(
-        objet__etat=EtatObjet.TROUVE,  # ← ici
-        reclame_par__isnull=True
+        objet__etat=EtatObjet.TROUVE
     ).order_by('-date_declaration')
-    return render(request, "frontend/objets/objets_trouves.html", {"declarations": declarations})
+
+    if query:
+        declarations = declarations.filter(objet__nom__icontains=query)
+
+    return render(request, "frontend/objets/objets_trouves.html", {
+        "declarations": declarations,
+        "query": query
+    })
+
 
 def objet_detail(request, pk):
     objet = get_object_or_404(Objet, pk=pk)

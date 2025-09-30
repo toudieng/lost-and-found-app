@@ -2,28 +2,21 @@ from django import forms
 from backend.users.models import Commissariat
 from .models import Declaration, Objet, EtatObjet
 
+from django import forms
+from .models import Declaration, Objet, EtatObjet
+from backend.users.models import Commissariat
+
 class DeclarationForm(forms.ModelForm):
-    # Champ texte pour saisir le nom de l'objet
     nom_objet = forms.CharField(
         max_length=100,
-        widget=forms.TextInput(
-            attrs={
-                'class': 'form-control form-control-sm',
-                'placeholder': "Nom de l'objet perdu ou trouvé"
-            }
-        ),
-        label="Objet"
+        widget=forms.TextInput(attrs={'class':'form-control','placeholder':"Nom de l'objet"}),
+        label="Nom de l'objet",
+        required=True
     )
 
     description = forms.CharField(
         required=False,
-        widget=forms.Textarea(
-            attrs={
-                'class': 'form-control form-control-sm',
-                'placeholder': "Description (facultative)",
-                'rows': 3
-            }
-        ),
+        widget=forms.Textarea(attrs={'class':'form-control','rows':3,'placeholder':'Description (facultative)'}),
         label="Description"
     )
 
@@ -32,46 +25,37 @@ class DeclarationForm(forms.ModelForm):
         label="Photo (facultative)"
     )
 
-    # Champ pour indiquer si l’objet est perdu ou trouvé
     etat = forms.ChoiceField(
         choices=[(EtatObjet.PERDU, "Objet perdu"), (EtatObjet.TROUVE, "Objet trouvé")],
-        widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
-        label="Type de déclaration"
+        widget=forms.RadioSelect(attrs={'class':'form-check-input'}),
+        label="Type de déclaration",
+        required=True
     )
 
     class Meta:
         model = Declaration
-        fields = ['lieu', 'etat', 'description', 'image']  # nom_objet est hors modèle
+        fields = ['lieu', 'etat', 'description', 'image']
         widgets = {
-            'lieu': forms.TextInput(
-                attrs={
-                    'class': 'form-control form-control-sm',
-                    'placeholder': "Lieu où l’objet a été perdu ou trouvé"
-                }
-            ),
+            'lieu': forms.TextInput(attrs={'class':'form-control','placeholder':'Lieu où l’objet a été perdu ou trouvé'}),
         }
 
     def save(self, commit=True, citoyen=None):
-        # Création de l'objet lié
+        # Création de l'objet lié avec image si fournie
         objet = Objet.objects.create(
             nom=self.cleaned_data['nom_objet'],
-            description=self.cleaned_data.get('description', ''),
-            etat=self.cleaned_data['etat']
+            description=self.cleaned_data.get('description') or "Aucune description fournie",
+            etat=self.cleaned_data['etat'],
+            image=self.cleaned_data.get('image')  # <-- ajout ici
         )
 
-        # Création de la déclaration
         declaration = super().save(commit=False)
         declaration.objet = objet
         if citoyen:
             declaration.citoyen = citoyen
-
         if commit:
             objet.save()
             declaration.save()
-
         return declaration
-
-
 
 
 
