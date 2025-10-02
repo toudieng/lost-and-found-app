@@ -24,6 +24,7 @@ urlpatterns = [
     path("", include("frontend.urls")),
     path('', include('backend.users.urls')),      
     path('objects/', include('backend.objets.urls')),
+    
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

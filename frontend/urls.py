@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import include, path
 from backend.objets.views import declarer_objet
 from . import views
 
@@ -6,6 +6,8 @@ urlpatterns = [
     # --- Public ---
     path("", views.home, name="home"),
     path("contact/", views.contact, name="contact"),
+    #
+
     path("objets/perdus/", views.objets_perdus, name="objets_perdus"),
     path("objets/trouves/", views.objets_trouves, name="objets_trouves"),
     path("objets/<int:pk>/", views.objet_detail, name="objet_detail"),
