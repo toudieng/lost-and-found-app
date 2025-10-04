@@ -70,6 +70,7 @@ urlpatterns = [
 
     # Planifier restitution pour un objet
     path('reclamer/<int:restitution_id>/', views.reclamer_objet, name='reclamer_objet'),
+    path('historique-objets/', views.historique_objets_restitues, name='historique_objets_restitues'),
 ]
 
 

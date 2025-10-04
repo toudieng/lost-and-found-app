@@ -3,27 +3,94 @@
 
 {% block title %}Objets à Réclamer{% endblock %}
 
+{% block extra_css %}
+<style>
+/* Cartes des objets à réclamer */
+.objet-reclamer-card {
+    border-radius: 1rem;
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    transition: transform 0.2s ease-in-out;
+    cursor: pointer;
+}
+.objet-reclamer-card:hover {
+    transform: translateY(-3px);
+}
+
+/* Image objet */
+.objet-reclamer-img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
+}
+
+/* Card body */
+.objet-reclamer-body h5 {
+    color: #343a40;
+    font-weight: 600;
+}
+.objet-reclamer-body p {
+    font-size: 0.9rem;
+    color: #555;
+}
+
+/* Boutons */
+.btn-reclamer {
+    background-color: #343a40;
+    border-color: #343a40;
+    color: #fff;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+.btn-reclamer:hover {
+    background-color: #212529;
+    transform: translateY(-1px);
+}
+
+/* Badge Restitué */
+.badge-restitue {
+    background-color: #28a745;
+    color: #fff;
+    font-weight: 600;
+    padding: 0.35em 0.6em;
+    border-radius: 0.5rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .objet-reclamer-img {
+        height: 200px;
+    }
+}
+</style>
+{% endblock %}
+
 {% block content %}
-<h2 class="welcome-title">📌 Objets à réclamer</h2>
+<h2 class="welcome-title" style="color:#343a40;">📌 Objets à réclamer</h2>
 <p class="text-muted">Objets qui vous sont attribués ou déjà restitués.</p>
 
 {% if objets %}
     <div class="row">
         {% for obj in objets %}
         <div class="col-md-4 mb-3">
-            <div class="card shadow-sm">
+            <div class="objet-reclamer-card">
                 {% if obj.objet.image %}
-                <img src="{{ obj.objet.image.url }}" class="card-img-top" alt="{{ obj.objet.nom }}">
+                    <img src="{{ obj.objet.image.url }}" class="objet-reclamer-img" alt="{{ obj.objet.nom }}">
+                {% else %}
+                    <img src="{% static 'images/default-object.png' %}" class="objet-reclamer-img" alt="Objet">
                 {% endif %}
-                <div class="card-body">
-                    <h5 class="card-title">{{ obj.objet.nom }}</h5>
-                    <p class="card-text">{{ obj.objet.description|default:"Aucune description" }}</p>
+                <div class="card-body objet-reclamer-body">
+                    <h5 class="card-title">{{ obj.objet.nom|default:"Objet inconnu" }}</h5>
+                    <p>{{ obj.objet.description|default:"Aucune description" }}</p>
                     <p><small class="text-muted">Déclaré le {{ obj.date_declaration|date:"d/m/Y H:i" }}</small></p>
-                    <p><small class="text-muted">État: {{ obj.objet.get_etat_display }}</small></p>
+                    <p><small class="text-muted">État: {{ obj.objet.get_etat_display|default:"Inconnu" }}</small></p>
+
                     {% if obj.etat != "restitue" %}
-                    <a href="{% url 'reclamer_objet' obj.id %}" class="btn btn-primary btn-sm">Réclamer</a>
+                        <a href="{% url 'reclamer_objet' obj.id %}" class="btn btn-reclamer btn-sm">Réclamer</a>
                     {% else %}
-                    <span class="badge bg-success">Restitué</span>
+                        <span class="badge badge-restitue">Restitué</span>
                     {% endif %}
                 </div>
             </div>

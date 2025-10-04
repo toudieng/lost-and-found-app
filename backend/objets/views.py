@@ -18,9 +18,9 @@ def declarer_objet(request):
 
             messages.success(request, "✅ Votre déclaration a été enregistrée avec succès.")
             if declaration.objet.etat == EtatObjet.PERDU:
-                return redirect('objets_perdus')
+                return redirect('declarer_objet')
             else:
-                return redirect('objets_trouves')
+                return redirect('declarer_objet')
         else:
             messages.error(request, "⚠️ Erreur : vérifiez les informations saisies.")
     else:

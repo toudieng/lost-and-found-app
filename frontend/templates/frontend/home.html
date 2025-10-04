@@ -160,6 +160,12 @@
         <a href="{% url 'objets_trouves' %}" class="btn-action btn-action-found">
             ✅ Voir les objets trouvés
         </a>
+        {% if user.is_authenticated and user.role == 'citoyen' %}
+
+        <a href="{% url 'dashboard_citoyen' %}" class="btn-action btn-action-dashboard mt-3" style="background:#343a40;">
+            🏠 Mon Dashboard
+        </a>
+        {% endif %}
     </div>
 </section>
 

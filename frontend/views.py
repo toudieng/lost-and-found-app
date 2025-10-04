@@ -10,10 +10,11 @@ from django.db.models import Count
 from django.db.models.functions import TruncMonth
 import calendar, random, string
 
-from backend.objets.models import Objet, Declaration, Restitution, Commissariat, EtatObjet
+from backend.objets.models import Objet, Declaration, Restitution, Commissariat, EtatObjet, StatutRestitution
 from backend.objets.forms import DeclarationForm, RestitutionForm
 from backend.users.models import Utilisateur, Notification
 from backend.users.forms import CommissariatForm, PolicierForm, AdministrateurCreationForm
+from frontend import models
 
 # =============================
 #       DÉCORATEURS RÔLES
@@ -599,6 +600,7 @@ def ca_m_appartient(request, declaration_id):
 
 
 
+
 # =============================
 #       Dashboard Citoyen
 # =============================
@@ -606,24 +608,15 @@ def ca_m_appartient(request, declaration_id):
 def dashboard_citoyen(request):
     user = request.user
 
-    # Objets perdus déclarés par ce citoyen
     nb_objets_perdus = Declaration.objects.filter(citoyen=user).count()
+    nb_objets_trouves = Declaration.objects.filter(trouve_par=user).count()
+    nb_objets_restitues = Restitution.objects.filter(citoyen=user, statut='effectuee').count()
 
-    # Objets trouvés par ce citoyen
-    nb_objets_trouvees = Declaration.objects.filter(trouve_par=user).count()
-
-    # Objets restitués au citoyen
-    nb_objets_restitues = Restitution.objects.filter(
-        citoyen=user,
-        statut='effectuee'
-    ).count()
-
-    # Notifications récentes (dernières déclarations)
     notifications = Declaration.objects.filter(citoyen=user).order_by('-date_declaration')[:5]
 
     context = {
         'nb_objets_perdus': nb_objets_perdus,
-        'nb_objets_trouves': nb_objets_trouvees,
+        'nb_objets_trouves': nb_objets_trouves,
         'nb_objets_restitues': nb_objets_restitues,
         'notifications': notifications,
     }
@@ -639,7 +632,8 @@ def mes_objets_perdus(request):
     objets = Declaration.objects.filter(
         citoyen=request.user,
         objet__etat=EtatObjet.PERDU
-    ).order_by('-date_declaration')
+    ).select_related('objet').order_by('-date_declaration')
+
     return render(request, "frontend/citoyen/mes_objets_perdus.html", {
         "objets": objets
     })
@@ -650,43 +644,50 @@ def mes_objets_perdus(request):
 # =============================
 @login_required
 def mes_objets_trouves(request):
-    # Filtre les déclarations où le citoyen a trouvé l'objet
+    q = request.GET.get('q', '')
     declarations_trouvees = Declaration.objects.filter(
         trouve_par=request.user,
         objet__etat__in=[EtatObjet.EN_ATTENTE, EtatObjet.RECLAME]
-    ).order_by('-id')
-
-    objets_trouves = [dec.objet for dec in declarations_trouvees if dec.objet]
-
-    return render(request, "frontend/citoyen/mes_objets_trouves.html", {
-        "objets_trouves": objets_trouves
-    })
+    )
+    if q:
+        declarations_trouvees = declarations_trouvees.filter(
+            models.Q(objet__nom__icontains=q) | models.Q(objet__description__icontains=q)
+        )
+    objets_trouves = [dec for dec in declarations_trouvees if dec.objet]
+    return render(request, "frontend/citoyen/mes_objets_trouves.html", {"objets": objets_trouves})
 
 
 # =============================
 #       Objets à réclamer
 # =============================
+
 @login_required
 def objets_a_reclamer(request):
+    # Objets qui sont attribués au citoyen et pas encore restitués
+    objets = Declaration.objects.filter(
+        reclame_par=request.user,
+        objet__etat__in=[EtatObjet.TROUVE, EtatObjet.RECLAME, EtatObjet.EN_ATTENTE]
+    ).order_by('-date_declaration')
+    
+    return render(request, 'frontend/citoyen/objets_a_reclamer.html', {'objets': objets})
+
+@login_required
+def historique_objets_restitues(request):
+    # Restitutions effectuées pour ce citoyen
     restitutions = Restitution.objects.filter(
         citoyen=request.user,
-        objet__etat__in=[EtatObjet.RESTITUE, EtatObjet.EN_ATTENTE],
-        restitue_par__isnull=False
-    ).order_by('-date_restitution')
-
-    return render(request, "frontend/citoyen/objets_a_reclamer.html", {
-        "restitutions": restitutions
-    })
-
+        statut=StatutRestitution.EFFECTUEE
+    ).order_by('-date_restitution', '-heure_restitution')
+    
+    return render(request, 'frontend/citoyen/historique_objets.html', {'restitutions': restitutions})
 
 # =============================
-#       Planifier / réclamer un objet
+#       Réclamer un objet
 # =============================
 @login_required
 def reclamer_objet(request, restitution_id):
     restitution = get_object_or_404(Restitution, id=restitution_id)
 
-    # Vérifie que l'objet est destiné à l'utilisateur
     if restitution.citoyen != request.user:
         messages.error(request, "⚠️ Vous n’êtes pas autorisé à réclamer cet objet.")
         return redirect("objets_a_reclamer")
@@ -701,10 +702,11 @@ def reclamer_objet(request, restitution_id):
     messages.success(request, f"✅ Vous avez réclamé l'objet '{restitution.objet.nom}'.")
 
     # Envoi mail au policier et/ou trouveur
-    destinataires = [email for email in [
-        restitution.policier.email if restitution.policier else None,
-        restitution.restitue_par.email if restitution.restitue_par else None
-    ] if email]
+    destinataires = []
+    if restitution.policier and restitution.policier.email:
+        destinataires.append(restitution.policier.email)
+    if restitution.restitue_par and restitution.restitue_par.email:
+        destinataires.append(restitution.restitue_par.email)
 
     if destinataires:
         send_mail(
@@ -719,5 +721,3 @@ def reclamer_objet(request, restitution_id):
         )
 
     return redirect("objets_a_reclamer")
-
-

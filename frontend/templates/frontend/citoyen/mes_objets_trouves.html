@@ -3,26 +3,128 @@
 
 {% block title %}Mes Objets Trouvés{% endblock %}
 
+{% block extra_css %}
+<style>
+/* Cartes des objets trouvés */
+.objet-trouve-card {
+    border-radius: 1rem;
+    background: #fff;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    overflow: hidden;
+}
+.objet-trouve-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+}
+
+/* Image objet */
+.objet-trouve-img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+/* Informations objet */
+.objet-trouve-body {
+    padding: 1rem 1.2rem;
+}
+.objet-trouve-body h5 {
+    color: #6c1e3d;
+    font-weight: 700;
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+}
+.objet-trouve-body p {
+    font-size: 0.95rem;
+    color: #555;
+    margin-bottom: 0.35rem;
+}
+
+/* Badges état */
+.badge-etat {
+    padding: 0.4em 0.65em;
+    border-radius: 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #fff;
+}
+.badge-perdu { background-color: #dc3545; }
+.badge-trouve { background-color: #28a745; }
+.badge-reclame { background-color: #ffc107; color: #343a40; }
+.badge-restitue { background-color: #17a2b8; }
+.badge-en_attente { background-color: #6c757d; }
+
+/* Date & icônes */
+.objet-meta {
+    font-size: 0.85rem;
+    color: #6c757d;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Barre de recherche */
+.search-bar {
+    margin-bottom: 1.5rem;
+}
+.search-bar input {
+    width: 100%;
+    padding: 0.6rem 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid #ccc;
+    transition: border-color 0.3s;
+}
+.search-bar input:focus {
+    border-color: #6c1e3d;
+    outline: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .objet-trouve-img {
+        height: 180px;
+    }
+}
+</style>
+{% endblock %}
+
 {% block content %}
-<h2 class="welcome-title">🔍 Mes objets trouvés</h2>
+<h2 class="welcome-title" style="color:#343a40;">🔍 Mes objets trouvés</h2>
 <p class="text-muted">Tous les objets que vous avez signalés comme trouvés.</p>
 
+<!-- Barre de recherche -->
+<form method="get" class="search-bar">
+    <input type="text" name="q" placeholder="Rechercher un objet..." value="{{ request.GET.q|default:'' }}">
+</form>
+
 {% if objets %}
-    <div class="row">
+    <div class="row g-4">
         {% for obj in objets %}
-        <div class="col-md-4 mb-3">
-            <div class="card shadow-sm">
+        {% with objet=obj.objet %}
+        <div class="col-md-4">
+            <div class="objet-trouve-card">
                 {% if obj.image %}
-                <img src="{{ obj.image.url }}" class="card-img-top" alt="{{ obj.objet.nom }}">
+                    <img src="{{ obj.image.url }}" class="objet-trouve-img" alt="{{ objet.nom }}">
+                {% elif objet and objet.image %}
+                    <img src="{{ objet.image.url }}" class="objet-trouve-img" alt="{{ objet.nom }}">
+                {% else %}
+                    <img src="{% static 'images/default-object.png' %}" class="objet-trouve-img" alt="Objet">
                 {% endif %}
-                <div class="card-body">
-                    <h5 class="card-title">{{ obj.objet.nom }}</h5>
-                    <p class="card-text">{{ obj.description|default:"Aucune description" }}</p>
-                    <p><small class="text-muted">Déclaré le {{ obj.date_declaration|date:"d/m/Y H:i" }}</small></p>
-                    <p><small class="text-muted">État: {{ obj.objet.get_etat_display }}</small></p>
+                <div class="objet-trouve-body">
+                    <h5>{{ objet.nom|default:"Objet inconnu" }}</h5>
+                    <p>{{ objet.description|default:"Aucune description" }}</p>
+                    <div class="objet-meta">
+                        <span><i class="fa-regular fa-calendar"></i> {{ obj.date_declaration|date:"d/m/Y H:i" }}</span>
+                        {% if objet.etat %}
+                            <span class="badge-etat badge-{{ objet.etat }}">{{ objet.get_etat_display }}</span>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
+        {% endwith %}
         {% endfor %}
     </div>
 {% else %}

@@ -1,0 +1,103 @@
+{% extends "frontend/citoyen/base_citoyen.html" %}
+{% load static %}
+
+{% block title %}Historique des Objets Restitués{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Cartes des objets restitués */
+.objet-restitue-card {
+    border-radius: 1rem;
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    transition: transform 0.2s ease-in-out;
+    cursor: default;
+}
+.objet-restitue-card:hover {
+    transform: translateY(-2px);
+}
+
+/* Image objet */
+.objet-restitue-img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
+}
+
+/* Card body */
+.objet-restitue-body h5 {
+    color: #343a40;
+    font-weight: 600;
+}
+.objet-restitue-body p {
+    font-size: 0.9rem;
+    color: #555;
+}
+
+/* Badge Restitué */
+.badge-restitue {
+    background-color: #28a745;
+    color: #fff;
+    font-weight: 600;
+    padding: 0.35em 0.6em;
+    border-radius: 0.5rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .objet-restitue-img {
+        height: 200px;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<h2 class="welcome-title" style="color:#343a40;">📜 Historique des Objets Restitués</h2>
+<p class="text-muted">Tous les objets qui vous ont été restitués.</p>
+
+{% if restitutions %}
+    <div class="row">
+        {% for rest in restitutions %}
+        <div class="col-md-4 mb-3">
+            <div class="objet-restitue-card">
+                {% if rest.objet.image %}
+                    <img src="{{ rest.objet.image.url }}" class="objet-restitue-img" alt="{{ rest.objet.nom }}">
+                {% else %}
+                    <img src="{% static 'images/default-object.png' %}" class="objet-restitue-img" alt="Objet">
+                {% endif %}
+                <div class="card-body objet-restitue-body">
+                    <h5 class="card-title">{{ rest.objet.nom|default:"Objet inconnu" }}</h5>
+                    <p>{{ rest.objet.description|default:"Aucune description" }}</p>
+                    <p><small class="text-muted">Restitué le {{ rest.date_restitution|date:"d/m/Y" }} à {{ rest.heure_restitution|time:"H:i" }}</small></p>
+                    
+                    <p><small class="text-muted">
+                        Citoyen : 
+                        {% if rest.citoyen %}
+                            {{ rest.citoyen.username }}
+                        {% else %}
+                            Inconnu
+                        {% endif %}
+                    </small></p>
+
+                    <p><small class="text-muted">
+                        Policier : 
+                        {% if rest.restitue_par %}
+                            {{ rest.restitue_par.username }}
+                        {% else %}
+                            Inconnu
+                        {% endif %}
+                    </small></p>
+
+                    <span class="badge badge-restitue">Restitué</span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <p class="text-muted">Aucun objet n'a été restitué pour le moment.</p>
+{% endif %}
+{% endblock %}
