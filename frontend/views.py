@@ -519,6 +519,41 @@ def creer_policier(request):
         return redirect("gerer_utilisateurs")
     return render(request, "frontend/admin/creer_policier.html", {"form": form})
 
+
+def is_admin(user):
+    return user.is_authenticated and user.role == 'admin'
+
+@login_required
+@user_passes_test(is_admin)
+def liste_citoyens(request):
+    query = request.GET.get('q', '')
+    citoyens = Utilisateur.objects.filter(role='citoyen')
+    if query:
+        citoyens = citoyens.filter(
+            first_name__icontains=query
+        ) | citoyens.filter(
+            last_name__icontains=query
+        ) | citoyens.filter(
+            email__icontains=query
+        )
+    return render(request, 'frontend/admin/liste_citoyens.html', {'citoyens': citoyens})
+
+@login_required
+@user_passes_test(is_admin)
+def bannir_citoyen(request, pk):
+    citoyen = get_object_or_404(Utilisateur, id=pk, role='citoyen')
+    citoyen.est_banni = True
+    citoyen.save()
+    return redirect('liste_citoyens')
+
+@login_required
+@user_passes_test(is_admin)
+def debannir_citoyen(request, pk):
+    citoyen = get_object_or_404(Utilisateur, id=pk, role='citoyen')
+    citoyen.est_banni = False
+    citoyen.save()
+    return redirect('liste_citoyens')
+
 # =============================
 #       ACTIONS CITOYEN
 # =============================

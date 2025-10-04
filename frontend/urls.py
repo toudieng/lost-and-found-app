@@ -49,6 +49,10 @@ urlpatterns = [
     path('dashboard/admin/utilisateurs/creer_administrateur/', 
          views.creer_administrateur, 
          name='creer_administrateur'),
+        
+    path('admin/citoyens/', views.liste_citoyens, name='liste_citoyens'),
+    path('admin/citoyens/<int:pk>/bannir/', views.bannir_citoyen, name='bannir_citoyen'),
+    path('admin/citoyens/<int:pk>/debannir/', views.debannir_citoyen, name='debannir_citoyen'),
 
 
 
