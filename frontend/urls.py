@@ -20,6 +20,8 @@ urlpatterns = [
     path("dashboard/policier/objets/<int:pk>/maj/", views.maj_objet, name="maj_objet"),
     path("dashboard/policier/restitutions/", views.historique_restitutions, name="historique_restitutions"),
      path("marquer/<int:restitution_id>/", views.marquer_restitue, name="marquer_restitue"),
+     path('restitution/<int:pk>/annuler/', views.annuler_restitution, name='annuler_restitution'),
+
     path(
     "dashboard/policier/planifier/<int:objet_id>/<str:type_objet>/",
     views.planifier_restitution,

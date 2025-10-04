@@ -138,56 +138,55 @@ def supprimer_objet(request, objet_id):
 # =============================
 #       DASHBOARD POLICIER
 # =============================
-from django.db.models import Count
+
 from django.utils.timezone import now
-from datetime import timedelta
+from dateutil.relativedelta import relativedelta
 import calendar
+
 
 @login_required
 def dashboard_policier(request):
     # 📦 Statistiques globales
-    nb_objets_trouves = Restitution.objects.filter(objet__etat='en_attente').count()
-    nb_objets_a_restituer = Declaration.objects.filter(objet__etat='reclame').count()
-    nb_restitutions = Restitution.objects.filter(objet__etat='restitue').count()
+    nb_objets_trouves = Declaration.objects.filter(objet__etat=EtatObjet.EN_ATTENTE).count()
+    nb_objets_a_restituer = Declaration.objects.filter(objet__etat=EtatObjet.RECLAME).count()
+    nb_restitutions = Restitution.objects.filter(objet__etat=EtatObjet.RESTITUE).count()
 
-    # 📊 Statistiques par mois pour les 6 derniers mois
+    # 📊 Statistiques par mois (6 derniers mois)
     today = now().date()
-    labels_trouves, data_trouves = [], []
-    labels_restitues, data_restitues = [], []
+    labels, data_trouves, data_restitues = [], [], []
 
-    for i in range(5, -1, -1):  # 5 mois en arrière + ce mois
-        month = (today - timedelta(days=i*30)).month
-        year = (today - timedelta(days=i*30)).year
+    for i in range(5, -1, -1):
+        date_ref = today - relativedelta(months=i)
+        month, year = date_ref.month, date_ref.year
         month_name = calendar.month_name[month]
 
-        # Objets retrouvés → basé sur la date de création de la restitution
-        nb_trouves = Restitution.objects.filter(
-            date_restitution__year=year,
-            date_restitution__month=month,
-            objet__etat='en_attente'
+        # Objets retrouvés (encore en attente de restitution)
+        nb_trouves = Declaration.objects.filter(
+            date_declaration__year=year,
+            date_declaration__month=month,
+            objet__etat=EtatObjet.EN_ATTENTE
         ).count()
-        labels_trouves.append(month_name)
-        data_trouves.append(nb_trouves)
 
         # Objets restitués
         nb_restitues = Restitution.objects.filter(
             date_restitution__year=year,
             date_restitution__month=month,
-            objet__etat='restitue'
+            objet__etat=EtatObjet.RESTITUE
         ).count()
-        labels_restitues.append(month_name)
+
+        labels.append(month_name)
+        data_trouves.append(nb_trouves)
         data_restitues.append(nb_restitues)
 
-    # 🔔 Notifications récentes (derniers 5)
+    # 🔔 Notifications récentes
     notifications = Notification.objects.filter(user=request.user).order_by('-date')[:5]
 
     context = {
         'nb_objets_trouves': nb_objets_trouves,
         'nb_objets_a_restituer': nb_objets_a_restituer,
         'nb_restitutions': nb_restitutions,
-        'labels_trouves': labels_trouves,
+        'labels': labels,
         'data_trouves': data_trouves,
-        'labels_restitues': labels_restitues,
         'data_restitues': data_restitues,
         'notifications': notifications,
     }
@@ -428,6 +427,26 @@ def marquer_restitue(request, restitution_id):
         messages.error(request, f"Une erreur est survenue : {str(e)}")
 
     return redirect("objets_trouves_attente")
+login_required
+def annuler_restitution(request, pk):
+    restitution = get_object_or_404(Restitution, id=pk)
+    objet = restitution.objet
+
+    # On récupère la déclaration originale pour connaître l'état initial
+    declaration = Declaration.objects.filter(objet=objet).first()
+    
+    if declaration:
+        objet.etat = declaration.etat_initial  # On remet l'état initial
+        objet.save()
+        restitution.delete()
+        messages.success(
+            request,
+            f"La restitution de l'objet '{objet.nom}' a été annulée. L'état a été remis à '{objet.etat}'."
+        )
+    else:
+        messages.error(request, "Impossible de déterminer l'état initial de l'objet.")
+
+    return redirect('objets_trouves_attente')
 
 
 # =============================

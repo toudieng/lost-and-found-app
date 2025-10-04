@@ -11,20 +11,24 @@
             <div class="col-md-6 mb-3">
                 <div class="card shadow-sm border-0 h-100">
                     <div class="card-body">
+                        <!-- Nom de l'objet -->
                         <h5 class="card-title fw-bold text-dark">
                             {{ restitution.objet.nom }}
                             <span class="badge bg-warning text-dark">En attente</span>
                         </h5>
 
+                        <!-- Déclaré par -->
                         <p class="mb-1 text-muted">
                             🙋 <strong>Déclaré par :</strong> 
                             {% if restitution.citoyen %}
                                 {{ restitution.citoyen.username }}
+                                {% if restitution.citoyen.email %} ({{ restitution.citoyen.email }}){% endif %}
                             {% else %}
                                 Non précisé
                             {% endif %}
                         </p>
 
+                        <!-- Commissariat -->
                         <p class="mb-2 text-muted">
                             📍 <strong>Commissariat :</strong> 
                             {% if restitution.commissariat %}
@@ -34,24 +38,36 @@
                             {% endif %}
                         </p>
 
-                        {% comment %} Liste des utilisateurs qui ont trouvé {% endcomment %}
+                        <!-- Utilisateurs qui ont trouvé -->
                         {% for declaration in restitution.objet.declarations_trouvees %}
                             {% if declaration.trouve_par.exists %}
-                                <span class="badge bg-info mb-1">
-                                    📌 Trouvé par 
+                                <span class="badge bg-info mb-1 d-block">
+                                    📌 Trouvé par: 
                                     {% for user in declaration.trouve_par.all %}
-                                        {{ user.username }}{% if not forloop.last %}, {% endif %}
+                                        {{ user.username }}
+                                        {% if user.email %} ({{ user.email }}){% endif %}
+                                        {% if not forloop.last %}, {% endif %}
                                     {% endfor %}
                                 </span>
                             {% endif %}
                         {% endfor %}
                     </div>
 
+                    <!-- Boutons action -->
                     <div class="card-footer bg-light text-end">
+                        <!-- Marquer restitué -->
                         <form method="POST" action="{% url 'marquer_restitue' restitution.id %}" class="d-inline">
                             {% csrf_token %}
                             <button type="submit" class="btn btn-sm btn-success">
                                 ✅ Marquer restitué
+                            </button>
+                        </form>
+
+                        <!-- Annuler restitution -->
+                        <form method="POST" action="{% url 'annuler_restitution' restitution.id %}" class="d-inline ms-2">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-danger">
+                                ❌ Annuler restitution
                             </button>
                         </form>
                     </div>

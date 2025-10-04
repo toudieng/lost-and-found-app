@@ -86,6 +86,14 @@ class Declaration(models.Model):
         verbose_name="Réclamé par"
     )
 
+    # --- Nouveau champ : état initial de l'objet lors de la déclaration ---
+    etat_initial = models.CharField(
+        max_length=20,
+        choices=EtatObjet.choices,
+        default=EtatObjet.PERDU,
+        verbose_name="État initial"
+    )
+
     def __str__(self):
         return f"Déclaration - {self.objet.nom if self.objet else 'Objet inconnu'}"
 
