@@ -13,7 +13,7 @@ import calendar, random, string
 from backend.objets.models import Objet, Declaration, Restitution, Commissariat, EtatObjet, StatutRestitution
 from backend.objets.forms import DeclarationForm, RestitutionForm
 from backend.users.models import Utilisateur, Notification
-from backend.users.forms import CommissariatForm, PolicierForm, AdministrateurCreationForm
+from backend.users.forms import AdministrateurForm, CommissariatForm, PolicierForm, AdministrateurCreationForm, UtilisateurCreationForm
 from frontend import models
 
 # =============================
@@ -252,31 +252,29 @@ def objets_restitues(request):
     return render(request, "frontend/objets/objets_restitues.html", {"restitutions": restitutions})
 
 @policier_required
-@login_required
+
 def objets_reclames(request):
     """
     Liste des objets réclamés par des citoyens.
-    - Un objet doit avoir l'état 'RECLAME'
-    - Il doit être lié à un citoyen via 'reclame_par'
     """
+    # Sélection des déclarations avec objet réclamé
     declarations = (
-        Declaration.objects.filter(
-            objet__etat=EtatObjet.RECLAME,   # uniquement les objets marqués comme réclamés
-            reclame_par__isnull=False        # avec un citoyen qui les a réclamés
-        )
-        .select_related("objet", "reclame_par")   # optimisations FK
-        .prefetch_related("trouve_par")           # optimisations M2M
+        Declaration.objects
+        .filter(objet__etat=EtatObjet.RECLAME, reclame_par__isnull=False)
+        .select_related("objet", "reclame_par", "citoyen")
+        .prefetch_related("trouve_par")
         .order_by("-date_declaration")
     )
 
-    # Restitutions non encore effectuées (planifiées ou en attente)
-    restitutions = (
-        Restitution.objects
-        .filter(restitue_par__isnull=True)
-        .select_related("objet")
-    )
+    # On ajoute un attribut dynamique "trouveur" pour le template
+    for dec in declarations:
+        if dec.objet.etat == EtatObjet.TROUVE:
+            dec.trouveur = dec.citoyen  # celui qui a déclaré est celui qui a trouvé
+        else:
+            dec.trouveur = None
 
-    # Dictionnaire {objet_id: restitution} pour savoir si une restitution existe déjà
+    # Restitutions planifiées
+    restitutions = Restitution.objects.filter(restitue_par__isnull=True).select_related("objet")
     restitutions_dict = {r.objet.id: r for r in restitutions}
 
     return render(
@@ -287,6 +285,7 @@ def objets_reclames(request):
             "restitutions_dict": restitutions_dict,
         },
     )
+
 
 from django.db.models import Prefetch
 
@@ -466,27 +465,86 @@ def gerer_commissariats(request):
     commissariats = Commissariat.objects.all()
     return render(request, "frontend/admin/gerer_commissariats.html", {"commissariats": commissariats})
 
+
+
+# --- Liste des administrateurs ---
 @admin_required
 def gerer_utilisateurs(request):
-    return render(request, "frontend/admin/gerer_utilisateurs.html")
+    administrateurs = Utilisateur.objects.filter(role='admin')
+    return render(request, "frontend/admin/gerer_utilisateurs.html", {'utilisateurs': administrateurs})
 
-@user_passes_test(lambda u: u.is_authenticated and u.role=="admin")
+# --- Créer un administrateur ---
+@admin_required
 def creer_administrateur(request):
     if request.method == "POST":
         form = AdministrateurCreationForm(request.POST)
         if form.is_valid():
             form.save()
             messages.success(request, "Administrateur créé et mot de passe envoyé par email.")
-            return redirect('dashboard_admin')
+            return redirect('gerer_utilisateurs')
     else:
         form = AdministrateurCreationForm()
-    return render(request, "frontend/admin/creer_admin.html", {"form": form})
+    return render(request, "frontend/admin/creer_administrateur.html", {"form": form})
 
+# --- Modifier un administrateur ---
+@admin_required
+def modifier_administrateur(request, pk):
+    utilisateur = get_object_or_404(Utilisateur, pk=pk, role='admin')
+    if request.method == 'POST':
+        form = AdministrateurForm(request.POST, instance=utilisateur)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Administrateur modifié avec succès.")
+            return redirect('gerer_utilisateurs')
+    else:
+        form = AdministrateurForm(instance=utilisateur)
+    return render(request, "frontend/admin/modifier_administrateur.html", {'form': form, 'utilisateur': utilisateur})
+
+# --- Supprimer un administrateur ---
+@admin_required
+def supprimer_administrateur(request, pk):
+    utilisateur = get_object_or_404(Utilisateur, pk=pk, role='admin')
+    utilisateur.delete()
+    messages.success(request, "Administrateur supprimé avec succès.")
+    return redirect('gerer_utilisateurs')
+
+# --- Liste des policiers ---
+@admin_required
+def gerer_policiers(request):
+    policiers = Utilisateur.objects.filter(role='policier')
+    return render(request, "frontend/admin/gerer_policiers.html", {'policiers': policiers})
+
+
+# --- Modifier un policier ---
+@admin_required
+def modifier_policier(request, pk):
+    policier = get_object_or_404(Utilisateur, pk=pk, role='policier')
+    if request.method == 'POST':
+        form = PolicierForm(request.POST, instance=policier)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Policier modifié avec succès.")
+            return redirect('gerer_policiers')
+    else:
+        form = PolicierForm(instance=policier)
+    return render(request, "frontend/admin/modifier_policier.html", {'form': form, 'policier': policier})
+
+# --- Supprimer un policier ---
+@admin_required
+def supprimer_policier(request, pk):
+    policier = get_object_or_404(Utilisateur, pk=pk, role='policier')
+    policier.delete()
+    messages.success(request, "Policier supprimé avec succès.")
+    return redirect('gerer_policiers')
+
+# --- Voir statistiques ---
 @admin_required
 def voir_stats(request):
     context = {
         "nb_objets": Objet.objects.count(),
-        "nb_restitutions": Restitution.objects.count()
+        "nb_restitutions": Restitution.objects.count(),
+        "nb_utilisateurs": Utilisateur.objects.filter(role='citoyen').count(),
+        "nb_admins": Utilisateur.objects.filter(role='admin').count(),
     }
     return render(request, "frontend/admin/voir_stats.html", context)
 
@@ -516,7 +574,7 @@ def creer_policier(request):
             fail_silently=False,
         )
         messages.success(request, "Policier créé et mot de passe envoyé par email ✅")
-        return redirect("gerer_utilisateurs")
+        return redirect("creer_policier")
     return render(request, "frontend/admin/creer_policier.html", {"form": form})
 
 
@@ -658,15 +716,36 @@ def ca_m_appartient(request, declaration_id):
 # =============================
 #       Dashboard Citoyen
 # =============================
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from django.db.models import Q
+
 @login_required
 def dashboard_citoyen(request):
     user = request.user
 
-    nb_objets_perdus = Declaration.objects.filter(citoyen=user).count()
-    nb_objets_trouves = Declaration.objects.filter(trouve_par=user).count()
-    nb_objets_restitues = Restitution.objects.filter(citoyen=user, statut='effectuee').count()
+    # Objets perdus = déclarations faites par le citoyen
+    nb_objets_perdus = Declaration.objects.filter(
+        citoyen=user,
+        objet__etat=EtatObjet.PERDU
+    ).count()
 
-    notifications = Declaration.objects.filter(citoyen=user).order_by('-date_declaration')[:5]
+    # Objets trouvés = déclarations où le citoyen est celui qui a trouvé
+    nb_objets_trouves = Declaration.objects.filter(
+        trouve_par=user,
+        objet__etat=EtatObjet.TROUVE
+    ).count()
+
+    # Objets restitués = restitution confirmée pour ce citoyen
+    nb_objets_restitues = Restitution.objects.filter(
+        Q(citoyen=user) | Q(objet__declaration__citoyen=user),
+        statut='effectuee'
+    ).count()
+
+    # Notifications = dernières déclarations liées à ce citoyen
+    notifications = Declaration.objects.filter(
+        Q(citoyen=user) | Q(trouve_par=user)
+    ).order_by('-date_declaration')[:5]
 
     context = {
         'nb_objets_perdus': nb_objets_perdus,
@@ -696,20 +775,55 @@ def mes_objets_perdus(request):
 # =============================
 #       Objets trouvés par le citoyen
 # =============================
+
+
 @login_required
 def mes_objets_trouves(request):
-    q = request.GET.get('q', '')
-    declarations_trouvees = Declaration.objects.filter(
-        trouve_par=request.user,
-        objet__etat__in=[EtatObjet.EN_ATTENTE, EtatObjet.RECLAME]
-    )
-    if q:
-        declarations_trouvees = declarations_trouvees.filter(
-            models.Q(objet__nom__icontains=q) | models.Q(objet__description__icontains=q)
-        )
-    objets_trouves = [dec for dec in declarations_trouvees if dec.objet]
-    return render(request, "frontend/citoyen/mes_objets_trouves.html", {"objets": objets_trouves})
+    q = request.GET.get('q', '').strip()
 
+    # Récupère toutes les déclarations du citoyen connecté dont l'objet est "trouvé"
+    objets_trouves = Declaration.objects.filter(
+        citoyen=request.user,
+        objet__etat=EtatObjet.TROUVE
+    ).select_related('objet').order_by('-date_declaration')
+
+    # Recherche texte (nom ou description)
+    if q:
+        objets_trouves = objets_trouves.filter(
+            models.Q(objet__nom__icontains=q) |
+            models.Q(objet__description__icontains=q)
+        )
+
+    return render(request, "frontend/citoyen/mes_objets_trouves.html", {
+        "objets": objets_trouves
+    })
+
+@login_required
+def modifier_objet_trouve(request, objet_id):
+    declaration = get_object_or_404(Declaration, citoyen=request.user, objet_id=objet_id)
+
+    if request.method == "POST":
+        form = DeclarationForm(request.POST, request.FILES, instance=declaration)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "✅ Objet mis à jour avec succès.")
+            return redirect('mes_objets_trouves')
+    else:
+        form = DeclarationForm(instance=declaration)
+
+    return render(request, "frontend/citoyen/modifier_objet_trouve.html", {"form": form})
+
+@login_required
+def supprimer_objet_trouve(request, objet_id):
+    """
+    Supprime la déclaration d'un objet trouvé du citoyen connecté.
+    """
+    declaration = get_object_or_404(Declaration, citoyen=request.user, objet_id=objet_id)
+    
+    if request.method == 'POST' or request.method == 'GET':  # GET pour le bouton dans le template
+        declaration.delete()
+        messages.success(request, "✅ Objet supprimé avec succès.")
+        return redirect('mes_objets_trouves')
 
 # =============================
 #       Objets à réclamer

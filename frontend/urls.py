@@ -21,7 +21,10 @@ urlpatterns = [
     path("dashboard/policier/restitutions/", views.historique_restitutions, name="historique_restitutions"),
      path("marquer/<int:restitution_id>/", views.marquer_restitue, name="marquer_restitue"),
      path('restitution/<int:pk>/annuler/', views.annuler_restitution, name='annuler_restitution'),
-
+     path('dashboard/admin/policiers/', views.gerer_policiers, name='gerer_policiers'),
+    path('dashboard/admin/policier/creer/', views.creer_policier, name='creer_policier'),
+    path('dashboard/admin/policier/modifier/<int:pk>/', views.modifier_policier, name='modifier_policier'),
+    path('dashboard/admin/policier/supprimer/<int:pk>/', views.supprimer_policier, name='supprimer_policier'),
     path(
     "dashboard/policier/planifier/<int:objet_id>/<str:type_objet>/",
     views.planifier_restitution,
@@ -50,9 +53,16 @@ urlpatterns = [
          views.creer_administrateur, 
          name='creer_administrateur'),
         
-    path('admin/citoyens/', views.liste_citoyens, name='liste_citoyens'),
-    path('admin/citoyens/<int:pk>/bannir/', views.bannir_citoyen, name='bannir_citoyen'),
-    path('admin/citoyens/<int:pk>/debannir/', views.debannir_citoyen, name='debannir_citoyen'),
+    path('citoyens/', views.liste_citoyens, name='liste_citoyens'),
+    path('bannir/citoyens/<int:pk>/bannir/', views.bannir_citoyen, name='bannir_citoyen'),
+    path('debannir/citoyens/<int:pk>/debannir/', views.debannir_citoyen, name='debannir_citoyen'),
+ path('dashboard/admin/utilisateur/modifier/<int:pk>/', 
+         views.modifier_administrateur, 
+         name='modifier_administrateur'),
+
+    path('dashboard/admin/utilisateur/supprimer/<int:pk>/',
+         views.supprimer_administrateur,
+         name='supprimer_administrateur'),
 
 
 
@@ -70,9 +80,12 @@ urlpatterns = [
 
     # Objets trouvés par le citoyen
     path('mes-objets-trouves/', views.mes_objets_trouves, name='mes_objets_trouves'),
+    path('objet-trouve/<int:objet_id>/modifier/', views.modifier_objet_trouve, name='modifier_objet_trouve'),
+    path('objet-trouve/<int:objet_id>/supprimer/', views.supprimer_objet_trouve, name='supprimer_objet_trouve'),
 
     # Objets à réclamer (restitués ou en attente)
     path('objets-a-reclamer/', views.objets_a_reclamer, name='objets_a_reclamer'),
+    
 
     # Planifier restitution pour un objet
     path('reclamer/<int:restitution_id>/', views.reclamer_objet, name='reclamer_objet'),

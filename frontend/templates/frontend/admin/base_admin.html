@@ -60,7 +60,9 @@
 <!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-dark shadow-sm">
     <div class="container-fluid">
-        <a class="navbar-brand" href="#">⚙️ Admin Panel</a>
+        <!-- Lien vers le Dashboard -->
+        <a class="navbar-brand" href="{% url 'dashboard_admin' %}">⚙️ Admin Panel</a>
+
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -78,10 +80,19 @@
                             {{ user.username }}
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end shadow">
-                            <li><a class="dropdown-item" href="{% url 'profil_admin' %}">👤 Mon Profil</a></li>
-                            <li><a class="dropdown-item" href="{% url 'modifier_profil_admin' %}">✏️ Modifier Profil</a></li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'dashboard_admin' %}">🏠 Dashboard</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'profil_admin' %}">👤 Mon Profil</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'modifier_profil_admin' %}">✏️ Modifier Profil</a>
+                            </li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-danger" href="{% url 'logout' %}">🚪 Déconnexion</a></li>
+                            <li>
+                                <a class="dropdown-item text-danger" href="{% url 'logout' %}">🚪 Déconnexion</a>
+                            </li>
                         </ul>
                     </li>
                 {% else %}
@@ -93,6 +104,7 @@
         </div>
     </div>
 </nav>
+
 
 <!-- Contenu principal -->
 <main class="content-wrapper container">

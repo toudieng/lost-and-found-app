@@ -15,9 +15,7 @@
     transform: translateY(-5px);
     box-shadow: 0 10px 25px rgba(0,0,0,0.15);
 }
-.card-title {
-    color: #6c1e3d !important;
-}
+.card-title { color: #6c1e3d !important; }
 .badge-success { background-color: #28a745; }
 .badge-warning { background-color: #ffc107; color: #212529; }
 .btn-outline-success {
@@ -101,27 +99,20 @@
                         {% endif %}
                     </div>
 
-                    <!-- Boutons d'action -->
+                    <!-- Boutons d'action simplifiés -->
                     <div class="card-footer bg-light text-end">
                         <a href="{% url 'objet_detail' declaration.objet.id %}" 
                            class="btn btn-sm btn-outline-success me-1">
                            🔍 Voir détails
                         </a>
 
-                        {% if user.is_authenticated %}
-                            <!-- Propriétaire ou ceux qui ont trouvé peuvent modifier/supprimer -->
-                            {% if user == declaration.citoyen or user in declaration.trouve_par.all %}
-                                <a href="{% url 'modifier_declaration' declaration.id %}" class="btn btn-sm btn-primary me-1">Modifier</a>
-                                <a href="{% url 'supprimer_declaration' declaration.id %}" class="btn btn-sm btn-danger">Supprimer</a>
-                            <!-- Les autres peuvent signaler que c'est à eux -->
-                            {% elif declaration.reclame_par is None and user not in declaration.trouve_par.all %}
-                                <form method="POST" action="{% url 'ca_m_appartient' declaration.id %}" class="d-inline">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-sm btn-primary">
-                                        💙 Ça m’appartient
-                                    </button>
-                                </form>
-                            {% endif %}
+                        {% if user.is_authenticated and declaration.reclame_par is None and user not in declaration.trouve_par.all %}
+                            <form method="POST" action="{% url 'ca_m_appartient' declaration.id %}" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-primary">
+                                    💙 Ça m’appartient
+                                </button>
+                            </form>
                         {% endif %}
                     </div>
 

@@ -79,18 +79,20 @@
                 <a class="nav-link {% if request.resolver_match.url_name == 'gerer_commissariats' %}active{% endif %}" href="{% url 'gerer_commissariats' %}">🏢 Gérer Commissariats</a>
             </li>
             <li class="nav-item mb-2">
-                <a class="nav-link {% if request.resolver_match.url_name == 'gerer_utilisateurs' %}active{% endif %}" href="{% url 'gerer_utilisateurs' %}">👥 Gérer Utilisateurs</a>
+                <a class="nav-link {% if request.resolver_match.url_name == 'gerer_utilisateurs' %}active{% endif %}" href="{% url 'gerer_utilisateurs' %}">👥 Gérer les Administrateurs</a>
             </li>
             <li class="nav-item mb-2">
                 <a class="nav-link {% if request.resolver_match.url_name == 'voir_stats' %}active{% endif %}" href="{% url 'voir_stats' %}">📊 Statistiques</a>
             </li>
-            <li class="nav-item mb-2">
-                <a class="nav-link {% if request.resolver_match.url_name == 'creer_policier' %}active{% endif %}" href="{% url 'creer_policier' %}">👮 Créer Policier</a>
+        
 
-            </li>
             <li class="nav-item mb-2">
     <a class="nav-link {% if request.resolver_match.url_name == 'liste_citoyens' %}active{% endif %}" 
        href="{% url 'liste_citoyens' %}">🧍 Citoyens</a>
+</li>
+<li class="nav-item mb-2">
+    <a class="nav-link {% if request.resolver_match.url_name == 'gerer_policiers' %}active{% endif %}" 
+       href="{% url 'gerer_policiers' %}">👮 Gestion des Policiers</a>
 </li>
 
         </ul>

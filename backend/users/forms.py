@@ -143,3 +143,16 @@ class ProfilForm(forms.ModelForm):
     class Meta:
         model = Utilisateur
         fields = ["username", "email", "telephone", "photo"]
+from django import forms
+from .models import Utilisateur
+
+class AdministrateurForm(forms.ModelForm):
+    class Meta:
+        model = Utilisateur
+        fields = ['first_name', 'last_name', 'email', 'telephone']
+        widgets = {
+            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'telephone': forms.TextInput(attrs={'class': 'form-control'}),
+        }

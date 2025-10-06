@@ -34,29 +34,20 @@ class DeclarationForm(forms.ModelForm):
 
     class Meta:
         model = Declaration
-        fields = ['lieu', 'etat', 'description', 'image']
+        fields = ['nom_objet', 'lieu', 'etat', 'description', 'image']  # ajoute 'nom_objet' ici
         widgets = {
             'lieu': forms.TextInput(attrs={'class':'form-control','placeholder':'Lieu où l’objet a été perdu ou trouvé'}),
         }
 
-    def save(self, commit=True, citoyen=None):
-        # Création de l'objet lié avec image si fournie
-        objet = Objet.objects.create(
-            nom=self.cleaned_data['nom_objet'],
-            description=self.cleaned_data.get('description') or "Aucune description fournie",
-            etat=self.cleaned_data['etat'],
-            image=self.cleaned_data.get('image')  # <-- ajout ici
-        )
-
-        declaration = super().save(commit=False)
-        declaration.objet = objet
-        if citoyen:
-            declaration.citoyen = citoyen
-        if commit:
-            objet.save()
-            declaration.save()
-        return declaration
-
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Remplir le champ nom_objet si l'instance existe
+        if self.instance and hasattr(self.instance, 'objet'):
+            self.fields['nom_objet'].initial = self.instance.objet.nom
+            self.fields['etat'].initial = self.instance.objet.etat
+            self.fields['description'].initial = self.instance.objet.description
+            if self.instance.objet.image:
+                self.fields['image'].initial = self.instance.objet.image
 
 
 class RestitutionForm(forms.Form):

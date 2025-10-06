@@ -2,33 +2,55 @@
 {% block title %}Gérer les utilisateurs{% endblock %}
 
 {% block content %}
-<h2>👥 Gestion des Utilisateurs</h2>
-<table class="table table-striped">
-  <thead>
-    <tr>
-      <th>ID</th>
-      <th>Nom d'utilisateur</th>
-      <th>Email</th>
-      <th>Rôle</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for u in utilisateurs %}
-    <tr>
-      <td>{{ u.id }}</td>
-      <td>{{ u.username }}</td>
-      <td>{{ u.email }}</td>
-      <td>{{ u.role }}</td>
-      <td>
-        <a href="#" class="btn btn-sm btn-warning">Modifier</a>
-        <a href="#" class="btn btn-sm btn-danger">Supprimer</a>
-      </td>
-    </tr>
-    {% empty %}
-    <tr><td colspan="5">Aucun utilisateur trouvé.</td></tr>
-    {% endfor %}
-  </tbody>
-</table>
-<a href="creer_administrateur" class="btn btn-primary">➕ Ajouter un utilisateur</a>
+<div class="container mt-4">
+  <h2 class="mb-4">👥 Gestion des Utilisateurs</h2>
+
+  <table class="table table-hover align-middle shadow-sm">
+    <thead class="table-dark">
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Nom d'utilisateur</th>
+        <th scope="col">Email</th>
+        <th scope="col">Rôle</th>
+        <th scope="col" class="text-center">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for u in utilisateurs %}
+      <tr>
+        <td>{{ u.id }}</td>
+        <td>{{ u.username }}</td>
+        <td>{{ u.email }}</td>
+        <td>
+          {% if u.role == 'admin' %}
+            <span class="badge bg-dark">Administrateur</span>
+          {% elif u.role == 'policier' %}
+            <span class="badge bg-primary">Policier</span>
+          {% else %}
+            <span class="badge bg-secondary">Citoyen</span>
+          {% endif %}
+        </td>
+        <td class="text-center">
+          <a href="{% url 'modifier_administrateur' u.id %}" class="btn btn-sm btn-warning me-2">✏️ Modifier</a>
+          <a href="{% url 'supprimer_administrateur' u.id %}" class="btn btn-sm btn-danger"
+             onclick="return confirm('Voulez-vous vraiment supprimer cet utilisateur ?');">
+             🗑️ Supprimer
+          </a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="5" class="text-center text-muted">Aucun utilisateur trouvé.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <!-- Bouton Ajouter placé juste en dessous -->
+  <div class="text-center mt-4">
+    <a href="{% url 'creer_administrateur' %}" class="btn btn-lg btn-primary px-4">
+      ➕ Ajouter un utilisateur
+    </a>
+  </div>
+</div>
 {% endblock %}

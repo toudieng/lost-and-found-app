@@ -19,74 +19,28 @@
     box-shadow: 0 12px 30px rgba(0,0,0,0.15);
 }
 
-/* Image objet */
-.objet-trouve-img {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-}
+.objet-trouve-img { width: 100%; height: 200px; object-fit: cover; }
+.objet-trouve-body { padding: 1rem 1.2rem; }
+.objet-trouve-body h5 { color: #6c1e3d; font-weight: 700; font-size: 1.2rem; margin-bottom: 0.5rem; }
+.objet-trouve-body p { font-size: 0.95rem; color: #555; margin-bottom: 0.35rem; }
 
-/* Informations objet */
-.objet-trouve-body {
-    padding: 1rem 1.2rem;
-}
-.objet-trouve-body h5 {
-    color: #6c1e3d;
-    font-weight: 700;
-    font-size: 1.2rem;
-    margin-bottom: 0.5rem;
-}
-.objet-trouve-body p {
-    font-size: 0.95rem;
-    color: #555;
-    margin-bottom: 0.35rem;
-}
-
-/* Badges état */
-.badge-etat {
-    padding: 0.4em 0.65em;
-    border-radius: 0.5rem;
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: #fff;
-}
+.badge-etat { padding: 0.4em 0.65em; border-radius: 0.5rem; font-size: 0.8rem; font-weight: 600; color: #fff; }
 .badge-perdu { background-color: #dc3545; }
 .badge-trouve { background-color: #28a745; }
 .badge-reclame { background-color: #ffc107; color: #343a40; }
 .badge-restitue { background-color: #17a2b8; }
 .badge-en_attente { background-color: #6c757d; }
 
-/* Date & icônes */
-.objet-meta {
-    font-size: 0.85rem;
-    color: #6c757d;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
+.objet-meta { font-size: 0.85rem; color: #6c757d; display: flex; justify-content: space-between; align-items: center; }
+.search-bar { margin-bottom: 1.5rem; }
+.search-bar input { width: 100%; padding: 0.6rem 1rem; border-radius: 0.5rem; border: 1px solid #ccc; transition: border-color 0.3s; }
+.search-bar input:focus { border-color: #6c1e3d; outline: none; }
 
-/* Barre de recherche */
-.search-bar {
-    margin-bottom: 1.5rem;
-}
-.search-bar input {
-    width: 100%;
-    padding: 0.6rem 1rem;
-    border-radius: 0.5rem;
-    border: 1px solid #ccc;
-    transition: border-color 0.3s;
-}
-.search-bar input:focus {
-    border-color: #6c1e3d;
-    outline: none;
-}
+.btn-action { display: inline-block; padding: 0.4rem 0.8rem; border-radius: 0.5rem; font-size: 0.85rem; color: #fff; text-decoration: none; margin-right: 0.4rem; transition: background 0.3s; }
+.btn-action-edit { background-color: #6c1e3d; } .btn-action-edit:hover { background-color: #8a2c55; }
+.btn-action-delete { background-color: #dc3545; } .btn-action-delete:hover { background-color: #b02a37; }
 
-/* Responsive */
-@media (max-width: 768px) {
-    .objet-trouve-img {
-        height: 180px;
-    }
-}
+@media (max-width: 768px) { .objet-trouve-img { height: 180px; } }
 </style>
 {% endblock %}
 
@@ -101,30 +55,39 @@
 
 {% if objets %}
     <div class="row g-4">
-        {% for obj in objets %}
-        {% with objet=obj.objet %}
-        <div class="col-md-4">
-            <div class="objet-trouve-card">
-                {% if obj.image %}
-                    <img src="{{ obj.image.url }}" class="objet-trouve-img" alt="{{ objet.nom }}">
-                {% elif objet and objet.image %}
-                    <img src="{{ objet.image.url }}" class="objet-trouve-img" alt="{{ objet.nom }}">
-                {% else %}
-                    <img src="{% static 'images/default-object.png' %}" class="objet-trouve-img" alt="Objet">
-                {% endif %}
-                <div class="objet-trouve-body">
-                    <h5>{{ objet.nom|default:"Objet inconnu" }}</h5>
-                    <p>{{ objet.description|default:"Aucune description" }}</p>
-                    <div class="objet-meta">
-                        <span><i class="fa-regular fa-calendar"></i> {{ obj.date_declaration|date:"d/m/Y H:i" }}</span>
-                        {% if objet.etat %}
-                            <span class="badge-etat badge-{{ objet.etat }}">{{ objet.get_etat_display }}</span>
-                        {% endif %}
+        {% for declaration in objets %}
+            {% with objet=declaration.objet %}
+            <div class="col-md-4">
+                <div class="objet-trouve-card">
+                    {% if objet.image %}
+                        <img src="{{ objet.image.url }}" class="objet-trouve-img" alt="{{ objet.nom }}">
+                    {% else %}
+                        <img src="{% static 'images/default-object.png' %}" class="objet-trouve-img" alt="Objet">
+                    {% endif %}
+
+                    <div class="objet-trouve-body">
+                        <h5>{{ objet.nom|default:"Objet inconnu" }}</h5>
+                        <p>{{ objet.description|default:"Aucune description" }}</p>
+
+                        <div class="objet-meta mb-2">
+                            <span><i class="fa-regular fa-calendar"></i> {{ declaration.date_declaration|date:"d/m/Y H:i" }}</span>
+                            <span class="badge-etat badge-trouve">Trouvé</span>
+                        </div>
+
+                        <!-- Boutons Modifier / Supprimer -->
+                        <div class="text-end">
+                            <a href="{% url 'modifier_objet_trouve' objet.id %}" class="btn-action btn-action-edit">
+                                ✏️ Modifier
+                            </a>
+                            <a href="{% url 'supprimer_objet_trouve' objet.id %}" class="btn-action btn-action-delete" 
+                               onclick="return confirm('Voulez-vous vraiment supprimer cet objet ?');">
+                                🗑️ Supprimer
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        {% endwith %}
+            {% endwith %}
         {% endfor %}
     </div>
 {% else %}

@@ -1,0 +1,50 @@
+{% extends "frontend/admin/base_admin.html" %}
+
+{% block title %}Gérer les policiers{% endblock %}
+
+{% block content %}
+<h2>👮 Gestion des Policiers</h2>
+
+<table class="table table-striped mt-3">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nom</th>
+            <th>Prénom</th>
+            <th>Email</th>
+            <th>Téléphone</th>
+            <th>Commissariat</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for p in policiers %}
+        <tr>
+            <td>{{ p.id }}</td>
+            <td>{{ p.first_name }}</td>
+            <td>{{ p.last_name }}</td>
+            <td>{{ p.email }}</td>
+            <td>{{ p.telephone }}</td>
+            <td>
+                {% if p.commissariat %}
+                    {{ p.commissariat.nom }}
+                {% else %}
+                    N/A
+                {% endif %}
+            </td>
+            <td>
+                <a href="{% url 'modifier_policier' p.id %}" class="btn btn-sm btn-warning">Modifier</a>
+                <a href="{% url 'supprimer_policier' p.id %}" class="btn btn-sm btn-danger"
+                   onclick="return confirm('Voulez-vous vraiment supprimer ce policier ?')">Supprimer</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="7">Aucun policier trouvé.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a href="{% url 'creer_policier' %}" class="btn btn-primary mt-3">➕ Ajouter un policier</a>
+{% endblock %}
