@@ -1,0 +1,190 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Preuve de restitution - {{ restitution.id }}</title>
+    <style>
+        body {
+            font-family: 'DejaVu Sans', sans-serif;
+            margin: 2cm;
+            color: #333;
+        }
+
+        /* Header avec logos en table */
+        .header-table {
+            width: 100%;
+            border-bottom: 2px solid #003366;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-collapse: collapse;
+        }
+
+        .header-table td {
+            vertical-align: middle;
+        }
+
+        .header-table td.left {
+            text-align: left;
+            width: 20%;
+        }
+
+        .header-table td.center {
+            text-align: center;
+            width: 60%;
+        }
+
+        .header-table td.right {
+            text-align: right;
+            width: 20%;
+        }
+
+        .header-table img {
+            height: 80px;
+            width: auto;
+        }
+
+        .title {
+            text-align: center;
+            color: #003366;
+            margin-bottom: 25px;
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        .section h4 {
+            color: #003366;
+            margin-bottom: 8px;
+            border-bottom: 1px solid #ccc;
+            display: inline-block;
+            padding-bottom: 2px;
+        }
+
+        .qr {
+            text-align: right;
+            margin-top: 30px;
+        }
+
+        .qr img {
+            height: 100px;
+        }
+
+        .signature {
+            margin-top: 40px;
+            text-align: right;
+            font-style: italic;
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 1cm;
+            text-align: center;
+            font-size: 10px;
+            color: #888;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header avec logos -->
+    <table class="header-table">
+        <tr>
+            <td class="left">
+                <img src="{% static 'frontend/images/logo_senegal.png' %}" alt="Logo Sénégal">
+            </td>
+            <td class="center">
+                <h2>République du Sénégal</h2>
+                <p><strong>Police Nationale</strong> — Preuve de restitution d’objet</p>
+            </td>
+            <td class="right">
+                <img src="{% static 'frontend/images/logo_police.png' %}" alt="Logo Police">
+            </td>
+        </tr>
+    </table>
+
+    <!-- Titre principal -->
+    <div class="title">
+        <h3>Attestation de Restitution N°{{ restitution.id }}</h3>
+        <p>Date : {{ restitution.date_restitution|date:"d/m/Y" }} — Heure : {{ restitution.heure_restitution|time:"H:i" }}</p>
+    </div>
+
+    <!-- Informations citoyen -->
+    <div class="section">
+        <h4>Citoyen</h4>
+        <p>Nom d'utilisateur : <strong>{{ restitution.citoyen.username|default:"Non renseigné" }}</strong></p>
+        <p>Email : {{ restitution.citoyen.email|default:"Non renseigné" }}</p>
+    </div>
+
+    <!-- Informations objet -->
+    <div class="section">
+        <h4>Objet Restitué</h4>
+        <p><strong>{{ restitution.objet.nom|default:"Non renseigné" }}</strong></p>
+        <p>{{ restitution.objet.description|default:"Aucune description disponible" }}</p>
+    </div>
+
+    <!-- Informations policier -->
+    <div class="section">
+        <h4>Policier</h4>
+        {% if restitution.restitue_par %}
+            <p>Nom d'utilisateur : <strong>{{ restitution.restitue_par.username }}</strong></p>
+            <p>Email : {{ restitution.restitue_par.email|default:"Non renseigné" }}</p>
+        {% elif restitution.policier %}
+            <p>Nom d'utilisateur : <strong>{{ restitution.policier.username }}</strong></p>
+            <p>Email : {{ restitution.policier.email|default:"Non renseigné" }}</p>
+        {% else %}
+            <p>Nom d'utilisateur : <strong>Non renseigné</strong></p>
+            <p>Email : Non renseigné</p>
+        {% endif %}
+    </div>
+
+    <!-- Informations commissariat -->
+   
+    <div class="section">
+    <h4>Commissariat</h4>
+    {% if restitution.commissariat %}
+        <p>{{ restitution.commissariat.nom|default:"Non renseigné" }}</p>
+        {% if restitution.commissariat.adresse %}
+            <p>{{ restitution.commissariat.adresse }}</p>
+        {% else %}
+            <p>Adresse non renseignée</p>
+        {% endif %}
+    {% else %}
+        <p>Commissariat non renseigné</p>
+        <p>Adresse non renseignée</p>
+    {% endif %}
+</div>
+
+
+    <!-- QR Code -->
+    {% if qr_code %}
+    <div class="qr">
+        <p><strong>QR Code de vérification :</strong></p>
+        <img src="data:image/png;base64,{{ qr_code|safe }}" alt="QR Code">
+    </div>
+    {% endif %}
+
+    <!-- Signature -->
+    <div class="signature">
+        <p>Signé par : 
+            {% if restitution.restitue_par %}
+                {{ restitution.restitue_par.username }}
+            {% elif restitution.policier %}
+                {{ restitution.policier.username }}
+            {% else %}
+                Non renseigné
+            {% endif %}
+        </p>
+        <p>Fait à {{ restitution.commissariat.nom|default:"Lieu non précisé" }}, le {{ restitution.date_restitution|date:"d/m/Y" }}</p>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        Document généré automatiquement par le système de gestion des objets perdus et retrouvés © {{ now|date:"Y" }}
+    </div>
+
+</body>
+</html>

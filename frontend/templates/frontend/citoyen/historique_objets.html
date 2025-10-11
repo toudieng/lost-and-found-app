@@ -5,99 +5,101 @@
 
 {% block extra_css %}
 <style>
+/* Section principale */
+.welcome-title {
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 0.5rem;
+}
+.text-muted {
+    text-align: center;
+}
+
 /* Cartes des objets restitués */
 .objet-restitue-card {
     border-radius: 1rem;
     background: #fff;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    transition: transform 0.2s ease-in-out;
-    cursor: default;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    transition: transform 0.25s ease-in-out, box-shadow 0.25s ease-in-out;
+    overflow: hidden;
 }
 .objet-restitue-card:hover {
-    transform: translateY(-2px);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 18px rgba(0,0,0,0.1);
 }
 
 /* Image objet */
 .objet-restitue-img {
     width: 100%;
-    height: 180px;
+    height: 200px;
     object-fit: cover;
-    border-top-left-radius: 1rem;
-    border-top-right-radius: 1rem;
 }
 
-/* Card body */
+/* Contenu */
+.objet-restitue-body {
+    padding: 1rem 1.2rem;
+}
 .objet-restitue-body h5 {
     color: #343a40;
     font-weight: 600;
+    font-size: 1.05rem;
+    margin-bottom: 0.5rem;
 }
 .objet-restitue-body p {
     font-size: 0.9rem;
     color: #555;
+    margin-bottom: 0.4rem;
 }
 
 /* Badge Restitué */
 .badge-restitue {
+    display: inline-block;
     background-color: #28a745;
     color: #fff;
     font-weight: 600;
-    padding: 0.35em 0.6em;
+    padding: 0.4em 0.75em;
     border-radius: 0.5rem;
+    font-size: 0.85rem;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
     .objet-restitue-img {
-        height: 200px;
+        height: 180px;
     }
 }
 </style>
 {% endblock %}
 
 {% block content %}
-<h2 class="welcome-title" style="color:#343a40;">📜 Historique des Objets Restitués</h2>
-<p class="text-muted">Tous les objets qui vous ont été restitués.</p>
+<h2 class="welcome-title">📜 Historique des Objets Restitués</h2>
+<p class="text-muted mb-4">Tous les objets qui vous ont été restitués par les forces de l’ordre.</p>
 
 {% if restitutions %}
     <div class="row">
         {% for rest in restitutions %}
-        <div class="col-md-4 mb-3">
+        <div class="col-md-4 mb-4">
             <div class="objet-restitue-card">
                 {% if rest.objet.image %}
                     <img src="{{ rest.objet.image.url }}" class="objet-restitue-img" alt="{{ rest.objet.nom }}">
                 {% else %}
                     <img src="{% static 'images/default-object.png' %}" class="objet-restitue-img" alt="Objet">
                 {% endif %}
-                <div class="card-body objet-restitue-body">
-                    <h5 class="card-title">{{ rest.objet.nom|default:"Objet inconnu" }}</h5>
-                    <p>{{ rest.objet.description|default:"Aucune description" }}</p>
-                    <p><small class="text-muted">Restitué le {{ rest.date_restitution|date:"d/m/Y" }} à {{ rest.heure_restitution|time:"H:i" }}</small></p>
+                <div class="objet-restitue-body">
+                    <h5>{{ rest.objet.nom|default:"Objet inconnu" }}</h5>
+                    <p>{{ rest.objet.description|default:"Aucune description disponible." }}</p>
+                    <p><small class="text-muted">📅 Restitué le {{ rest.date_restitution|date:"d/m/Y" }} à {{ rest.heure_restitution|time:"H:i" }}</small></p>
                     
-                    <p><small class="text-muted">
-                        Citoyen : 
-                        {% if rest.citoyen %}
-                            {{ rest.citoyen.username }}
-                        {% else %}
-                            Inconnu
-                        {% endif %}
-                    </small></p>
+                    <p><small class="text-muted">👤 Citoyen : {{ rest.citoyen.username|default:"Inconnu" }}</small></p>
+                    <p><small class="text-muted">👮 Policier : {{ rest.restitue_par.username|default:"Inconnu" }}</small></p>
 
-                    <p><small class="text-muted">
-                        Policier : 
-                        {% if rest.restitue_par %}
-                            {{ rest.restitue_par.username }}
-                        {% else %}
-                            Inconnu
-                        {% endif %}
-                    </small></p>
-
-                    <span class="badge badge-restitue">Restitué</span>
+                    <span class="badge badge-restitue">✅ Restitué</span>
                 </div>
             </div>
         </div>
         {% endfor %}
     </div>
 {% else %}
-    <p class="text-muted">Aucun objet n'a été restitué pour le moment.</p>
+    <p class="text-muted text-center mt-5">Aucun objet n’a encore été restitué.</p>
 {% endif %}
 {% endblock %}

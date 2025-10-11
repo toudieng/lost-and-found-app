@@ -53,26 +53,30 @@
                         {% endfor %}
                     </div>
 
-                    <!-- Boutons action -->
-                    <div class="card-footer bg-light text-end">
-                        <!-- Marquer restitué -->
-                        <form method="POST" action="{% url 'marquer_restitue' restitution.id %}" class="d-inline">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-sm btn-success">
-                                ✅ Marquer restitué
-                            </button>
-                        </form>
+                 <!-- Boutons action -->
+<div class="card-footer bg-light text-end">
+    <!-- Marquer restitué -->
+    <form method="POST" action="{% url 'marquer_restitue' restitution.id %}" class="d-inline">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-sm btn-success">
+            ✅ Marquer restitué
+        </button>
+    </form>
 
-                        <!-- Annuler restitution -->
-                        <form method="POST" action="{% url 'annuler_restitution' restitution.id %}" class="d-inline ms-2">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-sm btn-danger">
-                                ❌ Annuler restitution
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
+    <!-- Annuler restitution -->
+    <form method="POST" action="{% url 'annuler_restitution' restitution.id %}" class="d-inline ms-2">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-sm btn-danger">
+            ❌ Annuler restitution
+        </button>
+    </form>
+
+    <!-- Générer preuve PDF -->
+    <a href="{% url 'preuve_restitution_pdf' restitution.id %}" target="_blank" class="btn btn-sm btn-primary ms-2">
+        📄 Preuve PDF
+    </a>
+</div>
+
         {% empty %}
             <div class="col-12">
                 <div class="alert alert-info text-center">
