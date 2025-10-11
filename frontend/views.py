@@ -826,20 +826,9 @@ def supprimer_objet_trouve(request, objet_id):
         return redirect('mes_objets_trouves')
 
 # =============================
-#       Objets à réclamer
+#       Objets à historique
 # =============================
 
-@login_required
-def objets_a_reclamer(request):
-    # Objets qui sont attribués au citoyen et pas encore restitués
-    objets = Declaration.objects.filter(
-        reclame_par=request.user,
-        objet__etat__in=[EtatObjet.TROUVE, EtatObjet.RECLAME, EtatObjet.EN_ATTENTE]
-    ).order_by('-date_declaration')
-    
-    return render(request, 'frontend/citoyen/objets_a_reclamer.html', {'objets': objets})
-
-@login_required
 def historique_objets_restitues(request):
     # Restitutions effectuées pour ce citoyen
     restitutions = Restitution.objects.filter(

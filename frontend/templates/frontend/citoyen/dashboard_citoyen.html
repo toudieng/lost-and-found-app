@@ -158,7 +158,7 @@ body {
         <a href="{% url 'mes_objets_perdus' %}" class="sidebar-link {% if request.path == '/mes-objets-perdus/' %}active{% endif %}">📦 Mes objets perdus</a>
         <a href="{% url 'mes_objets_trouves' %}" class="sidebar-link {% if request.path == '/mes-objets-trouves/' %}active{% endif %}">🔍 Mes objets trouvés</a>
         <a href="{% url 'historique_objets_restitues' %}" class="sidebar-link {% if request.path == '/historique_objets_restitues/' %}active{% endif %}">📜 Historique des objets</a> 
-        <a href="{% url 'objets_a_reclamer' %}" class="sidebar-link {% if request.path == '/objets-a-reclamer/' %}active{% endif %}">📌 Objets à réclamer</a>
+        <a href="{% url 'objets_perdus' %}" class="sidebar-link {% if request.path == '/objets/perdus//' %}active{% endif %}">📌 les objets declares perdus</a>
         <a href="{% url 'modifier_profil_citoyen' %}" class="sidebar-link {% if request.path == '/modifier-profil/' %}active{% endif %}">✏️ Modifier mon profil</a>
     </div>
 
@@ -187,7 +187,7 @@ body {
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="stats-card stats-restitues" onclick="location.href='{% url 'objets_a_reclamer' %}'">
+                <div class="stats-card stats-restitues" onclick="location.href='{% url 'objets_perdus' %}'">
                     <span class="stats-icon">✅</span>
                     <div>
                         <h5 class="mb-0">{{ nb_objets_restitues }}</h5>

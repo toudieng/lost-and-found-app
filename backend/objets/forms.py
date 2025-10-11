@@ -2,21 +2,18 @@ from django import forms
 from backend.users.models import Commissariat
 from .models import Declaration, Objet, EtatObjet
 
-from django import forms
-from .models import Declaration, Objet, EtatObjet
-from backend.users.models import Commissariat
 
 class DeclarationForm(forms.ModelForm):
     nom_objet = forms.CharField(
         max_length=100,
-        widget=forms.TextInput(attrs={'class':'form-control','placeholder':"Nom de l'objet"}),
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': "Nom de l'objet"}),
         label="Nom de l'objet",
         required=True
     )
 
     description = forms.CharField(
         required=False,
-        widget=forms.Textarea(attrs={'class':'form-control','rows':3,'placeholder':'Description (facultative)'}),
+        widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Description (facultative)'}),
         label="Description"
     )
 
@@ -27,27 +24,32 @@ class DeclarationForm(forms.ModelForm):
 
     etat = forms.ChoiceField(
         choices=[(EtatObjet.PERDU, "Objet perdu"), (EtatObjet.TROUVE, "Objet trouvé")],
-        widget=forms.RadioSelect(attrs={'class':'form-check-input'}),
+        widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
         label="Type de déclaration",
         required=True
     )
 
     class Meta:
         model = Declaration
-        fields = ['nom_objet', 'lieu', 'etat', 'description', 'image']  # ajoute 'nom_objet' ici
+        fields = ['nom_objet', 'lieu', 'etat', 'description', 'image']
         widgets = {
-            'lieu': forms.TextInput(attrs={'class':'form-control','placeholder':'Lieu où l’objet a été perdu ou trouvé'}),
+            'lieu': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Lieu où l’objet a été perdu ou trouvé'
+            }),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Remplir le champ nom_objet si l'instance existe
-        if self.instance and hasattr(self.instance, 'objet'):
-            self.fields['nom_objet'].initial = self.instance.objet.nom
-            self.fields['etat'].initial = self.instance.objet.etat
-            self.fields['description'].initial = self.instance.objet.description
-            if self.instance.objet.image:
-                self.fields['image'].initial = self.instance.objet.image
+
+        # Vérifie que l'instance a un objet valide avant d'accéder à ses attributs
+        if getattr(self.instance, 'objet', None):
+            objet = self.instance.objet
+            self.fields['nom_objet'].initial = objet.nom or ''
+            self.fields['etat'].initial = objet.etat or ''
+            self.fields['description'].initial = objet.description or ''
+            if objet.image:
+                self.fields['image'].initial = objet.image
 
 
 class RestitutionForm(forms.Form):

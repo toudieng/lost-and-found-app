@@ -83,8 +83,7 @@ urlpatterns = [
     path('objet-trouve/<int:objet_id>/modifier/', views.modifier_objet_trouve, name='modifier_objet_trouve'),
     path('objet-trouve/<int:objet_id>/supprimer/', views.supprimer_objet_trouve, name='supprimer_objet_trouve'),
 
-    # Objets à réclamer (restitués ou en attente)
-    path('objets-a-reclamer/', views.objets_a_reclamer, name='objets_a_reclamer'),
+
     
 
     # Planifier restitution pour un objet
