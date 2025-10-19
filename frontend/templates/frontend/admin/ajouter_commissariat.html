@@ -3,23 +3,47 @@
 
 {% block title %}Ajouter un Commissariat{% endblock %}
 
+{% block extra_css %}
+<style>
+    h2 {
+        color: #343a40;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+    }
+
+    .card {
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        max-width: 500px;
+        margin: auto;
+    }
+
+    .btn-group {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: flex-end;
+        margin-top: 1rem;
+    }
+
+    form p {
+        margin-bottom: 0.8rem;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container mt-4">
-    <h2 class="mb-4 text-center">➕ Ajouter un Commissariat</h2>
+    <h2 class="text-center">➕ Ajouter un Commissariat</h2>
 
-    <!-- Messages -->
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-        {% endfor %}
-    {% endif %}
-
-    <form method="post">
+    <form method="post" class="mt-3">
         {% csrf_token %}
-        <div class="card shadow p-4">
+        <div class="card p-4">
             {{ form.as_p }}
-            <button type="submit" class="btn btn-primary mt-3">Enregistrer</button>
-            <a href="{% url 'gerer_commissariats' %}" class="btn btn-secondary mt-3">Annuler</a>
+
+            <div class="btn-group">
+                <button type="submit" class="btn btn-primary">Enregistrer</button>
+                <a href="{% url 'gerer_commissariats' %}" class="btn btn-secondary">Annuler</a>
+            </div>
         </div>
     </form>
 </div>

@@ -1,55 +1,74 @@
 {% extends "frontend/admin/base_admin.html" %}
-{% block title %}Gérer les utilisateurs{% endblock %}
+{% block title %}Gérer les Administrateurs{% endblock %}
+
+{% block extra_css %}
+<style>
+.table-hover tbody tr:hover {
+    background-color: #f8f9fa;
+}
+.badge-role {
+    font-size: 0.85rem;
+    padding: 0.4em 0.6em;
+}
+.search-bar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 1rem;
+}
+.search-bar input {
+    width: 250px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    border: 1px solid #ced4da;
+}
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
-  <h2 class="mb-4">👥 Gestion des Utilisateurs</h2>
+  <h2 class="mb-4">👤 Gestion des Administrateurs</h2>
 
-  <table class="table table-hover align-middle shadow-sm">
+  <div class="search-bar">
+    <form method="get">
+      <input type="text" name="q" placeholder="Rechercher un admin..." value="{{ request.GET.q }}">
+      <button type="submit" class="btn btn-secondary ms-2">🔍</button>
+    </form>
+  </div>
+
+  <table class="table table-hover align-middle shadow-sm table-responsive">
     <thead class="table-dark">
       <tr>
-        <th scope="col">#</th>
-        <th scope="col">Nom d'utilisateur</th>
-        <th scope="col">Email</th>
-        <th scope="col">Rôle</th>
-        <th scope="col" class="text-center">Actions</th>
+        <th>#</th>
+        <th>Nom d'utilisateur</th>
+        <th>Email</th>
+        <th class="text-center">Actions</th>
       </tr>
     </thead>
     <tbody>
-      {% for u in utilisateurs %}
+      {% for admin in administrateurs %}
       <tr>
-        <td>{{ u.id }}</td>
-        <td>{{ u.username }}</td>
-        <td>{{ u.email }}</td>
-        <td>
-          {% if u.role == 'admin' %}
-            <span class="badge bg-dark">Administrateur</span>
-          {% elif u.role == 'policier' %}
-            <span class="badge bg-primary">Policier</span>
-          {% else %}
-            <span class="badge bg-secondary">Citoyen</span>
-          {% endif %}
-        </td>
+        <td>{{ admin.id }}</td>
+        <td>{{ admin.username }}</td>
+        <td>{{ admin.email }}</td>
         <td class="text-center">
-          <a href="{% url 'modifier_administrateur' u.id %}" class="btn btn-sm btn-warning me-2">✏️ Modifier</a>
-          <a href="{% url 'supprimer_administrateur' u.id %}" class="btn btn-sm btn-danger"
-             onclick="return confirm('Voulez-vous vraiment supprimer cet utilisateur ?');">
+          <a href="{% url 'modifier_administrateur' admin.id %}" class="btn btn-sm btn-warning me-2">✏️ Modifier</a>
+          <a href="{% url 'supprimer_administrateur' admin.id %}" class="btn btn-sm btn-danger"
+             onclick="return confirm('Voulez-vous vraiment supprimer cet administrateur ?');">
              🗑️ Supprimer
           </a>
         </td>
       </tr>
       {% empty %}
       <tr>
-        <td colspan="5" class="text-center text-muted">Aucun utilisateur trouvé.</td>
+        <td colspan="4" class="text-center text-muted">Aucun administrateur trouvé.</td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
 
-  <!-- Bouton Ajouter placé juste en dessous -->
   <div class="text-center mt-4">
     <a href="{% url 'creer_administrateur' %}" class="btn btn-lg btn-primary px-4">
-      ➕ Ajouter un utilisateur
+      ➕ Ajouter un administrateur
     </a>
   </div>
 </div>

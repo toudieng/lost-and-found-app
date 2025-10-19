@@ -461,12 +461,22 @@ def preuve_restitution_pdf(request, pk):
 # =============================
 #       DASHBOARD ADMIN
 # =============================
-@admin_required
+
+@login_required
 def dashboard_admin(request):
+    # Statistiques
+    nb_commissariats = Commissariat.objects.count()
+    nb_utilisateurs = Utilisateur.objects.count()
+    nb_objets = Objet.objects.count()
+
+    # Notifications récentes (5 dernières)
+    notifications = Notification.objects.order_by('-date')[:5]
+
     context = {
-        'nb_commissariats': Commissariat.objects.count(),
-        'nb_utilisateurs': Utilisateur.objects.count(),
-        'nb_objets': Objet.objects.count(),
+        'nb_commissariats': nb_commissariats,
+        'nb_utilisateurs': nb_utilisateurs,
+        'nb_objets': nb_objets,
+        'notifications': notifications,
     }
     return render(request, "frontend/admin/dashboard_admin.html", context)
 
@@ -476,11 +486,13 @@ def gerer_commissariats(request):
     commissariats = Commissariat.objects.all()
     return render(request, "frontend/admin/gerer_commissariats.html", {"commissariats": commissariats})
 
-
-@admin_required
 def gerer_utilisateurs(request):
     administrateurs = Utilisateur.objects.filter(role='admin')
-    return render(request, "frontend/admin/gerer_utilisateurs.html", {'utilisateurs': administrateurs})
+    context = {
+        'administrateurs': administrateurs  
+    }
+    return render(request, "frontend/admin/gerer_utilisateurs.html", context)
+
 
 
 @admin_required
@@ -548,11 +560,32 @@ def supprimer_policier(request, pk):
 
 @admin_required
 def voir_stats(request):
+    # Comptages globaux
+    nb_objets = Objet.objects.count()
+    nb_restitutions = Restitution.objects.count()
+    nb_citoyens = Utilisateur.objects.filter(role='citoyen').count()
+    nb_admins = Utilisateur.objects.filter(role='admin', is_active=True).count()  # admins actifs
+    nb_policiers = Utilisateur.objects.filter(role='policier').count()
+    
+    # Exemples d'évolution sur 7 jours (tu peux remplacer par données réelles)
+    evolution_objets = [5, 8, 6, 12, 15, 18, nb_objets]
+    evolution_restitutions = [2, 3, 4, 6, 5, 7, nb_restitutions]
+    evolution_citoyens = [1, 2, 3, 5, 6, 8, nb_citoyens]
+    evolution_admins = [1, 1, 1, 2, 2, 3, nb_admins]
+    evolution_policiers = [1, 1, 2, 2, 3, 4, nb_policiers]
+
     context = {
-        "nb_objets": Objet.objects.count(),
-        "nb_restitutions": Restitution.objects.count(),
-        "nb_utilisateurs": Utilisateur.objects.filter(role='citoyen').count(),
-        "nb_admins": Utilisateur.objects.filter(role='admin').count(),
+        "nb_objets": nb_objets,
+        "nb_objets_declare": nb_objets,  # pour clarifier le libellé
+        "nb_restitutions": nb_restitutions,
+        "nb_citoyens": nb_citoyens,
+        "nb_admins": nb_admins,
+        "nb_policiers": nb_policiers,
+        "evolution_objets": evolution_objets,
+        "evolution_restitutions": evolution_restitutions,
+        "evolution_citoyens": evolution_citoyens,
+        "evolution_admins": evolution_admins,
+        "evolution_policiers": evolution_policiers,
     }
     return render(request, "frontend/admin/voir_stats.html", context)
 
@@ -708,25 +741,38 @@ def ca_m_appartient(request, declaration_id):
 # =============================
 #       DASHBOARD CITOYEN
 # =============================
+
 @login_required
 def dashboard_citoyen(request):
     user = request.user
-    nb_objets_perdus = Declaration.objects.filter(citoyen=user, objet__etat=EtatObjet.PERDU).count()
-    nb_objets_trouves = Declaration.objects.filter(trouve_par=user, objet__etat=EtatObjet.TROUVE).count()
+
+    nb_objets_perdus = Declaration.objects.filter(
+        citoyen=user,
+        objet__etat=EtatObjet.PERDU
+    ).count()
+
+    nb_objets_trouves = Declaration.objects.filter(
+        trouve_par=user,
+        objet__etat=EtatObjet.TROUVE
+    ).count()
+
     nb_objets_restitues = Restitution.objects.filter(
         Q(citoyen=user) | Q(objet__declaration__citoyen=user),
-        statut='effectuee'
+        statut=''
     ).count()
-    notifications = Declaration.objects.filter(Q(citoyen=user) | Q(trouve_par=user)).order_by('-date_declaration')[:5]
+
+    notifications = Declaration.objects.filter(
+        Q(citoyen=user) | Q(trouve_par=user)
+    ).order_by('-date_declaration')[:5]
 
     context = {
+        'user': user,  # ✅ Ajouter explicitement l'utilisateur
         'nb_objets_perdus': nb_objets_perdus,
         'nb_objets_trouves': nb_objets_trouves,
         'nb_objets_restitues': nb_objets_restitues,
         'notifications': notifications,
     }
     return render(request, "frontend/citoyen/dashboard_citoyen.html", context)
-
 
 @login_required
 def mes_objets_perdus(request):

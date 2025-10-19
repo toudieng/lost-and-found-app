@@ -1,61 +1,75 @@
-{% extends "frontend/admin/base_admin.html" %} 
+{% extends "frontend/admin/base_admin.html" %}
+{% load static %}
 
 {% block title %}Statistiques{% endblock %}
 
 {% block extra_css %}
 <style>
-    .container {
-        max-width: 900px;
-        margin: 2rem auto;
-        padding: 1rem;
-    }
+.container {
+    max-width: 950px;
+    margin: 2rem auto;
+    padding: 1rem;
+}
 
-    .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 1.5rem;
-        margin-top: 1rem;
-    }
+h2 {
+    color: #6c1e3d;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    text-align: center;
+}
 
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.stats-card {
+    border-radius: 1rem;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #fefefe, #f8f9fa);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stats-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+.stats-icon {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+    color: #6c1e3d;
+}
+
+.stats-card h5 {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #343a40;
+}
+
+.stats-card small {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+canvas {
+    margin-top: 0.5rem;
+    width: 100% !important;
+    height: 50px !important;
+}
+
+@media (max-width: 600px) {
     .stats-card {
-        border-radius: 1rem;
-        padding: 1.5rem;
-        background: #fff;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        display: flex;
-        align-items: center;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        flex-direction: column;
+        text-align: center;
     }
-
-    .stats-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-    }
-
-    .stats-icon {
-        font-size: 2.5rem;
-        margin-right: 1rem;
-        color: #6c1e3d;
-    }
-
-    .stats-card div h5 {
-        margin: 0;
-        font-size: 1.8rem;
-    }
-
-    .stats-card div small {
-        color: #777;
-    }
-
-    @media (max-width: 600px) {
-        .stats-card {
-            flex-direction: column;
-            text-align: center;
-        }
-        .stats-icon {
-            margin: 0 0 0.5rem 0;
-        }
-    }
+}
 </style>
 {% endblock %}
 
@@ -64,21 +78,89 @@
     <h2>📊 Statistiques du système</h2>
 
     <div class="stats-grid">
+        {% comment %} Objets gérés {% endcomment %}
         <div class="stats-card">
             <span class="stats-icon">📦</span>
-            <div>
-                <h5>{{ nb_objets }}</h5>
-                <small>Objets gérés</small>
-            </div>
+            <h5>{{ nb_objets }}</h5>
+            <small>Objets gérés</small>
+            <canvas id="chartObjets"></canvas>
         </div>
 
+        {% comment %} Restitutions {% endcomment %}
         <div class="stats-card">
             <span class="stats-icon">✅</span>
-            <div>
-                <h5>{{ nb_restitutions }}</h5>
-                <small>Restitutions</small>
-            </div>
+            <h5>{{ nb_restitutions }}</h5>
+            <small>Restitutions</small>
+            <canvas id="chartRestitutions"></canvas>
+        </div>
+
+        {% comment %} Citoyens {% endcomment %}
+        <div class="stats-card">
+            <span class="stats-icon">🧍</span>
+            <h5>{{ nb_citoyens }}</h5>
+            <small>Citoyens enregistrés</small>
+            <canvas id="chartCitoyens"></canvas>
+        </div>
+
+        {% comment %} Policiers {% endcomment %}
+        <div class="stats-card">
+            <span class="stats-icon">👮</span>
+            <h5>{{ nb_policiers }}</h5>
+            <small>Policiers actifs</small>
+            <canvas id="chartPoliciers"></canvas>
+        </div>
+
+        {% comment %} Admins actifs {% endcomment %}
+        <div class="stats-card">
+            <span class="stats-icon">🛡️</span>
+            <h5>{{ nb_admins }}</h5>
+            <small>Admins actifs</small>
+            <canvas id="chartAdmins"></canvas>
+        </div>
+
+        {% comment %} Objets déclarés {% endcomment %}
+        <div class="stats-card">
+            <span class="stats-icon">📌</span>
+            <h5>{{ nb_objets_declare }}</h5>
+            <small>Objets déclarés</small>
+            <canvas id="chartObjetsDeclare"></canvas>
         </div>
     </div>
 </div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+function createSparkline(chartId, data, color) {
+    const ctx = document.getElementById(chartId).getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: data.map((_, i) => i + 1),
+            datasets: [{
+                data: data,
+                borderColor: color,
+                backgroundColor: color + '33',
+                tension: 0.3,
+                fill: true,
+                pointRadius: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { x: { display: false }, y: { display: false } }
+        }
+    });
+}
+
+// Données exemple (à remplacer par des données réelles)
+createSparkline('chartObjets', [5, 10, 8, 12, 15, 18, 20], '#6c1e3d');
+createSparkline('chartRestitutions', [2, 5, 4, 7, 6, 8, 10], '#198754');
+createSparkline('chartCitoyens', [1, 3, 5, 7, 8, 10, 12], '#0d6efd');
+createSparkline('chartPoliciers', [1, 2, 2, 3, 4, 5, 6], '#ffc107');
+createSparkline('chartAdmins', [1, 1, 2, 2, 3, 4, 4], '#6f42c1');
+createSparkline('chartObjetsDeclare', [3, 6, 8, 10, 12, 15, 18], '#fd7e14');
+</script>
 {% endblock %}

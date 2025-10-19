@@ -5,70 +5,95 @@
 
 {% block extra_css %}
 <style>
+    /* Titres */
     .page-title {
         font-weight: 700;
         color: #343a40;
+        font-size: 1.4rem;
     }
 
+    /* Table */
     .table thead {
         background-color: #343a40;
         color: white;
     }
+    .table tbody tr:hover {
+        background-color: #f1f3f5;
+    }
 
+    /* Boutons */
+    .btn-blacklist, .btn-unban {
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        border: none;
+        font-weight: 500;
+        transition: 0.2s;
+    }
     .btn-blacklist {
         background-color: #dc3545;
         color: white;
-        border: none;
-        padding: 6px 10px;
-        border-radius: 5px;
-        font-size: 0.9rem;
     }
     .btn-blacklist:hover {
         background-color: #c82333;
     }
-
     .btn-unban {
         background-color: #6c757d;
         color: white;
-        border: none;
-        padding: 6px 10px;
-        border-radius: 5px;
-        font-size: 0.9rem;
     }
     .btn-unban:hover {
         background-color: #5a6268;
     }
 
+    /* Barre de recherche */
     .search-bar {
         display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
         justify-content: space-between;
         align-items: center;
     }
-
     .search-bar input {
-        width: 300px;
-        border-radius: 5px;
+        width: 250px;
+        border-radius: 6px;
         border: 1px solid #ced4da;
-        padding: 5px 10px;
+        padding: 6px 10px;
+    }
+    .search-bar button {
+        height: 36px;
     }
 
+    /* Card */
     .card {
-        border-radius: 10px;
-        box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    /* Badge */
+    .badge {
+        font-size: 0.75rem;
+        padding: 4px 8px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .search-bar input {
+            width: 100%;
+        }
     }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
         <h2 class="page-title">🧍 Gestion des citoyens</h2>
         <a href="{% url 'dashboard_admin' %}" class="btn btn-dark">⬅ Retour Dashboard</a>
     </div>
 
     <div class="card p-3">
         <div class="search-bar mb-3">
-            <form method="get" class="d-flex gap-2">
+            <form method="get" class="d-flex gap-2 flex-wrap">
                 <input type="text" name="q" class="form-control" placeholder="Rechercher un citoyen..." value="{{ request.GET.q }}">
                 <button type="submit" class="btn btn-secondary">🔍 Rechercher</button>
             </form>
@@ -76,7 +101,7 @@
 
         {% if citoyens %}
             <div class="table-responsive">
-                <table class="table table-striped align-middle">
+                <table class="table table-striped align-middle mb-0">
                     <thead>
                         <tr>
                             <th>#</th>

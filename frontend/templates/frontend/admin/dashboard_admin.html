@@ -5,67 +5,106 @@
 
 {% block extra_css %}
 <style>
-    /* Sidebar */
+/* Sidebar */
+.sidebar {
+    background: linear-gradient(180deg, #343a40, #212529);
+    color: #fff;
+    min-height: 100vh;
+    padding: 1.5rem 0.8rem;
+    position: sticky;
+    top: 0;
+    transition: all 0.3s;
+}
+.sidebar h4 {
+    color: #ffc107;
+    text-align: center;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+}
+.sidebar .nav-link {
+    color: #cfd8dc;
+    border-radius: 0.4rem;
+    padding: 0.45rem 0.8rem;
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: all 0.2s ease-in-out;
+}
+.sidebar .nav-link:hover,
+.sidebar .nav-link.active {
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffc107;
+}
+
+/* Contenu principal */
+.main-content {
+    padding: 1.5rem;
+    background: #f8f9fa;
+    min-height: 100vh;
+}
+.welcome-title {
+    color: #343a40;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+    font-size: 1.5rem;
+}
+.stats-card {
+    border-radius: 0.8rem;
+    padding: 1rem;
+    background: #fff;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    transition: transform 0.2s ease-in-out;
+    cursor: pointer;
+}
+.stats-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.12);
+}
+.stats-icon {
+    font-size: 1.8rem;
+    color: #343a40;
+}
+
+/* Notifications */
+.card h5 {
+    margin-bottom: 0.8rem;
+    font-size: 1rem;
+}
+.notifications-card {
+    max-height: 220px;
+    overflow-y: auto;
+    padding: 0.8rem 1rem;
+}
+.list-group-item {
+    border: none;
+    padding: 0.5rem 0.8rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+}
+.list-group-item.new {
+    background: #fff3cd;
+    font-weight: 600;
+}
+.list-group-item small {
+    font-size: 0.7rem;
+    color: #555;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
     .sidebar {
-        background: linear-gradient(180deg, #343a40, #212529); /* ✅ Harmonisé */
-        color: #fff;
-        min-height: 100vh;
-        padding: 2rem 1rem;
-        position: sticky;
-        top: 0;
+        position: relative;
+        min-height: auto;
+        padding: 1rem 0.5rem;
     }
-    .sidebar h4 {
-        color: #ffc107;
-        text-align: center;
-        margin-bottom: 1.5rem;
-    }
-    .sidebar .nav-link {
-        color: #cfd8dc;
-        border-radius: 0.5rem;
-        padding: 0.6rem 1rem;
-        font-weight: 500;
-        transition: all 0.2s ease-in-out;
-    }
-    .sidebar .nav-link:hover,
-    .sidebar .nav-link.active {
-        background: rgba(255, 255, 255, 0.15);
-        color: #ffc107;
-    }
-
-    /* Contenu principal */
     .main-content {
-        padding: 2rem;
-        background: #f8f9fa;
-        min-height: 100vh;
+        padding: 1rem;
     }
-
-    .welcome-title {
-        color: #343a40; /* ✅ Harmonisé */
-        font-weight: 700;
-        margin-bottom: 0.5rem;
-    }
-
-    .stats-card {
-        border-radius: 1rem;
-        padding: 1.5rem;
-        background: #fff;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        transition: transform 0.2s ease-in-out;
-    }
-    .stats-card:hover {
-        transform: translateY(-5px);
-    }
-
-    .stats-icon {
-        font-size: 2rem;
-        margin-right: 1rem;
-        color: #343a40; /* ✅ Harmonisé */
-    }
-
-    .card h5 {
-        color: #343a40; /* ✅ Harmonisé */
-        font-weight: 600;
-    }
+}
 </style>
 {% endblock %}
 
@@ -76,37 +115,32 @@
         <h4>⚙️ Admin</h4>
         <ul class="nav flex-column">
             <li class="nav-item mb-2">
-                <a class="nav-link {% if request.resolver_match.url_name == 'gerer_commissariats' %}active{% endif %}" href="{% url 'gerer_commissariats' %}">🏢 Gérer Commissariats</a>
+                <a class="nav-link {% if request.resolver_match.url_name == 'gerer_commissariats' %}active{% endif %}" href="{% url 'gerer_commissariats' %}">🏢 Commissariats</a>
             </li>
             <li class="nav-item mb-2">
-                <a class="nav-link {% if request.resolver_match.url_name == 'gerer_utilisateurs' %}active{% endif %}" href="{% url 'gerer_utilisateurs' %}">👥 Gérer les Administrateurs</a>
+                <a class="nav-link {% if request.resolver_match.url_name == 'gerer_utilisateurs' %}active{% endif %}" href="{% url 'gerer_utilisateurs' %}">👥Administrateurs</a>
+            </li>
+            <li class="nav-item mb-2">
+                <a class="nav-link {% if request.resolver_match.url_name == 'liste_citoyens' %}active{% endif %}" href="{% url 'liste_citoyens' %}">🧍 Citoyens</a>
+            </li>
+            <li class="nav-item mb-2">
+                <a class="nav-link {% if request.resolver_match.url_name == 'gerer_policiers' %}active{% endif %}" href="{% url 'gerer_policiers' %}">👮 Policiers</a>
             </li>
             <li class="nav-item mb-2">
                 <a class="nav-link {% if request.resolver_match.url_name == 'voir_stats' %}active{% endif %}" href="{% url 'voir_stats' %}">📊 Statistiques</a>
             </li>
-        
-
-            <li class="nav-item mb-2">
-    <a class="nav-link {% if request.resolver_match.url_name == 'liste_citoyens' %}active{% endif %}" 
-       href="{% url 'liste_citoyens' %}">🧍 Citoyens</a>
-</li>
-<li class="nav-item mb-2">
-    <a class="nav-link {% if request.resolver_match.url_name == 'gerer_policiers' %}active{% endif %}" 
-       href="{% url 'gerer_policiers' %}">👮 Gestion des Policiers</a>
-</li>
-
         </ul>
     </div>
 
     <!-- Contenu principal -->
     <div class="col-md-9 col-lg-10 main-content">
         <h2 class="welcome-title">Bienvenue, Administrateur 👋</h2>
-        <p class="text-muted">Gérez les commissariats, utilisateurs et consultez les statistiques.</p>
+        <p class="text-muted mb-3">Gérez les commissariats, utilisateurs et consultez les statistiques.</p>
 
         <!-- Stats -->
-        <div class="row g-3">
-            <div class="col-md-4">
-                <div class="stats-card d-flex align-items-center">
+        <div class="row g-2">
+            <div class="col-md-6 col-lg-4">
+                <div class="stats-card" onclick="location.href='{% url 'gerer_commissariats' %}'">
                     <span class="stats-icon">🏢</span>
                     <div>
                         <h5 class="mb-0">{{ nb_commissariats }}</h5>
@@ -114,8 +148,8 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="stats-card d-flex align-items-center">
+            <div class="col-md-6 col-lg-4">
+                <div class="stats-card" onclick="location.href='{% url 'gerer_utilisateurs' %}'">
                     <span class="stats-icon">👥</span>
                     <div>
                         <h5 class="mb-0">{{ nb_utilisateurs }}</h5>
@@ -123,26 +157,20 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="stats-card d-flex align-items-center">
-                    <span class="stats-icon">📦</span>
-                    <div>
-                        <h5 class="mb-0">{{ nb_objets }}</h5>
-                        <small>Objets gérés</small>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <!-- Notifications -->
-        <div class="card shadow-sm p-3 mt-4">
+        <div class="card shadow-sm mt-3 notifications-card">
             <h5>🔔 Notifications récentes</h5>
             {% if notifications %}
                 <ul class="list-group list-group-flush">
                     {% for notif in notifications %}
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <li class="list-group-item {% if not notif.lu %}new{% endif %}">
                             {{ notif.message }}
-                            <small class="text-muted">{{ notif.date|date:"d/m/Y H:i" }}</small>
+                            <small>{{ notif.date|date:"d/m/Y H:i" }}</small>
+                            {% if not notif.lu %}
+                                <span class="badge bg-warning text-dark ms-1">NOUVEAU</span>
+                            {% endif %}
                         </li>
                     {% endfor %}
                 </ul>
