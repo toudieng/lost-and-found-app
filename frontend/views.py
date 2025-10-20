@@ -60,15 +60,46 @@ def admin_required(view_func):
 # =============================
 #       PAGES PUBLIQUES
 # =============================
+
+
+
+
 def home(request):
-    slides = [
-        {'url': 'frontend/images/head1.jpg', 'titre': 'Bienvenue', 'description': 'Découvrez les objets perdus'},
-        {'url': 'frontend/images/head2.jpg', 'titre': '', 'description': ''},
-        {'url': 'frontend/images/head3.jpg', 'titre': '', 'description': ''},
-        {'url': 'frontend/images/head4.jpg', 'titre': '', 'description': ''},
-        {'url': 'frontend/images/head5.jpg', 'titre': '', 'description': ''},
+    # 🔹 Objets perdus récents
+    objets_perdus = Objet.objects.filter(etat=EtatObjet.PERDU).order_by('-id')[:6]
+
+    # 🔹 Objets trouvés récents
+    objets_trouves = Objet.objects.filter(etat=EtatObjet.TROUVE).order_by('-id')[:6]
+
+    # 🔸 Construction des slides dynamiques avec type d'état
+    slides_perdus = [
+        {
+            'url': obj.image.url if obj.image else '/static/frontend/images/default.jpg',
+            'titre': obj.nom,
+            'description': (obj.description[:120] + "...") if obj.description else "",
+            'etat': obj.get_etat_display(),  # affiche "Perdu"
+            'etat_type': 'perdu'
+        }
+        for obj in objets_perdus
     ]
-    return render(request, "frontend/home.html", {'slides': slides})
+
+    slides_trouves = [
+        {
+            'url': obj.image.url if obj.image else '/static/frontend/images/default.jpg',
+            'titre': obj.nom,
+            'description': (obj.description[:120] + "...") if obj.description else "",
+            'etat': obj.get_etat_display(),  # affiche "Trouvé"
+            'etat_type': 'trouve'
+        }
+        for obj in objets_trouves
+    ]
+
+    # 🔹 Fusionner les deux listes pour un seul carrousel
+    all_slides = slides_perdus + slides_trouves
+
+    return render(request, "frontend/home.html", {
+        'all_slides': all_slides
+    })
 
 
 def contact(request):
@@ -879,20 +910,21 @@ def reclamer_objet(request, restitution_id):
 #       Gestion déclarations (citoyen)
 # =============================
 @login_required
+
 def modifier_declaration(request, declaration_id):
-    """Modifier une déclaration (uniquement par son citoyen)."""
+    """Modifier une déclaration par le citoyen."""
     declaration = get_object_or_404(Declaration, id=declaration_id, citoyen=request.user)
 
     if request.method == 'POST':
         form = DeclarationForm(request.POST, request.FILES, instance=declaration)
         if form.is_valid():
-            form.save(commit=True, citoyen=request.user)
+            form.save(commit=True)  # Django remplacera automatiquement l'image si uploadée
             messages.success(request, "✅ Objet mis à jour avec succès.")
-            return redirect('objets_perdus')
+            return redirect('objets_perdus')  # ou la page souhaitée
         else:
             messages.error(request, "⚠️ Erreur : vérifiez les informations saisies.")
     else:
-        form = DeclarationForm(instance=declaration, initial={'nom_objet': declaration.objet.nom})
+        form = DeclarationForm(instance=declaration)
 
     return render(request, "frontend/citoyen/modifier_declaration.html", {"form": form})
 

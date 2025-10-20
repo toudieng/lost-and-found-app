@@ -3,6 +3,7 @@ from backend.users.models import Commissariat
 from .models import Declaration, Objet, EtatObjet
 
 
+
 class DeclarationForm(forms.ModelForm):
     nom_objet = forms.CharField(
         max_length=100,
@@ -33,23 +34,27 @@ class DeclarationForm(forms.ModelForm):
         model = Declaration
         fields = ['nom_objet', 'lieu', 'etat', 'description', 'image']
         widgets = {
-            'lieu': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Lieu où l’objet a été perdu ou trouvé'
-            }),
+            'lieu': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Lieu où l’objet a été perdu ou trouvé'}),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # Vérifie que l'instance a un objet valide avant d'accéder à ses attributs
+        # Pré-remplir les champs texte et radio depuis l'objet lié
         if getattr(self.instance, 'objet', None):
             objet = self.instance.objet
             self.fields['nom_objet'].initial = objet.nom or ''
             self.fields['etat'].initial = objet.etat or ''
             self.fields['description'].initial = objet.description or ''
-            if objet.image:
-                self.fields['image'].initial = objet.image
+            # ⚠️ Ne pas mettre initial pour l'image !
+
+    def save(self, citoyen=None, commit=True):
+        declaration = super().save(commit=False)
+        if citoyen:
+            declaration.citoyen = citoyen
+        if commit:
+            declaration.save()
+        return declaration
 
 
 class RestitutionForm(forms.Form):
