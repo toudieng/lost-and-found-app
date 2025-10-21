@@ -8,50 +8,23 @@
 
 <style>
 /* =========================
-   Typographie et structure
-========================= */
-body {
-    font-family: 'Nunito', sans-serif;
-}
-
-h1, h2, h3, h4 {
-    font-weight: 700;
-}
-
-/* =========================
-   Hero Intro
-========================= */
-.hero-intro {
-    padding: 80px 0;
-    background: linear-gradient(135deg, #6c1e3d, #343a40);
-    color: #fff;
-    text-align: center;
-}
-.hero-intro h1 {
-    font-size: clamp(2rem, 5vw, 3rem);
-    margin-bottom: 1rem;
-}
-.hero-intro p {
-    font-size: clamp(1rem, 2.5vw, 1.25rem);
-}
-
-/* =========================
-   Hero Actions
+   Boutons hero-actions
 ========================= */
 .hero-actions .btn-action {
     position: relative;
     display: inline-block;
     padding: 1rem 2.5rem;
-    font-size: clamp(1rem, 2vw, 1.4rem);
+    font-size: 1.3rem;
     font-weight: 700;
     border-radius: 0.7rem;
     margin: 0.8rem;
     color: #fff;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.4);
     text-decoration: none;
     overflow: hidden;
     cursor: pointer;
-    transition: all 0.3s ease;
-    text-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+    transition: all 0.35s ease;
+    letter-spacing: 0.5px;
 }
 
 .btn-action-lost {
@@ -63,91 +36,23 @@ h1, h2, h3, h4 {
 }
 
 .btn-action:hover {
-    transform: scale(1.08);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.45);
-    filter: brightness(1.12);
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
 }
+
+.btn-action::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -75%;
+    width: 50%; height: 100%;
+    background: linear-gradient(120deg, rgba(255,255,255,0.3), rgba(255,255,255,0.05), rgba(255,255,255,0.3));
+    transform: skewX(-25deg);
+    transition: left 0.5s ease;
+}
+.btn-action:hover::before { left: 125%; }
 
 /* =========================
-   Carousels
-========================= */
-.carousel-inner img {
-    object-fit: cover;
-    object-position: center;
-    width: 100%;
-    height: 200px;
-    border-radius: 0.5rem;
-    filter: brightness(1.15) contrast(1.1);
-    transition: transform 0.3s ease, filter 0.3s ease;
-}
-
-/* Responsive heights */
-@media (min-width: 768px) { .carousel-inner img { height: 300px; } }
-@media (min-width: 1200px) { .carousel-inner img { height: 400px; } }
-
-/* Effet hover */
-.carousel-inner img:hover {
-    transform: scale(1.03);
-    filter: brightness(1.25) contrast(1.15);
-}
-
-/* Caption semi-transparente */
-.carousel-caption {
-    background-color: rgba(0, 0, 0, 0.55);
-    padding: 0.5rem 1rem;
-    border-radius: 0.5rem;
-    max-width: 80%;
-    left: 50%;
-    transform: translateX(-50%);
-}
-
-/* Responsive padding */
-@media (min-width: 768px) { .carousel-caption { padding: 0.7rem 1.2rem; } }
-
-/* Texte caption */
-.carousel-caption h5, 
-.carousel-caption p {
-    color: #fff;
-    text-shadow: 1px 1px 4px rgba(0,0,0,0.7);
-    font-size: 0.85rem;
-    margin: 0.2rem 0;
-}
-
-/* Responsive font */
-@media (min-width: 768px) { 
-    .carousel-caption h5, 
-    .carousel-caption p { font-size: 0.95rem; } 
-}
-
-/* Badges pour “Perdu” / “Trouvé” */
-.carousel-caption .badge {
-    font-size: 0.75rem;
-    padding: 0.3rem 0.5rem;
-}
-
-/* =========================
-   Features / Avantages
-========================= */
-.features-section .card {
-    border: none;
-    border-radius: 1rem;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-.features-section .card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-}
-
-/* =========================
-   Partenaires
-========================= */
-.partners img {
-    transition: transform 0.3s ease;
-}
-.partners img:hover { transform: scale(1.1); }
-
-/* =========================
-   CTA
+   CTA finale
 ========================= */
 .cta {
     padding: 80px 0;
@@ -155,12 +60,24 @@ h1, h2, h3, h4 {
     background-color: #495057;
     color: #fff;
     border-radius: 1rem;
-    transition: transform 0.3s ease;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
 }
+
+.cta h2 {
+    font-size: 2.4rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.cta p {
+    font-size: 1.25rem;
+    margin-bottom: 2rem;
+}
+
 .cta .btn-cta {
     font-weight: 700;
     font-size: 1.1rem;
-    padding: 0.9rem 2rem;
+    padding: 0.9rem 2.2rem;
     border-radius: 0.6rem;
     background: #ffc107;
     color: #343a40;
@@ -168,39 +85,115 @@ h1, h2, h3, h4 {
 }
 .cta .btn-cta:hover {
     background: #ffca28;
-    transform: scale(1.05);
+    transform: scale(1.07);
     box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+}
+
+/* =========================
+   Carousels
+========================= */
+
+.carousel-inner img {
+    object-fit: cover;
+    object-position: center;
+    width: 100%;
+    height: 230px;
+    transition: transform 0.5s ease, filter 0.4s ease;
+    filter: brightness(1.3) contrast(1.15) saturate(1.2);
+}
+@media (min-width: 768px) { .carousel-inner img { height: 340px; } }
+@media (min-width: 1200px) { .carousel-inner img { height: 450px; } }
+
+.carousel-inner img:hover {
+    transform: scale(1.05);
+    filter: brightness(1.4) contrast(1.2) saturate(1.25);
+}
+
+.carousel-caption {
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 0.8rem 1.3rem;
+    border-radius: 0.5rem;
+    backdrop-filter: blur(4px);
+    max-width: 85%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.carousel-caption h5,
+.carousel-caption p {
+    color: #fff;
+    text-shadow: 1px 1px 5px rgba(0,0,0,0.75);
+}
+
+/* =========================
+   Autres sections
+========================= */
+.hero-intro {
+    background: #f8f9fa;
+    border-radius: 1rem;
+    box-shadow: inset 0 -1px 6px rgba(0,0,0,0.1);
+}
+
+.features-section .card {
+    border: none;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.features-section .card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+.partners img {
+    transition: transform 0.4s ease, opacity 0.3s ease;
+    opacity: 0.85;
+}
+.partners img:hover {
+    transform: scale(1.1);
+    opacity: 1;
 }
 </style>
 {% endblock %}
 
 {% block content %}
+<!-- INTRO -->
+<section class="hero-intro py-5 text-center" style="
+  background: radial-gradient(circle at top left, #6c1e3d, #a83279 60%, #5b1b3a 100%);
+  color: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+  position: relative;
+  overflow: hidden;
+">
+  <!-- léger effet de brillance -->
+  <div style="
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    transform: rotate(25deg);
+  "></div>
 
-<!-- Hero Intro -->
-<section class="hero-intro">
-  <div class="container">
-    <h1>📦 Bienvenue sur la plateforme des Objets Perdus</h1>
-    <p>Déclarez un objet perdu, consultez les objets retrouvés et suivez vos démarches en toute sécurité.</p>
+  <div class="container position-relative">
+    <h1 class="display-4 fw-bold mb-4">📦 Bienvenue sur la plateforme Lost & Found</h1>
+    <p class="lead mb-4 fs-5">Déclarez un objet perdu, consultez les objets retrouvés et suivez vos démarches en toute sécurité.</p>
+    <a href='{% url "declarer_objet" %}' class="btn btn-warning btn-lg fw-bold shadow mt-3">
+      🚀 Vous pouvez faire une declaration 
+    </a>
   </div>
 </section>
 
-<!-- Hero Actions -->
-<section class="hero-actions py-5 text-center">
-  <div class="container">
-    <a href="{% url 'objets_perdus' %}" class="btn-action btn-action-lost">❌ Voir les objets perdus</a>
-    <a href="{% url 'objets_trouves' %}" class="btn-action btn-action-found">✅ Voir les objets trouvés</a>
-    {% if user.is_authenticated and user.role == 'citoyen' %}
-    <a href="{% url 'dashboard_citoyen' %}" class="btn-action btn-action-dashboard mt-3" style="background:#343a40;">🏠 Mon Dashboard</a>
-    {% endif %}
-  </div>
-</section>
-
+<!-- SECTION : CAROUSEL -->
 <section class="py-5">
   <div class="container">
-    <h2 class="text-center fw-bold mb-4">📦 Objets Récents</h2>
+    <h2 id="about1" class="text-center fw-bold mb-4">📦 Objets Récents</h2>
 
     {% if all_slides %}
     <div id="carouselAll" class="carousel slide carousel-fade" data-bs-ride="carousel">
+      
+      <!-- Indicators -->
       <div class="carousel-indicators">
         {% for slide in all_slides %}
         <button type="button" data-bs-target="#carouselAll" data-bs-slide-to="{{ forloop.counter0 }}"
@@ -210,10 +203,11 @@ h1, h2, h3, h4 {
         {% endfor %}
       </div>
 
-      <div class="carousel-inner">
+      <!-- Slides -->
+      <div class="carousel-inner rounded-4 shadow-lg overflow-hidden">
         {% for slide in all_slides %}
         <div class="carousel-item {% if forloop.first %}active{% endif %}">
-          <img src="{{ slide.url }}" class="d-block w-100 rounded shadow" alt="{{ slide.titre }}">
+          <img src="{{ slide.url }}" class="d-block w-100" alt="{{ slide.titre }}">
           <div class="carousel-caption d-none d-md-block">
             <h5>
               {{ slide.titre }}
@@ -231,6 +225,7 @@ h1, h2, h3, h4 {
         {% endfor %}
       </div>
 
+      <!-- Controls -->
       <button class="carousel-control-prev" type="button" data-bs-target="#carouselAll" data-bs-slide="prev">
         <span class="carousel-control-prev-icon"></span>
         <span class="visually-hidden">Précédent</span>
@@ -240,15 +235,27 @@ h1, h2, h3, h4 {
         <span class="visually-hidden">Suivant</span>
       </button>
     </div>
-
     {% else %}
     <p class="text-center text-muted">Aucun objet à afficher pour le moment.</p>
     {% endif %}
   </div>
 </section>
 
-<!-- Avantages -->
-<section class="features-section py-5">
+
+
+<!-- BOUTONS ACTION -->
+<section class="hero-actions py-5 text-center">
+  <div class="container">
+    <a href="{% url 'objets_perdus' %}" class="btn-action btn-action-lost">❌ Voir les objets perdus</a>
+    <a href="{% url 'objets_trouves' %}" class="btn-action btn-action-found">✅ Voir les objets trouvés</a>
+    {% if user.is_authenticated and user.role == 'citoyen' %}
+    <a href="{% url 'dashboard_citoyen' %}" class="btn-action mt-3" style="background:#343a40;">🏠 Mon Dashboard</a>
+    {% endif %}
+  </div>
+</section>
+
+<!-- AVANTAGES -->
+<section id="about" class="features-section py-5">
   <div class="container">
     <h2 class="text-center fw-bold mb-5">✨ Les avantages de notre plateforme</h2>
     <div class="row text-center g-4">
@@ -277,8 +284,8 @@ h1, h2, h3, h4 {
   </div>
 </section>
 
-<!-- Partenaires -->
-<section class="partners py-6 text-center bg-light">
+<!-- PARTENAIRES -->
+<section class="partners py-6 bg-light text-center">
   <div class="container">
     <h2 class="display-6 fw-bold mb-4">🤝 Nos Partenaires</h2>
     <p class="text-muted mb-5">Nous collaborons avec des organismes et entreprises de confiance pour faciliter la restitution.</p>
@@ -292,7 +299,7 @@ h1, h2, h3, h4 {
 </section>
 
 <!-- CTA -->
-<section class="cta py-5 text-center">
+<section class="cta text-center py-5">
   <div class="container">
     <h2 class="display-5 mb-3">Vous avez perdu un objet ?</h2>
     <p class="mb-4 fs-5">Déclarez-le dès maintenant et augmentez vos chances de le retrouver rapidement.</p>
