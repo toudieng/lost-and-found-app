@@ -149,46 +149,28 @@ def supprimer_objet(request, objet_id):
 # =============================
 #       DASHBOARD POLICIER
 # =============================
+
 @policier_required
+
+
+
 def dashboard_policier(request):
-    """Statistiques et notifications pour policier."""
-    nb_objets_trouves = Declaration.objects.filter(objet__etat=EtatObjet.EN_ATTENTE).count()
-    nb_objets_a_restituer = Declaration.objects.filter(objet__etat=EtatObjet.RECLAME).count()
-    nb_restitutions = Restitution.objects.filter(objet__etat=EtatObjet.RESTITUE).count()
+    # Statistiques
+    nb_objets_trouves = Declaration.objects.filter(etat_initial=EtatObjet.TROUVE).count()
+    nb_objets_a_restituer = Declaration.objects.filter(etat_initial=EtatObjet.RECLAME).count()
+    nb_restitutions = Restitution.objects.filter(statut=StatutRestitution.EFFECTUEE).count()
 
-    today = timezone.now().date()
-    labels, data_trouves, data_restitues = [], [], []
-    for i in range(5, -1, -1):
-        date_ref = today - relativedelta(months=i)
-        month, year = date_ref.month, date_ref.year
-        month_name = calendar.month_name[month]
-        nb_trouves = Declaration.objects.filter(
-            date_declaration__year=year,
-            date_declaration__month=month,
-            objet__etat=EtatObjet.EN_ATTENTE
-        ).count()
-        nb_restitues = Restitution.objects.filter(
-            date_restitution__year=year,
-            date_restitution__month=month,
-            objet__etat=EtatObjet.RESTITUE
-        ).count()
-        labels.append(month_name)
-        data_trouves.append(nb_trouves)
-        data_restitues.append(nb_restitues)
-
-    notifications = Notification.objects.filter(user=request.user).order_by('-date')[:5]
+    # Notifications récentes (exemple : 5 dernières déclarations non traitées)
+    notifications = Declaration.objects.filter(etat_initial__in=[EtatObjet.TROUVE, EtatObjet.RECLAME]).order_by('-date_declaration')[:5]
 
     context = {
         'nb_objets_trouves': nb_objets_trouves,
         'nb_objets_a_restituer': nb_objets_a_restituer,
         'nb_restitutions': nb_restitutions,
-        'labels': labels,
-        'data_trouves': data_trouves,
-        'data_restitues': data_restitues,
         'notifications': notifications,
+        'current_year': timezone.now().year,
     }
     return render(request, 'frontend/policier/dashboard_policier.html', context)
-
 
 @policier_required
 def liste_objets_declares(request):
@@ -493,22 +475,49 @@ def preuve_restitution_pdf(request, pk):
 #       DASHBOARD ADMIN
 # =============================
 
-@login_required
+
+
+@login_required(login_url='login')
 def dashboard_admin(request):
-    # Statistiques
+    """
+    Tableau de bord Administrateur :
+    Affiche les statistiques globales du système.
+    """
+
+    # Statistiques des utilisateurs
     nb_commissariats = Commissariat.objects.count()
-    nb_utilisateurs = Utilisateur.objects.count()
-    nb_objets = Objet.objects.count()
+    nb_utilisateurs = Utilisateur.objects.filter(role='admin').count()
+    nb_policiers = Utilisateur.objects.filter(role='policier').count()
+    nb_citoyens = Utilisateur.objects.filter(role='citoyen').count()
+
+    # Statistiques sur les objets
+    nb_objets_perdus = Objet.objects.filter(etat=EtatObjet.PERDU).count()
+    nb_objets_trouves = Objet.objects.filter(etat=EtatObjet.TROUVE).count()
+    nb_objets_reclames = Objet.objects.filter(etat=EtatObjet.RECLAME).count()
+    nb_objets_en_attente = Objet.objects.filter(etat=EtatObjet.EN_ATTENTE).count()
+    nb_objets_restitues = Objet.objects.filter(etat=EtatObjet.RESTITUE).count()
+
+    # Restitutions
+    nb_restitutions = Restitution.objects.count()
 
     # Notifications récentes (5 dernières)
     notifications = Notification.objects.order_by('-date')[:5]
 
+    # Contexte pour le template
     context = {
         'nb_commissariats': nb_commissariats,
         'nb_utilisateurs': nb_utilisateurs,
-        'nb_objets': nb_objets,
+        'nb_policiers': nb_policiers,
+        'nb_citoyens': nb_citoyens,
+        'nb_objets_perdus': nb_objets_perdus,
+        'nb_objets_trouves': nb_objets_trouves,
+        'nb_objets_reclames': nb_objets_reclames,
+        'nb_objets_en_attente': nb_objets_en_attente,
+        'nb_objets_restitues': nb_objets_restitues,
+        'nb_restitutions': nb_restitutions,
         'notifications': notifications,
     }
+
     return render(request, "frontend/admin/dashboard_admin.html", context)
 
 

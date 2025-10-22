@@ -5,7 +5,9 @@
 
 {% block extra_css %}
 <style>
-/* Sidebar */
+/* ========================
+   SIDEBAR
+======================== */
 .sidebar {
     background: linear-gradient(180deg, #343a40, #212529);
     color: #fff;
@@ -35,7 +37,9 @@
     color: #ffc107;
 }
 
-/* Contenu principal */
+/* ========================
+   CONTENU PRINCIPAL
+======================== */
 .main-content {
     padding: 1.5rem;
     background: #f8f9fa;
@@ -45,16 +49,36 @@
     color: #343a40;
     font-weight: 700;
     margin-bottom: 0.3rem;
-    font-size: 1.5rem;
+    font-size: 1.6rem;
+}
+.section-title {
+    font-weight: 700;
+    font-size: 1.2rem;
+    margin-top: 1.8rem;
+    color: #212529;
+    border-left: 4px solid #ffc107;
+    padding-left: 0.6rem;
+}
+
+/* ========================
+   CARTES STATISTIQUES
+======================== */
+.stats-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem;
 }
 .stats-card {
     border-radius: 0.8rem;
-    padding: 1rem;
+    padding: 1rem 1.2rem;
     background: #fff;
     box-shadow: 0 3px 8px rgba(0,0,0,0.08);
     display: flex;
     align-items: center;
     gap: 0.8rem;
+    width: 260px;
     transition: transform 0.2s ease-in-out;
     cursor: pointer;
 }
@@ -67,7 +91,9 @@
     color: #343a40;
 }
 
-/* Notifications */
+/* ========================
+   NOTIFICATIONS
+======================== */
 .card h5 {
     margin-bottom: 0.8rem;
     font-size: 1rem;
@@ -94,7 +120,9 @@
     color: #555;
 }
 
-/* Responsive */
+/* ========================
+   RESPONSIVE
+======================== */
 @media (max-width: 768px) {
     .sidebar {
         position: relative;
@@ -118,7 +146,7 @@
                 <a class="nav-link {% if request.resolver_match.url_name == 'gerer_commissariats' %}active{% endif %}" href="{% url 'gerer_commissariats' %}">🏢 Commissariats</a>
             </li>
             <li class="nav-item mb-2">
-                <a class="nav-link {% if request.resolver_match.url_name == 'gerer_utilisateurs' %}active{% endif %}" href="{% url 'gerer_utilisateurs' %}">👥Administrateurs</a>
+                <a class="nav-link {% if request.resolver_match.url_name == 'gerer_utilisateurs' %}active{% endif %}" href="{% url 'gerer_utilisateurs' %}">👥 Administrateurs</a>
             </li>
             <li class="nav-item mb-2">
                 <a class="nav-link {% if request.resolver_match.url_name == 'liste_citoyens' %}active{% endif %}" href="{% url 'liste_citoyens' %}">🧍 Citoyens</a>
@@ -135,33 +163,84 @@
     <!-- Contenu principal -->
     <div class="col-md-9 col-lg-10 main-content">
         <h2 class="welcome-title">Bienvenue, Administrateur 👋</h2>
-        <p class="text-muted mb-3">Gérez les commissariats, utilisateurs et consultez les statistiques.</p>
+        <p class="text-muted mb-4">Surveillez les activités, gérez les utilisateurs et consultez les indicateurs clés.</p>
 
-        <!-- Stats -->
-        <div class="row g-2">
-            <div class="col-md-6 col-lg-4">
-                <div class="stats-card" onclick="location.href='{% url 'gerer_commissariats' %}'">
-                    <span class="stats-icon">🏢</span>
-                    <div>
-                        <h5 class="mb-0">{{ nb_commissariats }}</h5>
-                        <small>Commissariats</small>
-                    </div>
+        <!-- Section : Description -->
+        <div class="section-description">
+            <h4 class="section-title">À propos de l’application</h4>
+            <p>
+                Cette plateforme facilite la gestion des <strong>objets perdus et retrouvés</strong>.
+                Les citoyens peuvent signaler la perte ou la découverte d’un objet, tandis que la police vérifie et gère les correspondances.
+            </p>
+            <p>
+                Le <strong>policier</strong> est responsable de la <strong>restitution</strong> :
+                il réceptionne les objets trouvés, confirme l’identité du propriétaire et valide la remise via la plateforme.
+                Chaque étape est enregistrée pour assurer traçabilité et transparence.
+            </p>
+            <ul>
+                <li>📍 Suivi des objets en temps réel</li>
+                <li>👮 Gestion complète par les services de police</li>
+                <li>🧾 Génération automatique de preuves PDF</li>
+                <li>💬 Notifications instantanées aux citoyens</li>
+                <li>📊 Statistiques dynamiques et rapports</li>
+            </ul>
+        </div>
+
+        <!-- Section : Statistiques -->
+        <h4 class="section-title mt-4">Statistiques principales</h4>
+        <div class="stats-container">
+            <div class="stats-card" onclick="location.href='{% url 'gerer_commissariats' %}'">
+                <span class="stats-icon">🏢</span>
+                <div>
+                    <h5 class="mb-0">{{ nb_commissariats }}</h5>
+                    <small>Commissariats</small>
                 </div>
             </div>
-            <div class="col-md-6 col-lg-4">
-                <div class="stats-card" onclick="location.href='{% url 'gerer_utilisateurs' %}'">
-                    <span class="stats-icon">👥</span>
-                    <div>
-                        <h5 class="mb-0">{{ nb_utilisateurs }}</h5>
-                        <small>Utilisateurs</small>
-                    </div>
+
+            <div class="stats-card" onclick="location.href='{% url 'gerer_policiers' %}'">
+                <span class="stats-icon">👮</span>
+                <div>
+                    <h5 class="mb-0">{{ nb_policiers }}</h5>
+                    <small>Policiers actifs</small>
+                </div>
+            </div>
+
+            <div class="stats-card" onclick="location.href='{% url 'liste_citoyens' %}'">
+                <span class="stats-icon">🧍</span>
+                <div>
+                    <h5 class="mb-0">{{ nb_citoyens }}</h5>
+                    <small>Citoyens enregistrés</small>
+                </div>
+            </div>
+
+            <div class="stats-card">
+                <span class="stats-icon">🎒</span>
+                <div>
+                    <h5 class="mb-0">{{ nb_objets_perdus }}</h5>
+                    <small>Objets perdus</small>
+                </div>
+            </div>
+
+            <div class="stats-card">
+                <span class="stats-icon">📦</span>
+                <div>
+                    <h5 class="mb-0">{{ nb_objets_trouves }}</h5>
+                    <small>Objets trouvés</small>
+                </div>
+            </div>
+
+            <div class="stats-card">
+                <span class="stats-icon">✅</span>
+                <div>
+                    <h5 class="mb-0">{{ nb_restitutions }}</h5>
+                    <small>Restitutions effectuées</small>
                 </div>
             </div>
         </div>
 
-        <!-- Notifications -->
-        <div class="card shadow-sm mt-3 notifications-card">
-            <h5>🔔 Notifications récentes</h5>
+        <!-- Section : Notifications -->
+        <h4 class="section-title">Notifications récentes</h4>
+        <div class="card shadow-sm mt-2 notifications-card">
             {% if notifications %}
                 <ul class="list-group list-group-flush">
                     {% for notif in notifications %}
@@ -175,7 +254,7 @@
                     {% endfor %}
                 </ul>
             {% else %}
-                <p class="text-muted">Aucune notification pour le moment.</p>
+                <p class="text-muted mb-0">Aucune notification pour le moment.</p>
             {% endif %}
         </div>
     </div>

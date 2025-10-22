@@ -2,19 +2,49 @@
 
 {% block title %}Objets Retrouvés en Attente{% endblock %}
 
+{% block extra_css %}
+<style>
+/* Highlight des nouvelles restitutions */
+.card.new-restitution {
+    animation: highlight 2s ease-in-out 1;
+    border: 2px solid #ffc107;
+}
+
+@keyframes highlight {
+    0% { background-color: #fffbe6; }
+    50% { background-color: #fff3cd; }
+    100% { background-color: #fffbe6; }
+}
+
+.badge-new {
+    background-color: #ffc107;
+    color: #343a40;
+    font-weight: 600;
+}
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container mt-4">
     <h2 class="fw-bold mb-4 text-primary">📦 Objets retrouvés (en attente)</h2>
 
-    <div class="row">
+    <div class="row g-3">
         {% for restitution in restitutions %}
-            <div class="col-md-6 mb-3">
-                <div class="card shadow-sm border-0 h-100">
+            <div class="col-md-6 col-lg-4">
+                <div class="card shadow-sm border-0 h-100 {% if not restitution.statut == 'effectuee' %}new-restitution{% endif %}">
+                    <!-- Image de l'objet -->
+                    {% if restitution.objet.image %}
+                        <img src="{{ restitution.objet.image.url }}" class="card-img-top" alt="{{ restitution.objet.nom }}" style="height:200px; object-fit:cover; border-radius:0.5rem 0.5rem 0 0;">
+                    {% endif %}
+
                     <div class="card-body">
                         <!-- Nom de l'objet -->
                         <h5 class="card-title fw-bold text-dark">
                             {{ restitution.objet.nom }}
-                            <span class="badge bg-warning text-dark">En attente</span>
+                            <span class="badge bg-warning text-dark ms-1">En attente</span>
+                            {% if not restitution.statut == 'effectuee' %}
+                                <span class="badge badge-new ms-1">Nouveau</span>
+                            {% endif %}
                         </h5>
 
                         <!-- Déclaré par -->
@@ -39,9 +69,9 @@
                         </p>
 
                         <!-- Utilisateurs qui ont trouvé -->
-                        {% for declaration in restitution.objet.declarations_trouvees %}
+                        {% for declaration in restitution.objet.declarations_trouvees.all %}
                             {% if declaration.trouve_par.exists %}
-                                <span class="badge bg-info mb-1 d-block">
+                                <span class="badge bg-info text-dark mb-1 d-block">
                                     📌 Trouvé par: 
                                     {% for user in declaration.trouve_par.all %}
                                         {{ user.username }}
@@ -53,30 +83,28 @@
                         {% endfor %}
                     </div>
 
-                 <!-- Boutons action -->
-<div class="card-footer bg-light text-end">
-    <!-- Marquer restitué -->
-    <form method="POST" action="{% url 'marquer_restitue' restitution.id %}" class="d-inline">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-sm btn-success">
-            ✅ Marquer restitué
-        </button>
-    </form>
+                    <!-- Boutons action -->
+                    <div class="card-footer bg-light text-end">
+                        <form method="POST" action="{% url 'marquer_restitue' restitution.id %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-success">
+                                ✅ Marquer restitué
+                            </button>
+                        </form>
 
-    <!-- Annuler restitution -->
-    <form method="POST" action="{% url 'annuler_restitution' restitution.id %}" class="d-inline ms-2">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-sm btn-danger">
-            ❌ Annuler restitution
-        </button>
-    </form>
+                        <form method="POST" action="{% url 'annuler_restitution' restitution.id %}" class="d-inline ms-2">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-danger">
+                                ❌ Annuler restitution
+                            </button>
+                        </form>
 
-    <!-- Générer preuve PDF -->
-    <a href="{% url 'preuve_restitution_pdf' restitution.id %}" target="_blank" class="btn btn-sm btn-primary ms-2">
-        📄 Preuve PDF
-    </a>
-</div>
-
+                        <a href="{% url 'preuve_restitution_pdf' restitution.id %}" target="_blank" class="btn btn-sm btn-primary ms-2">
+                            📄 Preuve PDF
+                        </a>
+                    </div>
+                </div>
+            </div>
         {% empty %}
             <div class="col-12">
                 <div class="alert alert-info text-center">

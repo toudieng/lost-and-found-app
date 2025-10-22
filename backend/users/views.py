@@ -25,7 +25,7 @@ def login_view(request):
                 elif user.role == "policier":
                     return redirect("dashboard_policier")
                 else:  # citoyen
-                    return redirect("dashboard_citoyen")
+                    return redirect("home")
             else:
                 return redirect("home")
         else:

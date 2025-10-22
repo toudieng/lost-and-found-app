@@ -3,47 +3,64 @@
 
 {% block title %}Objets Restitués{% endblock %}
 
-{% block content %}
+{% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/objets.css' %}">
 
+<style>
+.card-restitué {
+    border-radius: 1rem;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.card-restitué:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.15);
+}
+.card-restitué img {
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
+}
+.card-title .badge {
+    font-size: 0.8rem;
+    vertical-align: middle;
+}
+.list-info li {
+    margin-bottom: 0.5rem;
+}
+</style>
+{% endblock %}
+
+{% block content %}
 <div class="container mt-5">
-    <h2 class="mb-4 text-center fw-bold text-success">✅ Objets a Restitués</h2>
-    <div class="row">
+    <h2 class="mb-5 text-center fw-bold text-success">✅ Objets Restitués</h2>
+    <div class="row g-4">
         {% for restitution in restitutions %}
-            <div class="col-md-6 mb-4">
-                <div class="card shadow-sm h-100 border-0">
+            <div class="col-md-6 col-lg-4">
+                <div class="card card-restitué h-100 border-0">
                     {% if restitution.objet.image %}
-                        <img src="{{ restitution.objet.image.url }}" class="card-img-top rounded-top"
-                             style="height:200px; object-fit:cover;" alt="Image de {{ restitution.objet.nom }}">
+                        <img src="{{ restitution.objet.image.url }}" class="card-img-top" style="height:200px; object-fit:cover;" alt="Image de {{ restitution.objet.nom }}">
                     {% else %}
-                        <img src="{% static 'img/default_objet.png' %}" class="card-img-top rounded-top"
-                             style="height:200px; object-fit:cover;" alt="Image par défaut">
+                        <img src="{% static 'img/default_objet.png' %}" class="card-img-top" style="height:200px; object-fit:cover;" alt="Image par défaut">
                     {% endif %}
 
                     <div class="card-body">
                         <h5 class="card-title fw-bold text-success">
                             {{ restitution.objet.nom }}
-                            <span class="badge bg-success">Restitué</span>
+                            <span class="badge bg-success ms-2">Restitué</span>
                         </h5>
-                        <ul class="list-unstyled small text-muted">
+                        <ul class="list-unstyled small text-muted list-info">
                             {% if restitution.commissariat %}
                                 <li>📍 <strong>Commissariat :</strong> {{ restitution.commissariat.nom }}</li>
                             {% endif %}
-
                             {% if restitution.date_restitution %}
                                 <li>🕒 <strong>Date :</strong> {{ restitution.date_restitution|date:"d/m/Y" }}</li>
                             {% endif %}
-
                             {% if restitution.heure_restitution %}
                                 <li>⏰ <strong>Heure :</strong> {{ restitution.heure_restitution|time:"H:i" }}</li>
                             {% endif %}
-
                             {% if restitution.citoyen %}
-                                <li>🙋 <strong>Réclamé par :</strong> {{ restitution.citoyen.username }} 
-                                    {% if restitution.citoyen.email %}({{ restitution.citoyen.email }}){% endif %}
-                                </li>
+                                <li>🙋 <strong>Réclamé par :</strong> {{ restitution.citoyen.username }} {% if restitution.citoyen.email %}({{ restitution.citoyen.email }}){% endif %}</li>
                             {% endif %}
-
                             {% if restitution.restitue_par %}
                                 <li>👮 <strong>Restitué par :</strong> {{ restitution.restitue_par.username }}</li>
                             {% elif restitution.policier %}

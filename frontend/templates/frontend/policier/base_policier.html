@@ -16,45 +16,20 @@
             font-family: 'Segoe UI', sans-serif; 
         }
 
-        /* =====================
-           Navbar
-        ===================== */
+        /* Navbar */
         .navbar {
             background-color: #343a40;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
             padding: 0.6rem 2rem;
         }
-        .navbar .navbar-brand {
-            font-size: 1.6rem;
-            color: #ffc107;
-        }
-        .navbar .nav-link {
-            color: #f8f9fa;
-            font-weight: 500;
-            transition: color 0.3s;
-        }
-        .navbar .nav-link:hover {
-            color: #ffc107;
-        }
-        .navbar img.profile-img {
-            width: 36px;
-            height: 36px;
-            object-fit: cover;
-            border: 2px solid #ffc107;
-        }
-        .navbar .dropdown-menu {
-            border-radius: 0.8rem;
-            padding: 0.5rem 0;
-            min-width: 180px;
-        }
-        .navbar .dropdown-item:hover {
-            background-color: #f8f9fa;
-            color: #343a40;
-        }
+        .navbar .navbar-brand { font-size: 1.6rem; color: #ffc107; }
+        .navbar .nav-link { color: #f8f9fa; font-weight: 500; transition: color 0.3s; }
+        .navbar .nav-link:hover { color: #ffc107; }
+        .navbar img.profile-img { width: 36px; height: 36px; object-fit: cover; border: 2px solid #ffc107; border-radius: 50%; }
+        .navbar .dropdown-menu { border-radius: 0.8rem; padding: 0.5rem 0; min-width: 200px; }
+        .navbar .dropdown-item:hover { background-color: #f8f9fa; color: #343a40; }
 
-        /* =====================
-           Main content
-        ===================== */
+        /* Main content */
         .main-content { 
             padding: 2rem;
             min-height: 80vh;
@@ -64,11 +39,9 @@
             margin-top: 2rem;
         }
 
-        /* =====================
-           Footer
-        ===================== */
+        /* Footer */
         footer {
-            background-color: #343a40;
+            background-color: rgba(52, 58, 64, 0.95);
             color: #fff;
             text-align: center;
             padding: 1rem 2rem;
@@ -77,15 +50,10 @@
             margin-top: 2rem;
         }
 
-        /* Responsive adjustments */
+        /* Responsive */
         @media (max-width: 768px) {
-            .main-content {
-                padding: 1rem;
-                margin-top: 1rem;
-            }
-            .navbar .navbar-brand {
-                font-size: 1.3rem;
-            }
+            .main-content { padding: 1rem; margin-top: 1rem; }
+            .navbar .navbar-brand { font-size: 1.3rem; }
         }
     </style>
 
@@ -93,7 +61,7 @@
 </head>
 <body>
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark position-relative">
         <div class="container-fluid">
             <a class="navbar-brand fw-bold" href="#">🚓 Espace Policier</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -101,8 +69,9 @@
             </button>
 
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
+                <ul class="navbar-nav ms-auto align-items-center">
                     {% if user.is_authenticated %}
+                        <!-- Profil -->
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="profilDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 {% if user.photo %}
@@ -113,11 +82,7 @@
                                 {{ user.username }}
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="profilDropdown">
-                                <li>
-                                    <a class="dropdown-item d-flex align-items-center justify-content-between fw-bold text-primary" href="{% url 'dashboard_policier' %}">
-                                        🏠 Dashboard <i class="bi bi-speedometer2"></i>
-                                    </a>
-                                </li>
+                                <li><a class="dropdown-item fw-bold text-primary" href="{% url 'dashboard_policier' %}">🏠 Dashboard <i class="bi bi-speedometer2"></i></a></li>
                                 <li><a class="dropdown-item" href="{% url 'profil_police' %}">👤 Mon Profil</a></li>
                                 <li><a class="dropdown-item" href="{% url 'modifier_profil_police' %}">✏️ Modifier Profil</a></li>
                                 <li><hr class="dropdown-divider"></li>
@@ -143,7 +108,7 @@
 
     <!-- Footer -->
     <footer>
-        © {{ current_year }} - Espace Policier
+        © {{ current_year|default:2025 }} - Espace Policier
     </footer>
 
     <!-- Scripts Bootstrap -->
