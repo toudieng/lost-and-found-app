@@ -218,28 +218,57 @@ def supprimer_objet(request, objet_id):
 # =============================
 #       DASHBOARD POLICIER
 # =============================
+from django.shortcuts import render
+from django.utils import timezone
+from collections import defaultdict
+
 
 @policier_required
 
 
-
 def dashboard_policier(request):
-    # Statistiques
-    nb_objets_trouves = Declaration.objects.filter(etat_initial=EtatObjet.TROUVE).count()
-    nb_objets_a_restituer = Declaration.objects.filter(etat_initial=EtatObjet.RECLAME).count()
-    nb_restitutions = Restitution.objects.filter(statut=StatutRestitution.EFFECTUEE).count()
+    # --- Statistiques ---
+    nb_objets_trouves = Declaration.objects.filter(objet__etat=EtatObjet.EN_ATTENTE).count()
+    nb_objets_a_restituer = Declaration.objects.filter(objet__etat=EtatObjet.RECLAME).count()
+    nb_restitutions = Declaration.objects.filter(objet__etat=EtatObjet.RESTITUE).count()
 
-    # Notifications récentes (exemple : 5 dernières déclarations non traitées)
-    notifications = Declaration.objects.filter(etat_initial__in=[EtatObjet.TROUVE, EtatObjet.RECLAME]).order_by('-date_declaration')[:5]
+    # --- Graphiques ---
+    current_year = timezone.now().year
+    # Objets retrouvés par mois
+    declarations_trouves = Declaration.objects.filter(
+        objet__etat=EtatObjet.EN_ATTENTE,
+        date_declaration__year=current_year
+    )
+    data_trouves = [0] * 12
+    for decl in declarations_trouves:
+        month = decl.date_declaration.month - 1
+        data_trouves[month] += 1
+    labels_trouves = ["Jan", "Fév", "Mar", "Avr", "Mai", "Juin", "Juil", "Août", "Sep", "Oct", "Nov", "Déc"]
+
+    # Objets restitués par mois
+    declarations_restituees = Declaration.objects.filter(
+        objet__etat=EtatObjet.RESTITUE,
+        date_declaration__year=current_year
+    )
+    data_restitues = [0] * 12
+    for decl in declarations_restituees:
+        month = decl.date_declaration.month - 1
+        data_restitues[month] += 1
+    labels_restitues = labels_trouves  # même labels pour cohérence
 
     context = {
         'nb_objets_trouves': nb_objets_trouves,
         'nb_objets_a_restituer': nb_objets_a_restituer,
         'nb_restitutions': nb_restitutions,
-        'notifications': notifications,
-        'current_year': timezone.now().year,
+        'labels_trouves': labels_trouves,
+        'data_trouves': data_trouves,
+        'labels_restitues': labels_restitues,
+        'data_restitues': data_restitues,
+        'current_year': current_year,
     }
     return render(request, 'frontend/policier/dashboard_policier.html', context)
+
+
 
 @policier_required
 def liste_objets_declares(request):

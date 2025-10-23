@@ -5,112 +5,17 @@
 
 {% block extra_css %}
 <style>
-    body {
-        display: flex;
-        flex-direction: column;
-        min-height: 100vh;
-    }
-
-    /* Sidebar */
-    .sidebar {
-        background: linear-gradient(180deg, #343a40, #1d1f21);
-        color: #fff;
-        min-height: 100vh;
-        padding: 2rem 1rem;
-        position: sticky;
-        top: 0;
-    }
-    .sidebar h4 {
-        color: #ffc107;
-        text-align: center;
-        margin-bottom: 1.5rem;
-    }
-    .sidebar .nav-link {
-        color: #adb5bd;
-        border-radius: 0.5rem;
-        padding: 0.6rem 1rem;
-        transition: all 0.2s;
-    }
-    .sidebar .nav-link:hover,
-    .sidebar .nav-link.active {
-        background: #495057;
-        color: #ffc107;
-    }
-
-    /* Contenu principal */
-    .main-content {
-        flex: 1 0 auto;
-        padding: 2rem;
-        background: #f8f9fa;
-        min-height: 100vh;
-    }
-    .welcome-title {
-        color: #6c1e3d;
-        font-weight: 700;
-        margin-bottom: 0.5rem;
-    }
-
-    /* Cartes stats */
-    .stats-card {
-        border-radius: 1rem;
-        padding: 1.5rem;
-        background: #fff;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        transition: transform 0.2s;
-    }
-    .stats-card:hover {
-        transform: translateY(-3px);
-    }
-    .stats-icon {
-        font-size: 2.5rem;
-        color: #6c1e3d;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 3rem;
-        height: 3rem;
-        background: #f0e5f0;
-        border-radius: 50%;
-    }
-
-    /* Notifications */
-    .notifications-card {
-        border-radius: 1rem;
-        background: #fff;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        padding: 1.5rem;
-        margin-top: 2rem;
-    }
-    .list-group-item {
-        border: none;
-        padding: 0.75rem 1rem;
-    }
-    .list-group-item a {
-        color: #495057;
-        text-decoration: none;
-    }
-    .list-group-item a:hover {
-        text-decoration: underline;
-    }
-    .badge-notif {
-        background-color: #6c1e3d;
-        color: #fff;
-        font-size: 0.75rem;
-        padding: 0.25em 0.5em;
-        border-radius: 0.5rem;
-    }
-
-    /* Graphiques */
-    .chart-container {
-        background: #fff;
-        padding: 1rem;
-        border-radius: 1rem;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        margin-bottom: 2rem;
-    }
+    body { display: flex; flex-direction: column; min-height: 100vh; }
+    .sidebar { background: linear-gradient(180deg, #343a40, #1d1f21); color: #fff; min-height: 100vh; padding: 2rem 1rem; position: sticky; top: 0; }
+    .sidebar h4 { color: #ffc107; text-align: center; margin-bottom: 1.5rem; }
+    .sidebar .nav-link { color: #adb5bd; border-radius: 0.5rem; padding: 0.6rem 1rem; transition: all 0.2s; }
+    .sidebar .nav-link:hover, .sidebar .nav-link.active { background: #495057; color: #ffc107; }
+    .main-content { flex: 1 0 auto; padding: 2rem; background: #f8f9fa; min-height: 100vh; }
+    .welcome-title { color: #6c1e3d; font-weight: 700; margin-bottom: 0.5rem; }
+    .stats-card { border-radius: 1rem; padding: 1.5rem; background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 1rem; transition: transform 0.2s; }
+    .stats-card:hover { transform: translateY(-3px); }
+    .stats-icon { font-size: 2.5rem; color: #6c1e3d; display: flex; align-items: center; justify-content: center; width: 3rem; height: 3rem; background: #f0e5f0; border-radius: 50%; }
+    .chart-container { background: #fff; padding: 1rem; border-radius: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 2rem; }
 </style>
 {% endblock %}
 
@@ -148,7 +53,7 @@
                         <span class="stats-icon">📦</span>
                         <div>
                             <h5 class="mb-0">{{ nb_objets_trouves|default:"0" }}</h5>
-                            <small class="text-muted">Objets retrouvés</small>
+                            <small class="text-muted">Objets retrouvés (en attente)</small>
                         </div>
                     </div>
                 </a>
@@ -192,23 +97,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- Notifications -->
-        <div class="notifications-card">
-            <h5>🔔 Notifications récentes</h5>
-            {% if notifications %}
-                <ul class="list-group list-group-flush mt-2">
-                    {% for notif in notifications %}
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <a href="{{ notif.link }}" class="text-decoration-none">{{ notif.message }}</a>
-                            <span class="badge-notif">{{ notif.date|date:"d/m/Y H:i" }}</span>
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p class="text-muted mt-2">Aucune notification pour le moment.</p>
-            {% endif %}
-        </div>
     </div>
 </div>
 
@@ -219,10 +107,10 @@ const ctxTrouves = document.getElementById('chartTrouves').getContext('2d');
 new Chart(ctxTrouves, {
     type: 'bar',
     data: {
-        labels: {{ labels_trouves|default:"[]"|safe }},
+        labels: {{ labels_trouves|safe }},
         datasets: [{
             label: 'Objets retrouvés',
-            data: {{ data_trouves|default:"[]"|safe }},
+            data: {{ data_trouves|safe }},
             backgroundColor: '#6c1e3d'
         }]
     },
@@ -237,10 +125,10 @@ const ctxRestitues = document.getElementById('chartRestitues').getContext('2d');
 new Chart(ctxRestitues, {
     type: 'bar',
     data: {
-        labels: {{ labels_restitues|default:"[]"|safe }},
+        labels: {{ labels_restitues|safe }},
         datasets: [{
             label: 'Objets restitués',
-            data: {{ data_restitues|default:"[]"|safe }},
+            data: {{ data_restitues|safe }},
             backgroundColor: '#28a745'
         }]
     },
