@@ -1,0 +1,93 @@
+{% extends "frontend/admin/base_admin.html" %}
+{% block title %}Messages citoyens{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Table responsive */
+.table-responsive {
+    overflow-x: auto;
+}
+
+/* Boutons */
+.btn-outline-primary {
+    font-size: 0.85rem;
+    padding: 0.25rem 0.6rem;
+}
+
+/* Statut des messages */
+.status-repondu {
+    color: #28a745;
+    font-weight: 600;
+}
+.status-attente {
+    color: #ffc107;
+    font-weight: 600;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .table thead {
+        display: none;
+    }
+    .table tbody tr {
+        display: block;
+        margin-bottom: 1rem;
+        border-bottom: 1px solid #dee2e6;
+    }
+    .table tbody td {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem;
+    }
+    .table tbody td::before {
+        content: attr(data-label);
+        font-weight: 600;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h3 class="mb-4">📬 Messages reçus</h3>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Nom</th>
+                    <th>Email</th>
+                    <th>Message</th>
+                    <th>Date</th>
+                    <th>Statut</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for msg in messages_citoyens %}
+                <tr>
+                    <td data-label="Nom">{{ msg.nom }}</td>
+                    <td data-label="Email">{{ msg.email }}</td>
+                    <td data-label="Message">{{ msg.contenu|truncatewords:10 }}</td>
+                    <td data-label="Date">{{ msg.date_envoi|date:"d/m/Y H:i" }}</td>
+                    <td data-label="Statut">
+                        {% if msg.reponse %}
+                            <span class="status-repondu">✅ Répondu</span>
+                        {% else %}
+                            <span class="status-attente">⏳ En attente</span>
+                        {% endif %}
+                    </td>
+                    <td data-label="Action">
+                        <a href="{% url 'repondre_message' msg.id %}" class="btn btn-sm btn-outline-primary">Répondre</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center">Aucun message reçu</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

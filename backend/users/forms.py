@@ -1,8 +1,14 @@
-from django import forms # pyright: ignore[reportMissingModuleSource]
-from django.contrib.auth.forms import UserCreationForm # pyright: ignore[reportMissingModuleSource]
-from .models import Utilisateur, Commissariat
+from django import forms  # pyright: ignore[reportMissingModuleSource]
+from django.contrib.auth.forms import UserCreationForm  # pyright: ignore[reportMissingModuleSource]
+from django.utils.crypto import get_random_string
+from django.core.mail import send_mail
+from django.core.validators import RegexValidator
+from .models import Utilisateur, Commissariat, Message
 
-# Formulaire pour créer un utilisateur citoyen
+
+# =========================
+# 👤 Formulaire de création citoyen
+# =========================
 class UtilisateurCreationForm(UserCreationForm):
     telephone = forms.CharField(
         required=False,
@@ -26,7 +32,10 @@ class UtilisateurCreationForm(UserCreationForm):
             user.save()
         return user
 
-# Formulaire pour ajouter un commissariat
+
+# =========================
+# 🏢 Formulaire de commissariat
+# =========================
 class CommissariatForm(forms.ModelForm):
     class Meta:
         model = Commissariat
@@ -42,7 +51,10 @@ class CommissariatForm(forms.ModelForm):
             }),
         }
 
-# Formulaire pour créer un policier
+
+# =========================
+# 👮 Formulaire de création de policier
+# =========================
 class PolicierForm(forms.ModelForm):
     class Meta:
         model = Utilisateur
@@ -61,24 +73,24 @@ class PolicierForm(forms.ModelForm):
         if commit:
             user.save()
         return user
-from django import forms
-from django.utils.crypto import get_random_string
-from django.core.mail import send_mail
-from .models import Utilisateur
 
+
+# =========================
+# 🧑‍💼 Formulaire de création d’administrateur
+# =========================
 class AdministrateurCreationForm(forms.ModelForm):
     class Meta:
         model = Utilisateur
-        fields = ['email', 'first_name', 'last_name', 'telephone']  # ajout des noms
+        fields = ['email', 'first_name', 'last_name', 'telephone']
 
     def save(self, commit=True):
         user = super().save(commit=False)
         user.role = 'admin'
 
-        # Génération automatique d'un username valide (prenom.nom ou email)
+        # Génération automatique d'un username basé sur prénom.nom
         base_username = f"{self.cleaned_data['first_name']}.{self.cleaned_data['last_name']}".lower()
-        username = ''.join(c for c in base_username if c.isalnum() or c in ('@','.','+','-','_'))
-        user.username = username[:150]  # limite Django
+        username = ''.join(c for c in base_username if c.isalnum() or c in ('@', '.', '+', '-', '_'))
+        user.username = username[:150]
 
         # Mot de passe aléatoire
         password = get_random_string(10)
@@ -98,18 +110,18 @@ class AdministrateurCreationForm(forms.ModelForm):
             )
         return user
 
-from django.core.validators import RegexValidator
 
+# =========================
+# 👤 Formulaire de profil utilisateur
+# =========================
 class ProfilForm(forms.ModelForm):
     username = forms.CharField(
         max_length=150,
         required=True,
-        validators=[
-            RegexValidator(
-                regex=r'^[\w.@+-]+$',
-                message="Seulement lettres, chiffres et caractères @/./+/-/_ sont autorisés."
-            )
-        ],
+        validators=[RegexValidator(
+            regex=r'^[\w.@+-]+$',
+            message="Seulement lettres, chiffres et caractères @/./+/-/_ sont autorisés."
+        )],
         widget=forms.TextInput(attrs={
             "class": "form-control",
             "placeholder": "Nom d'utilisateur",
@@ -143,9 +155,11 @@ class ProfilForm(forms.ModelForm):
     class Meta:
         model = Utilisateur
         fields = ["username", "email", "telephone", "photo"]
-from django import forms
-from .models import Utilisateur
 
+
+# =========================
+# 🧾 Formulaire administrateur (modification)
+# =========================
 class AdministrateurForm(forms.ModelForm):
     class Meta:
         model = Utilisateur
@@ -155,4 +169,30 @@ class AdministrateurForm(forms.ModelForm):
             'last_name': forms.TextInput(attrs={'class': 'form-control'}),
             'email': forms.EmailInput(attrs={'class': 'form-control'}),
             'telephone': forms.TextInput(attrs={'class': 'form-control'}),
+        }
+
+
+
+
+class ContactForm(forms.ModelForm):
+    class Meta:
+        model = Message
+        fields = ['nom', 'email', 'contenu']
+        widgets = {
+            'nom': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Votre nom'
+            }),
+            'email': forms.EmailInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Votre adresse e-mail'
+            }),
+            'contenu': forms.Textarea(attrs={
+                'class': 'form-control',
+                'placeholder': 'Votre message...',
+                'rows': 4
+            }),
+        }
+        labels = {
+            'contenu': 'Message',
         }

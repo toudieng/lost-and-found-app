@@ -5,9 +5,9 @@
 
 {% block extra_css %}
 <style>
-/* ========================
+/* =========================
    SIDEBAR
-======================== */
+========================= */
 .sidebar {
     background: linear-gradient(180deg, #343a40, #212529);
     color: #fff;
@@ -21,12 +21,15 @@
     color: #ffc107;
     text-align: center;
     margin-bottom: 1rem;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
 }
 .sidebar .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
     color: #cfd8dc;
     border-radius: 0.4rem;
-    padding: 0.45rem 0.8rem;
+    padding: 0.5rem 0.8rem;
     font-weight: 500;
     font-size: 0.95rem;
     transition: all 0.2s ease-in-out;
@@ -37,9 +40,9 @@
     color: #ffc107;
 }
 
-/* ========================
+/* =========================
    CONTENU PRINCIPAL
-======================== */
+========================= */
 .main-content {
     padding: 1.5rem;
     background: #f8f9fa;
@@ -48,81 +51,97 @@
 .welcome-title {
     color: #343a40;
     font-weight: 700;
-    margin-bottom: 0.3rem;
-    font-size: 1.6rem;
+    margin-bottom: 0.5rem;
+    font-size: 1.8rem;
 }
 .section-title {
     font-weight: 700;
-    font-size: 1.2rem;
-    margin-top: 1.8rem;
+    font-size: 1.3rem;
+    margin-top: 2rem;
     color: #212529;
-    border-left: 4px solid #ffc107;
-    padding-left: 0.6rem;
+    border-left: 5px solid #ffc107;
+    padding-left: 0.7rem;
 }
 
-/* ========================
+/* =========================
    CARTES STATISTIQUES
-======================== */
+========================= */
 .stats-container {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
     gap: 1rem;
     margin-top: 1rem;
 }
 .stats-card {
-    border-radius: 0.8rem;
+    border-radius: 1rem;
     padding: 1rem 1.2rem;
     background: #fff;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    flex: 1 1 220px;
     display: flex;
-    align-items: center;
-    gap: 0.8rem;
-    width: 260px;
-    transition: transform 0.2s ease-in-out;
+    flex-direction: column;
+    gap: 0.5rem;
+    transition: all 0.3s ease-in-out;
     cursor: pointer;
+    position: relative;
+    min-width: 220px;
 }
 .stats-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.12);
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
 }
 .stats-icon {
-    font-size: 1.8rem;
-    color: #343a40;
+    font-size: 2rem;
 }
 
-/* ========================
-   NOTIFICATIONS
-======================== */
-.card h5 {
-    margin-bottom: 0.8rem;
-    font-size: 1rem;
-}
-.notifications-card {
-    max-height: 220px;
-    overflow-y: auto;
-    padding: 0.8rem 1rem;
-}
-.list-group-item {
-    border: none;
-    padding: 0.5rem 0.8rem;
+/* Badges colorés */
+.stats-card h5 {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    font-size: 0.9rem;
+    justify-content: space-between;
+    font-size: 1.6rem;
 }
-.list-group-item.new {
-    background: #fff3cd;
+.stats-badge {
+    padding: 0.2rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
     font-weight: 600;
-}
-.list-group-item small {
-    font-size: 0.7rem;
-    color: #555;
+    color: #fff;
 }
 
-/* ========================
+/* Couleurs badges */
+.badge-commissariat { background: #007bff; }
+.badge-policiers { background: #28a745; }
+.badge-citoyens { background: #17a2b8; }
+.badge-objets-perdus { background: #ffc107; color: #212529; }
+.badge-objets-trouves { background: #6f42c1; }
+.badge-restitutions { background: #20c997; }
+.badge-messages { background: #fd7e14; }
+
+/* =========================
+   LISTES DANS CARTES
+========================= */
+.stats-card ul {
+    list-style: none;
+    padding-left: 0;
+    max-height: 180px;
+    overflow-y: auto;
+    margin-top: 0.3rem;
+}
+.stats-card ul li {
+    font-size: 0.85rem;
+    padding: 0.3rem 0.5rem;
+    border-radius: 4px;
+    margin-bottom: 2px;
+}
+.stats-card ul li.new {
+    font-weight: 600;
+    background: #fff3cd;
+}
+
+/* =========================
    RESPONSIVE
-======================== */
+========================= */
 @media (max-width: 768px) {
     .sidebar {
         position: relative;
@@ -131,6 +150,9 @@
     }
     .main-content {
         padding: 1rem;
+    }
+    .stats-container {
+        justify-content: center;
     }
 }
 </style>
@@ -157,6 +179,9 @@
             <li class="nav-item mb-2">
                 <a class="nav-link {% if request.resolver_match.url_name == 'voir_stats' %}active{% endif %}" href="{% url 'voir_stats' %}">📊 Statistiques</a>
             </li>
+            <li class="nav-item mb-2">
+                <a class="nav-link {% if request.resolver_match.url_name == 'liste_messages' %}active{% endif %}" href="{% url 'liste_messages' %}">💬 Messages citoyens</a>
+            </li>
         </ul>
     </div>
 
@@ -165,97 +190,53 @@
         <h2 class="welcome-title">Bienvenue, Administrateur 👋</h2>
         <p class="text-muted mb-4">Surveillez les activités, gérez les utilisateurs et consultez les indicateurs clés.</p>
 
-        <!-- Section : Description -->
-        <div class="section-description">
-            <h4 class="section-title">À propos de l’application</h4>
-            <p>
-                Cette plateforme facilite la gestion des <strong>objets perdus et retrouvés</strong>.
-                Les citoyens peuvent signaler la perte ou la découverte d’un objet, tandis que la police vérifie et gère les correspondances.
-            </p>
-            <p>
-                Le <strong>policier</strong> est responsable de la <strong>restitution</strong> :
-                il réceptionne les objets trouvés, confirme l’identité du propriétaire et valide la remise via la plateforme.
-                Chaque étape est enregistrée pour assurer traçabilité et transparence.
-            </p>
-            <ul>
-                <li>📍 Suivi des objets en temps réel</li>
-                <li>👮 Gestion complète par les services de police</li>
-                <li>🧾 Génération automatique de preuves PDF</li>
-                <li>💬 Notifications instantanées aux citoyens</li>
-                <li>📊 Statistiques dynamiques et rapports</li>
-            </ul>
-        </div>
-
-        <!-- Section : Statistiques -->
         <h4 class="section-title mt-4">Statistiques principales</h4>
         <div class="stats-container">
             <div class="stats-card" onclick="location.href='{% url 'gerer_commissariats' %}'">
                 <span class="stats-icon">🏢</span>
-                <div>
-                    <h5 class="mb-0">{{ nb_commissariats }}</h5>
-                    <small>Commissariats</small>
-                </div>
+                <h5>{{ nb_commissariats }} <span class="stats-badge badge-commissariat">{{ nb_commissariats }}</span></h5>
+                <small>Commissariats</small>
             </div>
-
             <div class="stats-card" onclick="location.href='{% url 'gerer_policiers' %}'">
                 <span class="stats-icon">👮</span>
-                <div>
-                    <h5 class="mb-0">{{ nb_policiers }}</h5>
-                    <small>Policiers actifs</small>
-                </div>
+                <h5>{{ nb_policiers }} <span class="stats-badge badge-policiers">{{ nb_policiers }}</span></h5>
+                <small>Policiers actifs</small>
             </div>
-
             <div class="stats-card" onclick="location.href='{% url 'liste_citoyens' %}'">
                 <span class="stats-icon">🧍</span>
-                <div>
-                    <h5 class="mb-0">{{ nb_citoyens }}</h5>
-                    <small>Citoyens enregistrés</small>
-                </div>
+                <h5>{{ nb_citoyens }} <span class="stats-badge badge-citoyens">{{ nb_citoyens }}</span></h5>
+                <small>Citoyens enregistrés</small>
             </div>
-
             <div class="stats-card">
                 <span class="stats-icon">🎒</span>
-                <div>
-                    <h5 class="mb-0">{{ nb_objets_perdus }}</h5>
-                    <small>Objets perdus</small>
-                </div>
+                <h5>{{ nb_objets_perdus }} <span class="stats-badge badge-objets-perdus">{{ nb_objets_perdus }}</span></h5>
+                <small>Objets perdus</small>
             </div>
-
             <div class="stats-card">
                 <span class="stats-icon">📦</span>
-                <div>
-                    <h5 class="mb-0">{{ nb_objets_trouves }}</h5>
-                    <small>Objets trouvés</small>
-                </div>
+                <h5>{{ nb_objets_trouves }} <span class="stats-badge badge-objets-trouves">{{ nb_objets_trouves }}</span></h5>
+                <small>Objets trouvés</small>
             </div>
-
             <div class="stats-card">
                 <span class="stats-icon">✅</span>
-                <div>
-                    <h5 class="mb-0">{{ nb_restitutions }}</h5>
-                    <small>Restitutions effectuées</small>
-                </div>
+                <h5>{{ nb_restitutions }} <span class="stats-badge badge-restitutions">{{ nb_restitutions }}</span></h5>
+                <small>Restitutions effectuées</small>
             </div>
-        </div>
-
-        <!-- Section : Notifications -->
-        <h4 class="section-title">Notifications récentes</h4>
-        <div class="card shadow-sm mt-2 notifications-card">
-            {% if notifications %}
-                <ul class="list-group list-group-flush">
-                    {% for notif in notifications %}
-                        <li class="list-group-item {% if not notif.lu %}new{% endif %}">
-                            {{ notif.message }}
-                            <small>{{ notif.date|date:"d/m/Y H:i" }}</small>
-                            {% if not notif.lu %}
-                                <span class="badge bg-warning text-dark ms-1">NOUVEAU</span>
-                            {% endif %}
+            <div class="stats-card">
+                <span class="stats-icon">💬</span>
+                <h5>{{ messages_recus|length }} <span class="stats-badge badge-messages">{{ messages_recus|length }}</span></h5>
+                <small>Messages récents</small>
+                <ul>
+                    {% for msg in messages_recus %}
+                        <li class="{% if not msg.reponse %}new{% endif %}">
+                            <strong>{{ msg.nom }}</strong>: {{ msg.contenu|truncatewords:6 }}
+                            <small>({{ msg.date_envoi|date:"d/m H:i" }})</small>
                         </li>
+                    {% empty %}
+                        <li>Aucun message récent</li>
                     {% endfor %}
                 </ul>
-            {% else %}
-                <p class="text-muted mb-0">Aucune notification pour le moment.</p>
-            {% endif %}
+            </div>
         </div>
     </div>
 </div>

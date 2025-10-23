@@ -22,9 +22,9 @@ from backend.objets.models import (
     EtatObjet, StatutRestitution
 )
 from backend.objets.forms import DeclarationForm, RestitutionForm
-from backend.users.models import Utilisateur, Notification
+from backend.users.models import Message, Utilisateur, Notification
 from backend.users.forms import (
-    AdministrateurForm, CommissariatForm, PolicierForm,
+    AdministrateurForm, CommissariatForm, ContactForm, PolicierForm,
     AdministrateurCreationForm, UtilisateurCreationForm
 )
 from frontend import models
@@ -102,8 +102,77 @@ def home(request):
     })
 
 
+
+
+
+
+# =========================
+# 📩 Formulaire contact citoyen
+# =========================
 def contact(request):
-    return render(request, "frontend/contact.html")
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            message = form.save(commit=False)
+            if request.user.is_authenticated:
+                message.expediteur = request.user
+            message.save()
+
+            # Crée une notification pour l’admin
+            admin = Utilisateur.objects.filter(role='admin').first()
+            if admin:
+                Notification.objects.create(
+                    user=admin,
+                    message=f"Nouveau message de {message.nom} ({message.email})"
+                )
+
+            messages.success(request, "✅ Votre message a bien été envoyé. Merci de nous avoir contactés.")
+            return redirect('contact')
+    else:
+        form = ContactForm()
+
+    return render(request, 'frontend/contact.html', {'form': form})
+
+
+# =========================
+# 📬 Liste des messages pour l’admin
+# =========================
+def liste_messages(request):
+    if not request.user.is_authenticated or request.user.role != 'admin':
+        return redirect('login')
+
+    messages_citoyens = Message.objects.all()
+    return render(request, 'frontend/admin/liste_messages.html', {'messages_citoyens': messages_citoyens})
+
+# =========================
+# ✉️ Répondre à un message
+# =========================
+def repondre_message(request, message_id):
+    if not request.user.is_authenticated or request.user.role != 'admin':
+        return redirect('login')
+
+    message_obj = get_object_or_404(Message, id=message_id)
+
+    if request.method == 'POST':
+        reponse = request.POST.get('reponse')
+        message_obj.reponse = reponse
+        message_obj.date_reponse = timezone.now()
+        message_obj.traite = True
+        message_obj.save()
+
+        # Envoi de l’email au citoyen
+        send_mail(
+            subject=f"Réponse à votre message - Plateforme Objets Perdus",
+            message=f"Bonjour {message_obj.nom},\n\nVoici la réponse de l'administrateur :\n\n{reponse}\n\nMerci pour votre message.",
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[message_obj.email],
+            fail_silently=False,
+        )
+
+        messages.success(request, f"Réponse envoyée à {message_obj.nom}.")
+        return redirect('liste_messages')
+
+    return render(request, 'frontend/admin/repondre_message.html', {'message_obj': message_obj})
 
 
 @login_required
@@ -478,10 +547,11 @@ def preuve_restitution_pdf(request, pk):
 
 
 @login_required(login_url='login')
+
 def dashboard_admin(request):
     """
     Tableau de bord Administrateur :
-    Affiche les statistiques globales du système.
+    Affiche les statistiques globales du système ainsi que les messages citoyens récents.
     """
 
     # Statistiques des utilisateurs
@@ -503,6 +573,9 @@ def dashboard_admin(request):
     # Notifications récentes (5 dernières)
     notifications = Notification.objects.order_by('-date')[:5]
 
+    # Messages citoyens récents (5 derniers)
+    messages_recus = Message.objects.order_by('-date_envoi')[:5]
+
     # Contexte pour le template
     context = {
         'nb_commissariats': nb_commissariats,
@@ -516,6 +589,7 @@ def dashboard_admin(request):
         'nb_objets_restitues': nb_objets_restitues,
         'nb_restitutions': nb_restitutions,
         'notifications': notifications,
+        'messages_recus': messages_recus,  # Ajout des messages citoyens
     }
 
     return render(request, "frontend/admin/dashboard_admin.html", context)
