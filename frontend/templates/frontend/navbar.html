@@ -2,27 +2,32 @@
   <div class="container-fluid">
     <!-- Logo -->
     <a class="navbar-brand d-flex align-items-center fw-bold" href="{% url 'home' %}">
-      <i class="bi bi-search-heart me-2 text-warning fs-4"></i> Lost & Found
+      <i class="bi bi-search-heart me-2 text-warning fs-4"></i>
+      <span class="brand-text">Lost & Found</span>
     </a>
 
     <!-- Bouton burger -->
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
 
-    <!-- Menu -->
+    <!-- Menu principal -->
     <div class="collapse navbar-collapse justify-content-center" id="navbarContent">
-      <ul class="navbar-nav mb-2 mb-lg-0">
+      <ul class="navbar-nav mb-2 mb-lg-0 gap-lg-3">
         <li class="nav-item">
           <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'home' %}">
             <i class="bi bi-house-door me-1"></i> Accueil
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#about"><i class="bi bi-info-circle me-1"></i> À propos</a>
+          <a class="nav-link" href="#about">
+            <i class="bi bi-info-circle me-1"></i> À propos
+          </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#about1"><i class="bi bi-clock-history me-1"></i> Déclarations récentes</a>
+          <a class="nav-link" href="#about1">
+            <i class="bi bi-clock-history me-1"></i> Déclarations récentes
+          </a>
         </li>
         <li class="nav-item">
           <a class="nav-link {% if request.resolver_match.url_name == 'contact' %}active{% endif %}" href="{% url 'contact' %}">
@@ -35,18 +40,18 @@
     <!-- Zone droite -->
     <div class="d-flex align-items-center gap-2">
       {% if user.is_authenticated %}
-        <a class="btn btn-sm btn-outline-warning fw-bold" href="{% url 'logout' %}">
+        <a class="btn btn-sm btn-outline-warning fw-bold px-3" href="{% url 'logout' %}">
           <i class="bi bi-box-arrow-right me-1"></i> Déconnexion
         </a>
       {% else %}
-        <a class="btn btn-sm btn-outline-light fw-bold" href="{% url 'login' %}">
+        <a class="btn btn-sm btn-outline-light fw-bold px-3" href="{% url 'login' %}">
           <i class="bi bi-box-arrow-in-right me-1"></i> Connexion
         </a>
-        <a class="btn btn-sm btn-warning text-dark fw-bold" href="{% url 'register' %}">
+        <a class="btn btn-sm btn-warning text-dark fw-bold px-3" href="{% url 'register' %}">
           <i class="bi bi-person-plus-fill me-1"></i> Inscription
         </a>
       {% endif %}
-      <button id="bg-btn" class="btn btn-sm btn-outline-light rounded-circle" title="Changer le thème">
+      <button id="bg-btn" class="btn btn-sm btn-outline-light rounded-circle d-flex align-items-center justify-content-center" title="Changer le thème" style="width:34px; height:34px;">
         <i class="bi bi-moon-stars"></i>
       </button>
     </div>

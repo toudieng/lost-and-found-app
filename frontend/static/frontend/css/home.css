@@ -7,14 +7,14 @@
     padding: 1rem 2rem;
     font-size: 1.3rem;
     font-weight: 700;
-    border-radius: 0.7rem;
+    border-radius: 0.8rem; /* léger arrondi plus moderne */
     margin: 0.5rem;
     color: #fff;
     text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
     border: none;
     cursor: pointer;
     overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease, filter 0.3s ease;
+    transition: transform 0.35s ease, box-shadow 0.35s ease, filter 0.35s ease;
 }
 
 /* Dégradés */
@@ -29,13 +29,13 @@
 .btn-action::after {
     content: "";
     position: absolute;
-    inset: 0; /* top:0; left:0; right:0; bottom:0; */
-    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    inset: 0;
+    background: radial-gradient(circle, rgba(255,255,255,0.12) 0%, transparent 70%);
     opacity: 0;
     transition: opacity 0.4s ease;
     pointer-events: none;
-    border-radius: 0.7rem;
-    box-shadow: inset 0 0 15px rgba(255,255,255,0.2);
+    border-radius: 0.8rem;
+    box-shadow: inset 0 0 15px rgba(255,255,255,0.15);
 }
 
 .btn-action:hover::after {
@@ -45,8 +45,8 @@
 /* Hover général */
 .btn-action:hover {
     transform: scale(1.08);
-    box-shadow: 0 6px 18px rgba(0,0,0,0.35);
-    filter: brightness(1.1);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.35);
+    filter: brightness(1.12);
 }
 
 /* =========================
@@ -60,6 +60,7 @@
     border-radius: 1rem;
     position: relative;
     overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.25);
 }
 
 .cta::before {
@@ -69,10 +70,9 @@
     left: -50%;
     width: 200%;
     height: 200%;
-    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
     transform: rotate(30deg);
     pointer-events: none;
-    opacity: 0.15;
 }
 
 .cta h2 {
@@ -91,16 +91,16 @@
     font-weight: 700;
     font-size: 1.1rem;
     padding: 0.9rem 2rem;
-    border-radius: 0.6rem;
+    border-radius: 0.7rem;
     background: #ffc107;
     color: #343a40;
-    transition: all 0.3s ease;
+    transition: all 0.35s ease;
 }
 
 .cta .btn:hover {
     background: #ffd966;
-    transform: scale(1.05);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    transform: scale(1.06);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.32);
 }
 
 .cta .btn i {
