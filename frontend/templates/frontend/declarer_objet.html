@@ -3,6 +3,14 @@
 
 {% block extra_css %}
 <style>
+:root {
+    --jaune: #ffc107; /* 🎨 Jaune principal */
+    --jaune-fonce: #e0a800;
+    --bleu-clair: #0d6efd;
+    --bleu-fonce: #084298;
+    --bleu-transparent: rgba(13,110,253,0.15);
+}
+
 .form-container {
     background: #fff;
     padding: 2rem;
@@ -10,32 +18,107 @@
     box-shadow: 0 8px 20px rgba(0,0,0,0.1);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
-.form-container:hover { transform: translateY(-4px); box-shadow:0 12px 25px rgba(0,0,0,0.15); }
+.form-container:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 25px rgba(0,0,0,0.15);
+}
 
-.form-title { color:#6c1e3d; font-weight:700; font-size:1.5rem; text-align:center; }
+.form-title {
+    color: var(--jaune-fonce);
+    font-weight: 700;
+    font-size: 1.6rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
 
 input, select, textarea {
-    width:100%; height:42px; padding:0.375rem 0.75rem;
-    border:1px solid #ccc; border-radius:0.5rem;
-    transition:border-color 0.3s, box-shadow 0.3s;
+    width: 100%;
+    height: 42px;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #ced4da;
+    border-radius: 0.5rem;
+    transition: border-color 0.3s, box-shadow 0.3s;
 }
+textarea { height: auto; }
+
 input:focus, select:focus, textarea:focus {
-    border-color:#6c1e3d; box-shadow:0 0 5px rgba(108,30,61,0.5); outline:none;
+    border-color: var(--jaune);
+    box-shadow: 0 0 6px rgba(255,193,7,0.4);
+    outline: none;
 }
 
-.form-check-input:checked { background-color:#6c1e3d; border-color:#6c1e3d; }
+.form-check-input:checked {
+    background-color: var(--jaune);
+    border-color: var(--jaune);
+}
 
+.form-check-label {
+    color: #333;
+    font-weight: 500;
+}
+
+/* === 🌟 Bouton jaune avec effet brillant === */
 .btn-submit {
-    background-color:#6c1e3d; border-color:#6c1e3d; color:#fff; font-weight:700;
-    transition: all 0.3s;
+    position: relative;
+    background-color: var(--jaune);
+    border: none;
+    color: #212529;
+    font-weight: 700;
+    transition: all 0.3s ease-in-out;
+    border-radius: 0.5rem;
+    overflow: hidden;
 }
-.btn-submit:hover { background-color:#53162b; transform:translateY(-1px); }
+.btn-submit::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -75%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(
+        120deg,
+        rgba(255,255,255,0.2) 0%,
+        rgba(255,255,255,0.5) 50%,
+        rgba(255,255,255,0.2) 100%
+    );
+    transform: skewX(-20deg);
+}
+.btn-submit:hover::before {
+    left: 130%;
+    transition: left 0.8s ease-in-out;
+}
+.btn-submit:hover {
+    background-color: var(--jaune-fonce);
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
 
-.text-error { color:#dc3545; font-size:0.85rem; }
+.text-error {
+    color: #dc3545;
+    font-size: 0.85rem;
+}
 
-@media (max-width:576px) { .form-container { padding:1.5rem; } .form-title { font-size:1.3rem; } }
+.alert {
+    background-color: var(--bleu-transparent);
+    color: var(--bleu-fonce);
+    border: 1px solid var(--bleu-clair);
+    border-radius: 0.5rem;
+}
 
-#preview-image { display:none; max-height:200px; margin-top:0.5rem; border-radius:0.5rem; box-shadow:0 4px 10px rgba(0,0,0,0.1); }
+@media (max-width: 576px) {
+    .form-container { padding: 1.5rem; }
+    .form-title { font-size: 1.3rem; }
+}
+
+#preview-image {
+    display: none;
+    max-height: 200px;
+    margin-top: 0.5rem;
+    border-radius: 0.5rem;
+    border: 2px solid var(--bleu-transparent);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
 </style>
 {% endblock %}
 
@@ -43,7 +126,7 @@ input:focus, select:focus, textarea:focus {
 <div class="row justify-content-center mt-5">
     <div class="col-md-6 col-lg-5 col-xl-4">
         <div class="form-container">
-            <h4 class="mb-4 form-title">📢 Déclarer un objet</h4>
+            <h4 class="form-title">🟡 Déclarer un objet</h4>
 
             {% if messages %}
                 {% for message in messages %}
@@ -55,45 +138,49 @@ input:focus, select:focus, textarea:focus {
                 {% csrf_token %}
 
                 <div class="mb-3">
-                    <label for="{{ form.nom_objet.id_for_label }}" class="form-label fw-bold">🏷️ Nom de l'objet <span class="text-danger">*</span></label>
-                    {{ form.nom_objet|add_class:"form-control form-control-sm" }}
-                    {% for error in form.nom_objet.errors %}<div class="text-error">{{ error }}</div>{% endfor %}
+                    {{ form.nom_objet|add_class:"form-control form-control-sm"|attr:"placeholder: Nom de l'objet *" }}
+                    {% for error in form.nom_objet.errors %}
+                        <div class="text-error">{{ error }}</div>
+                    {% endfor %}
                 </div>
 
                 <div class="mb-3">
-                    <label for="{{ form.lieu.id_for_label }}" class="form-label fw-bold">📍 Lieu</label>
-                    {{ form.lieu|add_class:"form-control form-control-sm" }}
-                    {% for error in form.lieu.errors %}<div class="text-error">{{ error }}</div>{% endfor %}
+                    {{ form.lieu|add_class:"form-control form-control-sm"|attr:"placeholder: Lieu de perte ou de trouvaille" }}
+                    {% for error in form.lieu.errors %}
+                        <div class="text-error">{{ error }}</div>
+                    {% endfor %}
                 </div>
 
                 <div class="mb-3">
-                    <label for="{{ form.description.id_for_label }}" class="form-label fw-bold">✏️ Description (facultative)</label>
-                    {{ form.description|add_class:"form-control form-control-sm" }}
-                    {% for error in form.description.errors %}<div class="text-error">{{ error }}</div>{% endfor %}
+                    {{ form.description|add_class:"form-control form-control-sm"|attr:"placeholder: Description (facultative)" }}
+                    {% for error in form.description.errors %}
+                        <div class="text-error">{{ error }}</div>
+                    {% endfor %}
                 </div>
 
                 <div class="mb-3">
-                    <label for="{{ form.image.id_for_label }}" class="form-label fw-bold">📷 Photo (facultative)</label>
-                    {{ form.image|add_class:"form-control form-control-sm" }}
-                    {% for error in form.image.errors %}<div class="text-error">{{ error }}</div>{% endfor %}
+                    {{ form.image|add_class:"form-control form-control-sm"|attr:"placeholder: Ajouter une photo (facultatif)" }}
+                    {% for error in form.image.errors %}
+                        <div class="text-error">{{ error }}</div>
+                    {% endfor %}
                     <img id="preview-image" src="#" alt="Prévisualisation">
                 </div>
 
-                <div class="mb-4">
-                    <label class="form-label fw-bold">📌 Type de déclaration <span class="text-danger">*</span></label>
-                    <div>
-                        {% for radio in form.etat %}
-                            <div class="form-check form-check-inline">
-                                {{ radio.tag }}
-                                <label class="form-check-label" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
-                            </div>
-                        {% endfor %}
-                    </div>
-                    {% for error in form.etat.errors %}<div class="text-error">{{ error }}</div>{% endfor %}
+                <div class="mb-4 text-center">
+                    <p class="fw-bold mb-2 text-warning">📌 Type de déclaration</p>
+                    {% for radio in form.etat %}
+                        <div class="form-check form-check-inline">
+                            {{ radio.tag }}
+                            <label class="form-check-label" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
+                        </div>
+                    {% endfor %}
+                    {% for error in form.etat.errors %}
+                        <div class="text-error">{{ error }}</div>
+                    {% endfor %}
                 </div>
 
                 <div class="d-grid">
-                    <button type="submit" class="btn btn-submit fw-bold">✅ Soumettre</button>
+                    <button type="submit" class="btn btn-submit fw-bold"> Soumettre</button>
                 </div>
             </form>
         </div>
@@ -109,9 +196,14 @@ document.addEventListener("DOMContentLoaded", function() {
         const file = this.files[0];
         if (file) {
             const reader = new FileReader();
-            reader.onload = e => { preview.src = e.target.result; preview.style.display="block"; }
+            reader.onload = e => {
+                preview.src = e.target.result;
+                preview.style.display = "block";
+            }
             reader.readAsDataURL(file);
-        } else { preview.style.display="none"; }
+        } else {
+            preview.style.display = "none";
+        }
     });
 });
 </script>

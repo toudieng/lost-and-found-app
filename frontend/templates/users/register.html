@@ -1,17 +1,28 @@
-{% extends "frontend/base.html" %}
-{% load static %}
-
-{% block title %}Inscription{% endblock %}
-
-{% block extra_css %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inscription</title>
+<!-- FontAwesome pour les icônes -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-papQaGQZl+y8/+Vj4XDcz+wYVb5KhT/7fY5FZox8H3Zq+ZfC+RJ9TxjP+36cUPy3RWUlJ9bI6QmOq/1C8Jb0iw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <style>
 :root {
     --main-color: #495057;
     --main-color-dark: #343a40;
-    --button-color:skyblue !important;
-    --input-bg: rgba(255,255,255,0.9);
+    --button-color: #CC5500;
+    --button-color-hover: #e6b800;
+    --input-bg: rgba(255,255,255,0.95);
 }
 
+/* GLOBAL */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* BODY */
 body {
     background: linear-gradient(135deg, #f5f5f5, #e0e0e0);
     min-height: 100vh;
@@ -19,25 +30,35 @@ body {
     justify-content: center;
     align-items: center;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow-x: hidden;
 }
 
+/* FORM CONTAINER */
 .form-container {
-    background: var(--input-bg);
-    backdrop-filter: blur(10px);
-    padding: 2.5rem 2rem;
-    border-radius: 1rem;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.12);
     width: 100%;
     max-width: 400px;
+    padding: 2.5rem 1.5rem;
+    background: var(--input-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 1rem;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+.form-container:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 18px 35px rgba(0,0,0,0.2);
 }
 
+/* FORM TITLE */
 .form-title {
     color: var(--button-color);
     font-weight: 700;
-    font-size: 1.7rem;
+    font-size: 1.9rem;
     text-align: center;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.8rem;
     position: relative;
+    letter-spacing: 1px;
 }
 .form-title::after {
     content: '';
@@ -49,129 +70,131 @@ body {
     border-radius: 2px;
 }
 
+/* INPUTS */
 .input-group {
     position: relative;
     margin-bottom: 1.5rem;
 }
-
-.input-group i.icon-left {
-    position: absolute;
-    left: 0.75rem;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--main-color);
-    font-size: 1.1rem;
-}
-
 .input-group input {
     width: 100%;
     height: 45px;
     padding: 0.375rem 2.5rem 0.375rem 2.5rem;
     border-radius: 0.6rem;
     border: 1px solid #ced4da;
-    transition: 0.3s ease;
+    transition: 0.3s ease, box-shadow 0.3s ease;
+    background: #fff;
 }
-
 .input-group input:focus {
     border-color: var(--main-color);
-    box-shadow: 0 0 6px rgba(73,80,87,0.4);
+    box-shadow: 0 0 10px rgba(204,85,0,0.3);
     outline: none;
 }
 
-.input-group i.toggle-password {
+/* ICONS */
+.input-group i.icon-left {
     position: absolute;
-    right: 0.75rem;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--main-color);
+    font-size: 1.2rem;
+}
+.input-group .toggle-password {
+    position: absolute;
+    right: 2rem;
     top: 50%;
     transform: translateY(-50%);
     cursor: pointer;
     color: var(--main-color);
 }
 
+/* BUTTON */
 .btn-submit {
-    background: var(--button-color) !important;
-    color: #495057;
+    background: linear-gradient(90deg, var(--button-color), var(--button-color-hover));
+    color: #fff;
     border: none;
     border-radius: 0.6rem;
     height: 45px;
     font-weight: 700;
+    font-size: 1rem;
     width: 100%;
+    transition: all 0.3s ease;
 }
 .btn-submit:hover {
-    background: #0096e6 !important;
+    background: linear-gradient(90deg, var(--button-color-hover), var(--button-color));
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 6px 18px rgba(204,85,0,0.3);
 }
 
+/* ERREURS & ALERTS */
 .text-error { color: #dc3545; font-size: 0.85rem; }
 .alert { border-radius: 0.5rem; font-size: 0.9rem; text-align:center; }
 
+/* REGISTER LINK */
 .register-link {
     text-align: center;
     margin-top: 1rem;
 }
 .register-link a {
-    color: var(--main-color);
+    color: var(--button-color);
     font-weight: 600;
     text-decoration: none;
+    transition: color 0.3s ease, transform 0.2s;
 }
-.register-link a:hover { color: var(--main-color-dark); }
+.register-link a:hover { 
+    color: var(--button-color-hover); 
+    transform: translateY(-1px);
+}
 
+/* RESPONSIVE */
 @media (max-width:576px) {
     .form-container { padding: 2rem 1rem; }
-    .form-title { font-size: 1.5rem; }
+    .form-title { font-size: 1.6rem; }
+    .input-group .toggle-password { right: 1.5rem; }
 }
 </style>
-{% endblock %}
+</head>
+<body>
 
-{% block content %}
-<div class="row justify-content-center">
-    <div class="col-12 d-flex justify-content-center">
-        <div class="form-container">
-            <h4 class="form-title">📝 Inscription</h4>
+<div class="form-container">
+    <h4 class="form-title">📝 Inscription</h4>
 
-            {% if form.errors %}
-                <div class="alert alert-danger py-2 px-3">
-                    Veuillez corriger les erreurs ci-dessous.
-                </div>
-            {% endif %}
-
-            <form method="POST" novalidate>
-                {% csrf_token %}
-                {% for field in form %}
-                <div class="input-group">
-                    {# Icônes à gauche selon le type de champ #}
-                    {% if field.name == 'username' %}
-                        <i class="fa fa-user icon-left"></i>
-                    {% elif field.name == 'email' %}
-                        <i class="fa fa-envelope icon-left"></i>
-                    {% elif field.name == 'telephone' %}
-                        <i class="fa fa-phone icon-left"></i>
-                    {% elif field.name|slice:":8" == "password" %}
-                        <i class="fa fa-lock icon-left"></i>
-                    {% endif %}
-
-                    {{ field }}
-
-                    {# Toggle password #}
-                    {% if field.name|slice:":8" == "password" %}
-                        <i class="fa fa-eye-slash toggle-password" onclick="togglePassword('{{ field.id_for_label }}', this)"></i>
-                    {% endif %}
-
-                    {# Affichage des erreurs #}
-                    {% for error in field.errors %}
-                        <div class="text-error">{{ error }}</div>
-                    {% endfor %}
-                </div>
-                {% endfor %}
-
-                <button type="submit" class="btn-submit">
-                    ✅ S'inscrire
-                </button>
-            </form>
-
-            <p class="register-link small">
-                Vous avez déjà un compte ? <a href="{% url 'login' %}">Connectez-vous ici</a>
-            </p>
-        </div>
+    <!-- Erreurs -->
+    <div class="alert alert-danger py-2 px-3" style="display:none;" id="error-msg">
+        Veuillez corriger les erreurs ci-dessous.
     </div>
+
+    <form id="registerForm" method="POST" novalidate>
+        <!-- Exemple de champs statiques -->
+        <div class="input-group">
+            <i class="fa fa-user icon-left"></i>
+            <input type="text" name="username" placeholder="Nom d'utilisateur" required>
+        </div>
+        <div class="input-group">
+            <i class="fa fa-envelope icon-left"></i>
+            <input type="email" name="email" placeholder="Adresse e-mail" required>
+        </div>
+        <div class="input-group">
+            <i class="fa fa-phone icon-left"></i>
+            <input type="text" name="telephone" placeholder="Téléphone" required>
+        </div>
+        <div class="input-group">
+            <i class="fa fa-lock icon-left"></i>
+            <input type="password" id="password1" name="password1" placeholder="Mot de passe" required>
+            <i class="fa fa-eye-slash toggle-password" onclick="togglePassword('password1', this)"></i>
+        </div>
+        <div class="input-group">
+            <i class="fa fa-lock icon-left"></i>
+            <input type="password" id="password2" name="password2" placeholder="Confirmer le mot de passe" required>
+            <i class="fa fa-eye-slash toggle-password" onclick="togglePassword('password2', this)"></i>
+        </div>
+
+        <button type="submit" class="btn-submit">S'inscrire</button>
+    </form>
+
+    <p class="register-link small">
+        Vous avez déjà un compte ? <a href="login.html">Connectez-vous ici</a>
+    </p>
 </div>
 
 <script>
@@ -186,4 +209,6 @@ function togglePassword(fieldId, icon) {
     }
 }
 </script>
-{% endblock %}
+
+</body>
+</html>

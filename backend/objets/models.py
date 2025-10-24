@@ -76,15 +76,14 @@ class Declaration(models.Model):
         verbose_name="Trouvé par"
     )
 
-    reclame_par = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='objets_reclames',
-        limit_choices_to={'role': 'citoyen'},
-        verbose_name="Réclamé par"
-    )
+    reclame_par = models.ManyToManyField(
+    settings.AUTH_USER_MODEL,
+    blank=True,
+    related_name='objets_reclames',
+    limit_choices_to={'role': 'citoyen'},
+    verbose_name="Réclamé par"
+)
+
 
     # --- Nouveau champ : état initial de l'objet lors de la déclaration ---
     etat_initial = models.CharField(

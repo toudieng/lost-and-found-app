@@ -6,61 +6,46 @@
 <div class="container mt-4">
     <h2 class="fw-bold mb-3">📌 Objets réclamés</h2>
 
-    {% if declarations %}
-        {% for declaration in declarations %}
-            <div class="card my-3 shadow-sm border-0">
-                <div class="card-body">
-                    <h5 class="card-title">{{ declaration.objet.nom }}</h5>
+    {% for dec in declarations %}
+<div class="card my-3 shadow-sm border-0">
+    <div class="card-body">
+        <h5 class="card-title">{{ dec.objet.nom }}</h5>
 
-                    <p class="mb-1">
-                        <b>Réclamé par :</b>
-                        {% if declaration.reclame_par %}
-                            <span class="badge bg-primary">
-                                👤 {{ declaration.reclame_par.username }}
-                            </span>
-                            <small class="text-muted">
-                                ({{ declaration.reclame_par.email|default:"N/A" }})
-                            </small>
-                        {% else %}
-                            <span class="text-muted">N/A</span>
-                        {% endif %}
-                    </p>
+        <p class="mb-1">
+            <b>Réclamé par :</b>
+            <span class="badge bg-primary me-2">
+                👤 {{ dec.reclame_par.username }}
+            </span>
+            <small class="text-muted me-3">
+                ({{ dec.reclame_par.email|default:"N/A" }}, {{ dec.reclame_par.telephone|default:"N/A" }})
+            </small>
 
-                    <p class="mb-1">
-                        <b>Trouvé par :</b>
-                        {% if declaration.trouve_par.all %}
-                            {% for user in declaration.trouve_par.all %}
-                                <span class="badge bg-success">
-                                    👤 {{ user.username }}
-                                </span>
-                            {% endfor %}
-                        {% else %}
-                            <span class="text-muted">N/A</span>
-                        {% endif %}
-                    </p>
+            {% with restitution=restitutions_dict|get_item:(dec.objet.id, dec.reclame_par.id) %}
+                {% if restitution %}
+                    <button class="btn btn-secondary btn-sm" disabled>📅 Restitution planifiée</button>
+                {% else %}
+                    <a href="{% url 'planifier_restitution' dec.id dec.reclame_par.id %}" class="btn btn-primary btn-sm">
+                        📅 Programmer restitution
+                    </a>
+                {% endif %}
+            {% endwith %}
+        </p>
 
-                    <p class="mb-2">
-                        <b>Date déclaration :</b>
-                        {{ declaration.date_declaration|date:"d/m/Y H:i" }}
-                    </p>
+        <p class="mb-1">
+            <b>Trouvé par :</b>
+            {% for user in dec.trouve_par.all %}
+                <span class="badge bg-success me-1 mb-1">👤 {{ user.username }}</span>
+            {% empty %}
+                <span class="text-muted">N/A</span>
+            {% endfor %}
+        </p>
 
-                    {% if declaration.objet.id in restitutions_dict %}
-                        <button class="btn btn-secondary btn-sm" disabled>
-                            📅 Restitution planifiée
-                        </button>
-                    {% else %}
-                        <a href="{% url 'planifier_restitution' declaration.id 'declaration' %}" 
-                           class="btn btn-primary btn-sm">
-                            📅 Programmer restitution
-                        </a>
-                    {% endif %}
-                </div>
-            </div>
-        {% endfor %}
-    {% else %}
-        <div class="alert alert-info text-center">
-            Aucun objet réclamé pour le moment.
-        </div>
-    {% endif %}
+        <p class="mb-2">
+            <b>Date déclaration :</b> {{ dec.date_declaration|date:"d/m/Y H:i" }}
+        </p>
+    </div>
+</div>
+{% endfor %}
+
 </div>
 {% endblock %}

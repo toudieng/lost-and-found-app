@@ -64,6 +64,8 @@ def admin_required(view_func):
 
 
 
+
+
 def home(request):
     # 🔹 Objets perdus récents
     objets_perdus = Objet.objects.filter(etat=EtatObjet.PERDU).order_by('-id')[:6]
@@ -77,7 +79,7 @@ def home(request):
             'url': obj.image.url if obj.image else '/static/frontend/images/default.jpg',
             'titre': obj.nom,
             'description': (obj.description[:120] + "...") if obj.description else "",
-            'etat': obj.get_etat_display(),  # affiche "Perdu"
+            'etat': obj.get_etat_display(),
             'etat_type': 'perdu'
         }
         for obj in objets_perdus
@@ -88,7 +90,7 @@ def home(request):
             'url': obj.image.url if obj.image else '/static/frontend/images/default.jpg',
             'titre': obj.nom,
             'description': (obj.description[:120] + "...") if obj.description else "",
-            'etat': obj.get_etat_display(),  # affiche "Trouvé"
+            'etat': obj.get_etat_display(),
             'etat_type': 'trouve'
         }
         for obj in objets_trouves
@@ -97,9 +99,39 @@ def home(request):
     # 🔹 Fusionner les deux listes pour un seul carrousel
     all_slides = slides_perdus + slides_trouves
 
-    return render(request, "frontend/home.html", {
-        'all_slides': all_slides
-    })
+    # 🔹 Timeline restitution par la police
+    steps = [
+        {
+            'icon': 'bi bi-clipboard-check',
+            'title': '⿡ Vérification de la déclaration',
+            'desc': "Le policier consulte la fiche de l’objet et valide l’identité du déclarant."
+        },
+        {
+            'icon': 'bi bi-person-badge',
+            'title': '⿢ Identification du propriétaire',
+            'desc': "Une vérification d’identité est effectuée à l’aide d’une pièce officielle."
+        },
+        {
+            'icon': 'bi bi-box-seam',
+            'title': '⿣ Restitution de l’objet',
+            'desc': "Le policier remet l’objet au propriétaire et enregistre la restitution."
+        },
+        {
+            'icon': 'bi bi-file-earmark-text',
+            'title': '⿤ Génération d’une preuve',
+            'desc': "Une attestation PDF est générée et remise au citoyen comme preuve."
+        },
+    ]
+
+    context = {
+        'all_slides': all_slides,
+        'steps': steps,
+    }
+
+    return render(request, "frontend/home.html", context)
+
+
+
 
 
 

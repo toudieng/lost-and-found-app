@@ -8,7 +8,8 @@
 <style>
 :root {
   --main-color: #495057;
-  --accent-color: skyblue;
+  --accent-color: #1F3B73;
+  --accent-alt: #87CEEB;
   --light-bg: #f8f9fa;
   --gradient-main: linear-gradient(135deg, #495057, #343a40);
   --radius: 1rem;
@@ -24,128 +25,40 @@ body {
 .fade-up { opacity: 0; transform: translateY(40px); transition: all 0.8s ease-out; }
 .fade-up.show { opacity: 1; transform: translateY(0); }
 
-/* === HERO INTRO === */
+/* HERO INTRO */
 .hero-intro {
-  background: linear-gradient(135deg, #495057, #343a40);
+  background: var(--gradient-main);
   color: #fff;
   border-radius: var(--radius);
   box-shadow: var(--shadow);
+  padding: 4rem 0;
 }
 
-/* === MODERN CAROUSEL === */
-.carousel {
-  border-radius: var(--radius);
-  overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
-  position: relative;
+/* HERO ACTIONS */
+.hero-actions {
+  background: var(--light-bg);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  padding: 3rem 1rem;
 }
-
-.carousel-inner {
-  width: 100%;
-  max-height: 480px;
-  overflow: hidden;
-}
-
-.carousel-inner img {
-  width: 100%;
-  height: auto;
-  max-height: 480px;
-  object-fit: cover;
-  object-position: center;
-  transition: transform 1.2s ease, filter 0.8s ease;
-  filter: brightness(1.15) contrast(1.1) saturate(1.1);
-}
-
-.carousel-item::before {
-  content: "";
-  position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: linear-gradient(to bottom, rgba(0,0,0,0.25), rgba(0,0,0,0.55));
-  z-index: 1;
-}
-
-.carousel-item.active img {
-  transform: scale(1.08);
-  filter: brightness(1.2) saturate(1.25);
-}
-
-.carousel-caption {
-  position: absolute;
-  bottom: 2rem;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 2;
-  background: rgba(0,0,0,0.45);
-  padding: 1rem 1.5rem;
-  border-radius: 0.8rem;
-  backdrop-filter: blur(4px);
-  width: 85%;
-  text-align: center;
-}
-
-.carousel-caption h5 {
-  font-weight: 700;
-  font-size: 1.6rem;
-  color: skyblue;
-  text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
-  margin-bottom: 0.5rem;
-}
-
-.carousel-caption p {
-  color: #f8f9fa;
-  font-size: 1.05rem;
-  line-height: 1.5;
-}
-
-/* Contrôles stylisés */
-.carousel-control-prev-icon,
-.carousel-control-next-icon {
-  background-color: rgba(0,0,0,0.6);
-  border-radius: 50%;
-  width: 3rem;
-  height: 3rem;
-  background-size: 60%;
-  transition: all 0.3s ease;
-}
-
-.carousel-control-prev-icon:hover,
-.carousel-control-next-icon:hover {
-  background-color: rgba(0,0,0,0.85);
-  transform: scale(1.1);
-}
-
-/* Barre de progression */
-.carousel-progress {
-  height: 4px;
-  overflow: hidden;
-}
-
-.carousel-progress .progress-bar {
-  width: 0%;
-  height: 100%;
-  transition: width 4.5s linear;
-}
-
-/* === HERO ACTIONS === */
-.hero-actions .btn-action {
-  position: relative;
-  display: inline-block;
-  padding: 1rem 2.5rem;
-  font-size: 1.2rem;
-  font-weight: 700;
-  border-radius: 0.7rem;
-  margin: 0.8rem;
+.btn-action {
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  border: none;
+  text-decoration: none;
   color: #fff;
-  overflow: hidden;
+  transition: transform 0.2s, opacity 0.2s;
+  display: inline-block;
   cursor: pointer;
-  transition: all 0.35s ease;
 }
-.btn-action-lost { background: linear-gradient(135deg, #ff5c5c, #e53946); }
-.btn-action-found { background: linear-gradient(135deg, #4cd964, #28a745); }
-.btn-action:hover { transform: translateY(-4px) scale(1.05); box-shadow: var(--shadow); }
+.btn-lost { background: linear-gradient(135deg, #ff5c5c, #e53946); }
+.btn-found { background: var(--accent-alt); color: #343a40; }
+.btn-dashboard { background: #343a40; }
 
-/* === FEATURES === */
+/* Features / Avantages */
 .features-section .card {
   border: none;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -155,53 +68,75 @@ body {
   box-shadow: 0 8px 20px rgba(0,0,0,0.15);
 }
 
-/* === TIMELINE RESTITUTION === */
+/* Timeline Restitution */
 #restitution .step:hover .icon { transform: scale(1.15); }
 #restitution .step:hover {
   transform: translateY(-5px);
   box-shadow: 0 10px 20px rgba(0,0,0,0.25);
 }
 
-/* === PARTNERS === */
+/* Partners */
 .partners img {
   transition: transform 0.4s ease, opacity 0.3s ease;
   opacity: 0.85;
 }
 .partners img:hover { transform: scale(1.1); opacity: 1; }
 
-/* === CTA === */
+/* CTA Finale */
 .cta {
-  padding: 80px 0;
+  padding: 5rem 1rem;
   text-align: center;
   background-color: var(--main-color);
   color: #fff;
   border-radius: var(--radius);
   box-shadow: var(--shadow);
 }
-.cta .btn-cta {
+.btn-cta {
   font-weight: 700;
   font-size: 1.1rem;
   padding: 0.9rem 2.2rem;
   border-radius: 0.6rem;
   background: var(--accent-color);
-  color: var(--main-color);
+  color: #fff;
   transition: all 0.3s ease;
 }
-.cta .btn-cta:hover { background: skyblue; transform: scale(1.07); box-shadow: var(--shadow); }
+.btn-cta:hover { transform: scale(1.07); box-shadow: var(--shadow); }
 
-/* Animations */
-@keyframes fadeInUp {
-  0% { opacity: 0; transform: translate(-50%, 30px); }
-  100% { opacity: 1; transform: translate(-50%, 0); }
+/* Carousel */
+.carousel-inner img {
+  width: 100%;
+  max-height: 480px;
+  object-fit: cover;
+  object-position: center;
+  transition: transform 1.2s ease, filter 0.8s ease;
+  filter: brightness(1.15) contrast(1.1) saturate(1.1);
 }
+.carousel-item::before {
+  content: "";
+  position: absolute;
+  top:0; left:0;
+  width:100%; height:100%;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.25), rgba(0,0,0,0.55));
+  z-index:1;
+}
+.carousel-caption {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index:2;
+  background: rgba(0,0,0,0.45);
+  padding: 1rem 1.5rem;
+  border-radius: 0.8rem;
+  backdrop-filter: blur(4px);
+  width: 85%;
+  text-align: center;
+}
+.carousel-caption h5 { color: var(--accent-color); }
 
-/* === Responsive === */
+/* Responsive */
 @media (max-width: 768px) {
-  .carousel-caption {
-    bottom: 1.5rem;
-    width: 90%;
-    padding: 0.8rem 1rem;
-  }
+  .carousel-caption { width: 90%; bottom: 1.5rem; padding: 0.8rem 1rem; }
   .carousel-caption h5 { font-size: 1.2rem; }
   .carousel-caption p { font-size: 0.95rem; }
   .hero-intro h1 { font-size: 1.9rem; }
@@ -212,18 +147,17 @@ body {
 
 {% block content %}
 <!-- HERO INTRO -->
-<section class="hero-intro text-center py-5 fade-up">
+<section class="hero-intro text-center fade-up">
   <div class="container">
-    <h1 style="color: skyblue;" class="display-5 fw-bold mb-4">📦 Bienvenue sur la plateforme Lost & Found</h1>
+    <h1 class="display-5 fw-bold mb-4" style="color:  #e6b800;">Bienvenue sur la plateforme Lost & Found</h1>
     <p class="lead mb-4 fs-5">Déclarez un objet perdu, consultez les objets retrouvés et suivez vos démarches en toute sécurité.</p>
-  
   </div>
 </section>
 
 <!-- CAROUSEL MODERNE -->
 <section class="py-5 fade-up">
   <div class="container">
-    <h2 class="text-center fw-bold mb-4" style="color: skyblue;">🌀 Objets récents</h2>
+    <h2 class="text-center fw-bold mb-4" style="color:  #e6b800;">🌀 Objets récents</h2>
     {% if all_slides %}
     <div id="carouselAll" class="carousel slide carousel-fade position-relative" data-bs-ride="carousel" data-bs-interval="4500">
       <div class="carousel-progress position-absolute bottom-0 start-0 w-100">
@@ -248,26 +182,24 @@ body {
       </button>
     </div>
     {% else %}
-    <p class="text-center text-muted">Aucun objet à afficher pour le moment.</p>
+    <p class="text-center text-muted fs-5">Aucun objet disponible pour le moment. Revenez bientôt !</p>
     {% endif %}
   </div>
 </section>
 
 <!-- HERO ACTIONS -->
-<section class="hero-actions py-5 text-center fade-up">
-  <div class="container">
-    <a href="{% url 'objets_perdus' %}" class="btn-action btn-action-lost">🔴 Voir Objets perdus</a>
-    <a href="{% url 'objets_trouves' %}" class="btn-action btn-action-found">🟢 Voir Objets trouvés</a>
-    {% if user.is_authenticated and user.role == 'citoyen' %}
-      <a href="{% url 'dashboard_citoyen' %}" class="btn-action mt-3" style="background:#343a40;">🏠 Mon Dashboard</a>
-    {% endif %}
-  </div>
+<section class="hero-actions fade-up">
+  <a href="{% url 'objets_perdus' %}" class="btn-action btn-lost">🔴 Voir Objets perdus</a>
+  <a href="{% url 'objets_trouves' %}" class="btn-action btn-found">🟢 Voir Objets trouvés</a>
+  {% if user.is_authenticated and user.role == 'citoyen' %}
+  <a href="{% url 'dashboard_citoyen' %}" class="btn-action btn-dashboard">🏠 Mon Dashboard</a>
+  {% endif %}
 </section>
 
-<!-- AVANTAGES -->
+<!-- FEATURES / AVANTAGES -->
 <section id="about" class="features-section py-5 fade-up">
   <div class="container">
-    <h2 class="text-center fw-bold mb-5" style="color: skyblue;">✨ Les avantages de notre plateforme</h2>
+    <h2 class="text-center fw-bold mb-5" style="color:  #e6b800;">✨ Les avantages de notre plateforme</h2>
     <div class="row text-center g-4">
       <div class="col-md-4">
         <div class="card shadow-sm p-4 h-100">
@@ -297,7 +229,7 @@ body {
 <!-- RESTITUTION PAR LA POLICE -->
 <section id="restitution" class="py-5 fade-up">
   <div class="container">
-    <h2 class="text-center fw-bold mb-5" style="color:skyblue; font-size:2rem;">👮‍♂️ Comment se passe la restitution</h2>
+    <h2 class="text-center fw-bold mb-5" style="color:  #e6b800; font-size:2rem;"> Comment se passe la restitution</h2>
     <div class="row align-items-center g-4">
       <div class="col-md-6">
         <img src="{% static 'frontend/images/preuve_restitution.png' %}" alt="Restitution par la police"
@@ -305,60 +237,30 @@ body {
       </div>
       <div class="col-md-6">
         <div class="timeline">
+          {% for step in steps %}
           <div class="step mb-4 p-3 rounded-3 shadow-sm bg-light">
             <div class="d-flex align-items-start">
               <div class="icon flex-shrink-0 me-3 rounded-circle bg-warning text-dark d-flex justify-content-center align-items-center" style="width:55px;height:55px;font-size:1.4rem;">
-                <i class="bi bi-clipboard-check"></i>
+                <i class="{{ step.icon }}"></i>
               </div>
               <div class="text">
-                <h5 class="fw-bold mb-2">1️⃣ Vérification de la déclaration</h5>
-                <p>Le policier consulte la fiche de l’objet et valide l’identité du déclarant.</p>
+                <h5 class="fw-bold mb-2">{{ step.title }}</h5>
+                <p>{{ step.desc }}</p>
               </div>
             </div>
           </div>
-          <div class="step mb-4 p-3 rounded-3 shadow-sm bg-light">
-            <div class="d-flex align-items-start">
-              <div class="icon flex-shrink-0 me-3 rounded-circle bg-warning text-dark d-flex justify-content-center align-items-center" style="width:55px;height:55px;font-size:1.4rem;">
-                <i class="bi bi-person-badge"></i>
-              </div>
-              <div class="text">
-                <h5 class="fw-bold mb-2">2️⃣ Identification du propriétaire</h5>
-                <p>Une vérification d’identité est effectuée à l’aide d’une pièce officielle.</p>
-              </div>
-            </div>
-          </div>
-          <div class="step mb-4 p-3 rounded-3 shadow-sm bg-light">
-            <div class="d-flex align-items-start">
-              <div class="icon flex-shrink-0 me-3 rounded-circle bg-warning text-dark d-flex justify-content-center align-items-center" style="width:55px;height:55px;font-size:1.4rem;">
-                <i class="bi bi-box-seam"></i>
-              </div>
-              <div class="text">
-                <h5 class="fw-bold mb-2">3️⃣ Restitution de l’objet</h5>
-                <p>Le policier remet l’objet au propriétaire et enregistre la restitution.</p>
-              </div>
-            </div>
-          </div>
-          <div class="step p-3 rounded-3 shadow-sm bg-light">
-            <div class="d-flex align-items-start">
-              <div class="icon flex-shrink-0 me-3 rounded-circle bg-warning text-dark d-flex justify-content-center align-items-center" style="width:55px;height:55px;font-size:1.4rem;">
-                <i class="bi bi-file-earmark-text"></i>
-              </div>
-              <div class="text">
-                <h5 class="fw-bold mb-2">4️⃣ Génération d’une preuve</h5>
-                <p>Une attestation PDF est générée et remise au citoyen comme preuve.</p>
-              </div>
-            </div>
-          </div>
+          {% endfor %}
         </div>
       </div>
     </div>
   </div>
 </section>
 
+
 <!-- PARTENAIRES -->
 <section class="partners py-6 bg-light text-center fade-up">
   <div class="container">
-    <h2 class="display-6 fw-bold mb-4" style="color: skyblue;">🤝 Nos Partenaires</h2>
+    <h2 class="display-6 fw-bold mb-4">Nos Partenaires</h2>
     <p class="text-muted mb-5">Nous collaborons avec des organismes de confiance.</p>
     <div class="row justify-content-center align-items-center g-4">
       <div class="col-4 col-md-2"><img src="{% static 'frontend/img/partenaire1.png' %}" class="img-fluid" alt=""></div>
@@ -369,7 +271,7 @@ body {
 </section>
 
 <!-- CTA FINALE -->
-<section class="cta my-6 text-center fade-up">
+<section class="cta fade-up">
   <div class="container">
     <h2>Vous avez perdu ou trouvé un objet ?</h2>
     <p>Déclarez-le dès maintenant et aidez-nous à le restituer à son propriétaire.</p>
@@ -377,7 +279,7 @@ body {
   </div>
 </section>
 
-<!-- Script animation et progression -->
+<!-- Scripts -->
 <script>
 document.addEventListener("DOMContentLoaded", () => {
   const elements = document.querySelectorAll(".fade-up");
@@ -391,9 +293,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }, { threshold: 0.2 });
   elements.forEach(el => observer.observe(el));
 
-  // Progress bar
+  // Carousel progress
   const carousel = document.querySelector('#carouselAll');
-  if (carousel) {
+  if(carousel){
     const progressBar = carousel.querySelector('.progress-bar');
     const interval = 4500;
     const resetProgress = () => {

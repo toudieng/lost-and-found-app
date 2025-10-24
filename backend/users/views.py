@@ -5,18 +5,14 @@ from django.contrib.auth.decorators import login_required
 from backend.objets.models import Objet
 from .forms import UtilisateurCreationForm, ProfilForm
 from .models import Notification
-
 # -------------------- AUTHENTIFICATION --------------------
-
 def login_view(request):
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
-
         user = authenticate(request, email=email, password=password)
         if user:
             login(request, user)
-            
             # Redirection selon le rôle
             if hasattr(user, "role"):
                 if user.role == "admin":
@@ -29,7 +25,6 @@ def login_view(request):
                 return redirect("home")
         else:
             messages.error(request, "Adresse e-mail ou mot de passe incorrect.")
-    
     return render(request, 'users/login.html')
 
 
@@ -51,9 +46,7 @@ def register_view(request):
             messages.error(request, "❌ Erreurs dans le formulaire. Merci de corriger.")
     else:
         form = UtilisateurCreationForm()
-    
     return render(request, 'users/register.html', {'form': form})
-
 
 # -------------------- DASHBOARDS --------------------
 
@@ -62,11 +55,9 @@ def admin_dashboard(request):
     if not hasattr(request.user, "role") or request.user.role != "admin":
         messages.error(request, "Accès refusé : réservé aux administrateurs.")
         return redirect("home")
-
     total_objets = Objet.objects.count()
     objets_perdus = Objet.objects.filter(est_perdu=True).count()
     objets_trouves = Objet.objects.filter(est_perdu=False).count()
-
     context = {
         "total_objets": total_objets,
         "objets_perdus": objets_perdus,
@@ -77,7 +68,6 @@ def admin_dashboard(request):
 
 @login_required
 def dashboard_citoyen(request):
-    # Ici tu peux ajouter des infos spécifiques au citoyen
     return render(request, "frontend/citoyen/dashboard.html")
 
 
@@ -85,13 +75,11 @@ def dashboard_citoyen(request):
 def dashboard_policier(request):
     return render(request, "frontend/policier/dashboard.html")
 
-
 # -------------------- PROFILS --------------------
 
 @login_required
 def profil_admin(request):
     return render(request, "frontend/admin/profil.html", {"user": request.user})
-
 
 @login_required
 def modifier_profil_admin(request):
@@ -104,14 +92,11 @@ def modifier_profil_admin(request):
             return redirect("profil_admin")
     else:
         form = ProfilForm(instance=user)
-    
     return render(request, "frontend/admin/modifier_profil.html", {"form": form})
-
 
 @login_required
 def profil_police(request):
     return render(request, "frontend/policier/profil.html", {"user": request.user})
-
 
 @login_required
 def modifier_profil_police(request):
@@ -124,9 +109,7 @@ def modifier_profil_police(request):
             return redirect("profil_police")
     else:
         form = ProfilForm(instance=user)
-    
     return render(request, "frontend/policier/modifier_profil.html", {"form": form})
-
 
 @login_required
 def profil_citoyen(request):
@@ -139,9 +122,7 @@ def profil_citoyen(request):
             return redirect('profil_citoyen')
     else:
         form = ProfilForm(instance=user)
-    
     return render(request, 'frontend/citoyen/profil_citoyen.html', {'form': form})
-
 
 @login_required
 def modifier_profil_citoyen(request):
@@ -154,9 +135,7 @@ def modifier_profil_citoyen(request):
             return redirect("dashboard_citoyen")
     else:
         form = ProfilForm(instance=user)
-    
     return render(request, "frontend/citoyen/modifier_profil_citoyen.html", {"form": form})
-
 
 # -------------------- NOTIFICATIONS --------------------
 
