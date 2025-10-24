@@ -6,41 +6,21 @@
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/objets.css' %}">
 <style>
-.objet-card {
-    border-radius: 1rem;
-    overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-.objet-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-}
+.objet-card { border-radius: 1rem; overflow: hidden; transition: transform 0.3s ease, box-shadow 0.3s ease; }
+.objet-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.15); }
 .card-title { color: #6c1e3d !important; }
 .badge-success { background-color: #28a745; }
 .badge-warning { background-color: #ffc107; color: #212529; }
-.btn-outline-success {
-    color: #6c1e3d;
-    border-color: #6c1e3d;
-    font-weight: 600;
-}
-.btn-outline-success:hover {
-    background-color: #6c1e3d;
-    color: #fff;
-}
-.btn-primary {
-    background-color: #6c1e3d;
-    border-color: #6c1e3d;
-}
-.btn-primary:hover {
-    background-color: #53162b;
-    border-color: #53162b;
-}
+.btn-outline-success { color: #6c1e3d; border-color: #6c1e3d; font-weight: 600; }
+.btn-outline-success:hover { background-color: #6c1e3d; color: #fff; }
+.btn-primary { background-color: #6c1e3d; border-color: #6c1e3d; }
+.btn-primary:hover { background-color: #53162b; border-color: #53162b; }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="container mt-5">
-    <h2 class="mb-4 text-center fw-bold">✅ Objets Trouvés</h2>
+    <h2 class="mb-4 text-center fw-bold">Objets Trouvés</h2>
 
     <!-- Barre de recherche -->
     <form method="get" class="mb-4">
@@ -55,64 +35,42 @@
 
                     <!-- Image de l'objet -->
                     {% if declaration.objet.image %}
-                        <img src="{{ declaration.objet.image.url }}" 
-                             class="card-img-top" 
-                             style="height:200px; object-fit:cover;" 
-                             alt="Image de {{ declaration.objet.nom }}">
+                        <img src="{{ declaration.objet.image.url }}" class="card-img-top" style="height:200px; object-fit:cover;" alt="{{ declaration.objet.nom }}">
                     {% else %}
-                        <img src="{% static 'img/default_objet.png' %}" 
-                             class="card-img-top" 
-                             style="height:200px; object-fit:cover;" 
-                             alt="Image par défaut">
+                        <img src="{% static 'img/default_objet.png' %}" class="card-img-top" style="height:200px; object-fit:cover;" alt="Image par défaut">
                     {% endif %}
 
                     <div class="card-body">
-                        <h5 class="card-title fw-bold">🟢 {{ declaration.objet.nom }}</h5>
+                        <h5 class="card-title fw-bold">{{ declaration.objet.nom }}</h5>
                         <p class="card-text small text-muted">{{ declaration.description|truncatewords:20 }}</p>
-                        <p class="card-text small text-muted">Déclaré le {{ declaration.date_declaration|date:"d/m/Y H:i" }}</p>
+                        <p class="card-text small text-muted">Déclaré par {{ declaration.citoyen.username }}</p>
 
-                        <!-- Nombre de signalements -->
-                        {% if declaration.trouve_par.count > 0 %}
-                            <span class="badge bg-info">
-                                {{ declaration.trouve_par.count }} signalement{% if declaration.trouve_par.count > 1 %}s{% endif %}
+                        <!-- Statut et réclamants -->
+                        {% if declaration.reclame_par.exists %}
+                            <span class="badge bg-warning text-dark">
+                                Réclamé par 
+                                {% for user in declaration.reclame_par.all %}
+                                    {{ user.username }}{% if not forloop.last %}, {% endif %}
+                                {% endfor %}
                             </span>
-                        {% endif %}
-
-                        <!-- Réclamé ou trouvé -->
-                        {% if declaration.reclame_par %}
-                            <div class="d-flex align-items-center mt-2">
-                                {% if declaration.reclame_par.profile.image %}
-                                    <img src="{{ declaration.reclame_par.profile.image.url }}" 
-                                         alt="Photo de {{ declaration.reclame_par.username }}" 
-                                         class="rounded-circle me-2" width="32" height="32">
-                                {% else %}
-                                    <img src="{% static 'img/default_user.png' %}" 
-                                         alt="Utilisateur par défaut" 
-                                         class="rounded-circle me-2" width="32" height="32">
-                                {% endif %}
-                                <span class="badge bg-warning text-dark">
-                                    Réclamé par {{ declaration.reclame_par.username }}
-                                </span>
-                            </div>
                         {% else %}
-                            <span class="badge badge-success mt-2">Trouvé</span>
+                            <span class="badge badge-success">Disponible</span>
                         {% endif %}
                     </div>
 
-                    <!-- Boutons d'action simplifiés -->
+                    <!-- Boutons d'action -->
                     <div class="card-footer bg-light text-end">
-                        <a href="{% url 'objet_detail' declaration.objet.id %}" 
-                           class="btn btn-sm btn-outline-success me-1">
-                           🔍 Voir détails
-                        </a>
+                        <a href="{% url 'objet_detail' declaration.objet.id %}" class="btn btn-sm btn-outline-success me-1">🔍 Voir détails</a>
 
-                        {% if user.is_authenticated and declaration.reclame_par is None and user not in declaration.trouve_par.all %}
-                            <form method="POST" action="{% url 'ca_m_appartient' declaration.id %}" class="d-inline">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-sm btn-primary">
-                                    💙 Ça m’appartient
-                                </button>
-                            </form>
+                        {% if user.is_authenticated %}
+                            {% if user in declaration.reclame_par.all %}
+                                <button type="button" class="btn btn-sm btn-primary" disabled>💙 Déjà réclamé</button>
+                            {% else %}
+                                <form method="POST" action="{% url 'ca_m_appartient' declaration.id %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-primary">💙 Ça m’appartient</button>
+                                </form>
+                            {% endif %}
                         {% endif %}
                     </div>
 
@@ -121,9 +79,7 @@
             {% endif %}
         {% empty %}
             <div class="col-12">
-                <div class="alert alert-info text-center">
-                    Aucun objet trouvé.
-                </div>
+                <div class="alert alert-info text-center">Aucun objet trouvé.</div>
             </div>
         {% endfor %}
     </div>

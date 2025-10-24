@@ -4,48 +4,69 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h2 class="fw-bold mb-3">📌 Objets réclamés</h2>
+    <h2 class="fw-bold mb-4">📌 Objets réclamés</h2>
 
-    {% for dec in declarations %}
-<div class="card my-3 shadow-sm border-0">
-    <div class="card-body">
-        <h5 class="card-title">{{ dec.objet.nom }}</h5>
+    {% if declarations %}
+        {% for dec in declarations %}
+        <div class="card my-3 shadow-sm border-0">
+            <div class="card-body p-3">
+                <!-- Nom de l'objet -->
+                <h5 class="card-title fw-bold mb-3">{{ dec.objet.nom }}</h5>
 
-        <p class="mb-1">
-            <b>Réclamé par :</b>
-            <span class="badge bg-primary me-2">
-                👤 {{ dec.reclame_par.username }}
-            </span>
-            <small class="text-muted me-3">
-                ({{ dec.reclame_par.email|default:"N/A" }}, {{ dec.reclame_par.telephone|default:"N/A" }})
-            </small>
+                <!-- Réclamants -->
+                <div class="mb-2">
+                    <b>Réclamé par :</b>
+                    <div class="d-flex flex-wrap align-items-center mt-1">
+                        {% for user in dec.reclame_par.all %}
+                            <span class="badge bg-primary me-2 mb-2">👤 {{ user.username }}</span>
+                            <small class="text-muted me-3 mb-2">
+                                ({{ user.email|default:"N/A" }}, {{ user.telephone|default:"N/A" }})
+                            </small>
 
-            {% with restitution=restitutions_dict|get_item:(dec.objet.id, dec.reclame_par.id) %}
-                {% if restitution %}
-                    <button class="btn btn-secondary btn-sm" disabled>📅 Restitution planifiée</button>
-                {% else %}
-                    <a href="{% url 'planifier_restitution' dec.id dec.reclame_par.id %}" class="btn btn-primary btn-sm">
-                        📅 Programmer restitution
-                    </a>
-                {% endif %}
-            {% endwith %}
-        </p>
+                            {% if user.restitution_planifiee %}
+                                <button class="btn btn-secondary btn-sm mb-2" disabled>📅 Restitution planifiée</button>
+                            {% else %}
+                                <a href="{% url 'planifier_restitution' dec.id user.id %}" class="btn btn-primary btn-sm mb-2">
+                                    📅 Programmer restitution
+                                </a>
+                            {% endif %}
+                        {% empty %}
+                            <span class="text-muted">Aucun réclamant enregistré</span>
+                        {% endfor %}
+                    </div>
+                </div>
 
-        <p class="mb-1">
-            <b>Trouvé par :</b>
-            {% for user in dec.trouve_par.all %}
-                <span class="badge bg-success me-1 mb-1">👤 {{ user.username }}</span>
-            {% empty %}
-                <span class="text-muted">N/A</span>
-            {% endfor %}
-        </p>
+                <!-- Déclarant principal -->
+                <div class="mb-2">
+                    <b>Déclaré trouvé par :</b>
+                    {% if dec.trouveur %}
+                        <span class="badge bg-success me-1 mb-1">👤 {{ dec.trouveur.username }}</span>
+                    {% else %}
+                        <span class="text-muted">N/A</span>
+                    {% endif %}
+                </div>
 
-        <p class="mb-2">
-            <b>Date déclaration :</b> {{ dec.date_declaration|date:"d/m/Y H:i" }}
-        </p>
-    </div>
-</div>
-{% endfor %}
+                <!-- Autres trouveurs -->
+                <div class="mb-2">
+                    <b>Aussi trouvé par :</b>
+                    {% for user in dec.trouve_egalement_par.all %}
+                        <span class="badge bg-info me-1 mb-1">👤 {{ user.username }}</span>
+                    {% empty %}
+                        <span class="text-muted">Aucun autre trouveur</span>
+                    {% endfor %}
+                </div>
 
+                <!-- Date de déclaration -->
+                <p class="text-muted mb-0">
+                    <small>📅 Date déclaration : {{ dec.date_declaration|date:"d/m/Y H:i" }}</small>
+                </p>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="alert alert-info text-center mt-4">
+            Aucun objet réclamé pour le moment.
+        </div>
+    {% endif %}
 </div>
 {% endblock %}

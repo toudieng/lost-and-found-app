@@ -1,10 +1,9 @@
 {% extends "frontend/base.html" %}
-{% load widget_tweaks %}
 
 {% block extra_css %}
 <style>
 :root {
-    --jaune: #ffc107; /* 🎨 Jaune principal */
+    --jaune: #ffc107;
     --jaune-fonce: #e0a800;
     --bleu-clair: #0d6efd;
     --bleu-fonce: #084298;
@@ -57,7 +56,6 @@ input:focus, select:focus, textarea:focus {
     font-weight: 500;
 }
 
-/* === 🌟 Bouton jaune avec effet brillant === */
 .btn-submit {
     position: relative;
     background-color: var(--jaune);
@@ -138,40 +136,43 @@ input:focus, select:focus, textarea:focus {
                 {% csrf_token %}
 
                 <div class="mb-3">
-                    {{ form.nom_objet|add_class:"form-control form-control-sm"|attr:"placeholder: Nom de l'objet *" }}
+                    {{ form.nom_objet }}
                     {% for error in form.nom_objet.errors %}
                         <div class="text-error">{{ error }}</div>
                     {% endfor %}
                 </div>
 
                 <div class="mb-3">
-                    {{ form.lieu|add_class:"form-control form-control-sm"|attr:"placeholder: Lieu de perte ou de trouvaille" }}
+                    {{ form.lieu }}
                     {% for error in form.lieu.errors %}
                         <div class="text-error">{{ error }}</div>
                     {% endfor %}
                 </div>
 
                 <div class="mb-3">
-                    {{ form.description|add_class:"form-control form-control-sm"|attr:"placeholder: Description (facultative)" }}
+                    {{ form.description }}
                     {% for error in form.description.errors %}
                         <div class="text-error">{{ error }}</div>
                     {% endfor %}
                 </div>
 
                 <div class="mb-3">
-                    {{ form.image|add_class:"form-control form-control-sm"|attr:"placeholder: Ajouter une photo (facultatif)" }}
+                    {{ form.image }}
                     {% for error in form.image.errors %}
                         <div class="text-error">{{ error }}</div>
                     {% endfor %}
                     <img id="preview-image" src="#" alt="Prévisualisation">
                 </div>
 
+                <!-- Bloc Type de déclaration -->
                 <div class="mb-4 text-center">
                     <p class="fw-bold mb-2 text-warning">📌 Type de déclaration</p>
                     {% for radio in form.etat %}
                         <div class="form-check form-check-inline">
                             {{ radio.tag }}
-                            <label class="form-check-label" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
+                            <label class="form-check-label" for="{{ radio.id_for_label }}">
+                                {{ radio.choice_label }}
+                            </label>
                         </div>
                     {% endfor %}
                     {% for error in form.etat.errors %}
@@ -180,7 +181,7 @@ input:focus, select:focus, textarea:focus {
                 </div>
 
                 <div class="d-grid">
-                    <button type="submit" class="btn btn-submit fw-bold"> Soumettre</button>
+                    <button type="submit" class="btn btn-submit fw-bold">Soumettre</button>
                 </div>
             </form>
         </div>

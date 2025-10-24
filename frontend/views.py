@@ -367,24 +367,24 @@ def objets_reclames(request):
     declarations = (
         Declaration.objects
         .filter(objet__etat=EtatObjet.RECLAME, reclame_par__isnull=False)
-        .select_related("objet", "reclame_par", "citoyen")
-        .prefetch_related("trouve_par")
+        .select_related("objet", "citoyen")
+        .prefetch_related("reclame_par", "trouve_egalement_par")
         .order_by("-date_declaration")
     )
 
-    for dec in declarations:
-        dec.trouveur = dec.citoyen if dec.objet.etat == EtatObjet.TROUVE else None
+    # Corriger ici selon ton modèle
+    restitutions = Restitution.objects.filter(restitue_par__isnull=True).select_related("objet", "citoyen")
+    restitutions_dict = { (r.objet.id, r.citoyen.id): r for r in restitutions }
 
-    restitutions = Restitution.objects.filter(restitue_par__isnull=True).select_related("objet")
-    restitutions_dict = {r.objet.id: r for r in restitutions}
+    for dec in declarations:
+        dec.trouveur = dec.citoyen if dec.etat_initial == EtatObjet.TROUVE else None
+        for user in dec.reclame_par.all():
+            user.restitution_planifiee = restitutions_dict.get((dec.objet.id, user.id))
 
     return render(
         request,
         "frontend/objets/objets_reclames.html",
-        {
-            "declarations": declarations,
-            "restitutions_dict": restitutions_dict,
-        },
+        {"declarations": declarations},
     )
 
 
@@ -879,37 +879,53 @@ def je_le_trouve(request, declaration_id):
 
 
 @login_required
+
+
 def ca_m_appartient(request, declaration_id):
+    if not request.user.is_authenticated:
+        messages.error(request, "⚠️ Vous devez être connecté pour réclamer un objet.")
+        return redirect("login")
+
     declaration = get_object_or_404(Declaration, id=declaration_id)
 
-    if declaration.objet.etat == EtatObjet.TROUVE and declaration.reclame_par is None:
-        declaration.reclame_par = request.user
-        declaration.objet.etat = EtatObjet.RECLAME
-        declaration.objet.save()
-        declaration.save()
+    if declaration.objet.etat != EtatObjet.TROUVE:
+        messages.error(request, "⚠️ Cet objet n'est pas disponible pour réclamation.")
+        return redirect("objets_trouves")
 
-        if declaration.citoyen and declaration.citoyen.email:
-            objet_url = request.build_absolute_uri(reverse('objet_detail', args=[declaration.objet.id]))
-            try:
-                send_mail(
-                    subject=f"[Objet Trouvé] Votre objet '{declaration.objet.nom}' a été réclamé !",
-                    message=(
-                        f"Bonjour {declaration.citoyen.username},\n\n"
-                        f"L'objet que vous avez déclaré perdu a été retrouvé et réclamé par "
-                        f"{request.user.username}.\n\n"
-                        f"Détails : {objet_url}"
-                    ),
-                    from_email=settings.DEFAULT_FROM_EMAIL,
-                    recipient_list=[declaration.citoyen.email],
-                    fail_silently=False,
-                )
-            except (BadHeaderError, ConnectionError, OSError) as e:
-                messages.warning(request, f"⚠️ Impossible d'envoyer l'email : {e}")
+    # Vérifie si l'utilisateur a déjà réclamé
+    if declaration.reclame_par.filter(id=request.user.id).exists():
+        messages.warning(request, "⚠️ Vous avez déjà réclamé cet objet.")
+        return redirect("objets_trouves")
 
-        messages.success(request, f"✅ Vous avez réclamé l'objet '{declaration.objet.nom}'.")
-    else:
-        messages.error(request, "⚠️ Cet objet a déjà été réclamé ou n'est pas encore marqué comme trouvé.")
+    try:
+        with transaction.atomic():
+            declaration.reclame_par.add(request.user)  # ajout dans ManyToManyField
+            declaration.objet.etat = EtatObjet.RECLAME
+            declaration.objet.save()
+            declaration.save()
+    except Exception as e:
+        messages.error(request, f"⚠️ Une erreur est survenue : {e}")
+        return redirect("objets_trouves")
 
+    # Envoi mail au déclarant
+    if declaration.citoyen and declaration.citoyen.email:
+        objet_url = request.build_absolute_uri(reverse('objet_detail', args=[declaration.objet.id]))
+        try:
+            send_mail(
+                subject=f"[Objet Trouvé] Votre objet '{declaration.objet.nom}' a été réclamé !",
+                message=(
+                    f"Bonjour {declaration.citoyen.username},\n\n"
+                    f"L'objet que vous avez déclaré perdu a été réclamé par {request.user.username}.\n\n"
+                    f"Détails : {objet_url}"
+                ),
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[declaration.citoyen.email],
+                fail_silently=False,
+            )
+        except (BadHeaderError, ConnectionError, OSError) as e:
+            messages.warning(request, f"⚠️ Impossible d'envoyer l'email : {e}")
+
+    messages.success(request, f"✅ Vous avez réclamé l'objet '{declaration.objet.nom}'.")
     return redirect("objets_trouves")
 
 
