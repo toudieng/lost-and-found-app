@@ -46,7 +46,7 @@
                         <p class="card-text small text-muted">Déclaré par {{ declaration.citoyen.username }}</p>
 
                         <!-- Statut et réclamants -->
-                        {% if declaration.reclame_par.exists %}
+                        {% if declaration.reclame_par.all %}
                             <span class="badge bg-warning text-dark">
                                 Réclamé par 
                                 {% for user in declaration.reclame_par.all %}

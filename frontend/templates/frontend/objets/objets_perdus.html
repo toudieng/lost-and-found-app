@@ -51,8 +51,8 @@
             <div class="card objet-card shadow-sm h-100 border-0">
 
                 <!-- Image -->
-                {% if declaration.objet.image %}
-                    <img src="{{ declaration.objet.image.url }}" class="card-img-top" style="height:200px; object-fit:cover;" alt="Image de {{ declaration.objet.nom }}">
+                {% if declaration.image %}
+                    <img src="{{ declaration.image.url }}" class="card-img-top" style="height:200px; object-fit:cover;" alt="Image de {{ declaration.objet.nom }}">
                 {% else %}
                     <img src="{% static 'img/default_objet.png' %}" class="card-img-top" style="height:200px; object-fit:cover;" alt="Image par défaut">
                 {% endif %}
@@ -70,6 +70,11 @@
                     {% elif declaration.objet.etat == "réclamé" %}
                         <span class="badge badge-warning">Réclamé</span>
                     {% endif %}
+
+                    <!-- Compteur de citoyens ayant trouvé -->
+                    <p class="card-text small text-muted mt-2">
+                        👥 {{ declaration.trouve_par.count }} citoyen(s) l'ont trouvé
+                    </p>
                 </div>
 
                 <!-- Actions -->
@@ -79,18 +84,18 @@
                     </a>
 
                     {% if user.is_authenticated %}
-                        {% if declaration.reclame_par is None and user not in declaration.trouve_par.all %}
+                        {% if user not in declaration.trouve_par.all %}
                             <form method="POST" action="{% url 'je_le_trouve' declaration.id %}" class="d-inline">
                                 {% csrf_token %}
                                 <button type="submit" class="btn btn-sm btn-success">
                                     🍏 Je l’ai trouvé
                                 </button>
                             </form>
+                        {% else %}
+                            <span class="text-success small">✅ Vous avez déjà signalé l’avoir trouvé</span>
                         {% endif %}
                     {% else %}
-                        <!-- Toujours afficher le bouton, mais rediriger vers le login -->
-                        <a href="{% url 'login' %}?next={% url 'objets_perdus' %}" 
-                           class="btn btn-sm btn-success">
+                        <a href="{% url 'login' %}?next={% url 'objets_perdus' %}" class="btn btn-sm btn-success">
                             🍏 Je l’ai trouvé
                         </a>
                     {% endif %}

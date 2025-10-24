@@ -1,96 +1,57 @@
 from django import forms
-from backend.users.models import Commissariat
-from .models import Declaration, Objet, EtatObjet
-
-
-
-from django import forms
 from django.utils import timezone
 from .models import Declaration, Objet, EtatObjet
+from backend.objets.models import Commissariat, Restitution
 
 
-from django import forms
-from django.utils import timezone
-from .models import Declaration, Objet, EtatObjet
+
 
 class DeclarationForm(forms.ModelForm):
     nom_objet = forms.CharField(
         max_length=100,
-        widget=forms.TextInput(attrs={
-            'class': 'form-control',
-            'placeholder': "Nom de l'objet"
-        }),
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': "Nom de l'objet"}),
         label="Nom de l'objet",
         required=True
     )
-
     description = forms.CharField(
         required=False,
-        widget=forms.Textarea(attrs={
-            'class': 'form-control',
-            'rows': 3,
-            'placeholder': 'Description (facultative)'
-        }),
+        widget=forms.Textarea(attrs={'class': 'form-control', 'rows':3, 'placeholder': 'Description (facultative)'}),
         label="Description"
     )
+    image = forms.ImageField(required=False, label="Photo (facultative)")
 
-    image = forms.ImageField(
-        required=False,
-        label="Photo (facultative)"
-    )
-
-    etat = forms.ChoiceField(
-        choices=[
-            (EtatObjet.PERDU, "Objet perdu"),
-            (EtatObjet.TROUVE, "Objet trouvé")
-        ],
-        widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
+    # Champ pour l'état initial choisi par le déclarant
+    etat_initial = forms.ChoiceField(
+        choices=[(EtatObjet.PERDU, "Objet perdu"), (EtatObjet.TROUVE, "Objet trouvé")],
+        widget=forms.RadioSelect(attrs={'class':'form-check-input'}),
         label="Type de déclaration",
         required=True
     )
 
     class Meta:
         model = Declaration
-        fields = ['nom_objet', 'lieu', 'etat', 'description', 'image']
+        fields = ['nom_objet', 'lieu', 'etat_initial', 'description', 'image']
         widgets = {
-            'lieu': forms.TextInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Lieu où l’objet a été perdu ou trouvé'
-            }),
+            'lieu': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Lieu où l’objet a été perdu ou trouvé'}),
         }
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        # Pré-remplissage des champs à partir de l'objet associé si existant
-        objet = getattr(self.instance, 'objet', None)
-        if objet:
-            self.fields['nom_objet'].initial = objet.nom or ''
-            self.fields['description'].initial = objet.description or ''
-            self.fields['etat'].initial = objet.etat or ''
-
     def save(self, citoyen=None, commit=True):
-        """
-        Sauvegarde la déclaration avec création ou mise à jour de l'objet lié.
-        """
         declaration = super().save(commit=False)
 
-        # Lier le citoyen déclarant si fourni
         if citoyen:
             declaration.citoyen = citoyen
 
-        # Récupérer les données nettoyées
+        # Création ou mise à jour de l'objet lié
         nom_objet = self.cleaned_data.get('nom_objet')
         description = self.cleaned_data.get('description')
         image = self.cleaned_data.get('image')
-        etat = self.cleaned_data.get('etat')
+        etat_initial = self.cleaned_data.get('etat_initial')
 
-        # Mise à jour ou création de l'objet associé
         if declaration.objet:
             objet = declaration.objet
             objet.nom = nom_objet
             objet.description = description
-            objet.etat = etat
+            objet.etat = etat_initial
             if image:
                 objet.image = image
             objet.save()
@@ -98,11 +59,12 @@ class DeclarationForm(forms.ModelForm):
             objet = Objet.objects.create(
                 nom=nom_objet,
                 description=description,
-                etat=etat,
+                etat=etat_initial,
                 image=image
             )
             declaration.objet = objet
 
+        declaration.etat_initial = etat_initial
         declaration.date_declaration = timezone.now()
 
         if commit:
@@ -110,20 +72,19 @@ class DeclarationForm(forms.ModelForm):
 
         return declaration
 
-
-
-class RestitutionForm(forms.Form):
-    date_restitution = forms.DateField(
-        widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
-        label="Date de restitution"
-    )
-    heure_restitution = forms.TimeField(
-        widget=forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}),
-        label="Heure de restitution"
-    )
-    commissariat = forms.ModelChoiceField(
-        queryset=Commissariat.objects.all(),
-        widget=forms.Select(attrs={'class': 'form-select'}),
-        empty_label="-- Sélectionnez un commissariat --",
-        label="Commissariat"
-    )
+class RestitutionForm(forms.ModelForm):
+    class Meta:
+        model = Restitution
+        fields = ['citoyen', 'date_restitution', 'heure_restitution', 'commissariat']
+        widgets = {
+            'citoyen': forms.Select(attrs={'class': 'form-select'}),
+            'date_restitution': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'heure_restitution': forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}),
+            'commissariat': forms.Select(attrs={'class': 'form-select'}),
+        }
+        labels = {
+            'citoyen': 'Réclamant',
+            'date_restitution': 'Date de restitution',
+            'heure_restitution': 'Heure de restitution',
+            'commissariat': 'Commissariat'
+        }

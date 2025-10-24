@@ -167,7 +167,7 @@ input:focus, select:focus, textarea:focus {
                 <!-- Bloc Type de déclaration -->
                 <div class="mb-4 text-center">
                     <p class="fw-bold mb-2 text-warning">📌 Type de déclaration</p>
-                    {% for radio in form.etat %}
+                    {% for radio in form.etat_initial %}
                         <div class="form-check form-check-inline">
                             {{ radio.tag }}
                             <label class="form-check-label" for="{{ radio.id_for_label }}">
@@ -175,7 +175,7 @@ input:focus, select:focus, textarea:focus {
                             </label>
                         </div>
                     {% endfor %}
-                    {% for error in form.etat.errors %}
+                    {% for error in form.etat_initial.errors %}
                         <div class="text-error">{{ error }}</div>
                     {% endfor %}
                 </div>

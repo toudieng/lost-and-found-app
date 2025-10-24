@@ -81,4 +81,19 @@ urlpatterns = [
 
     # Statistiques
     path("dashboard/admin/stats/", views.voir_stats, name="voir_stats"),
+     #  Objets déclarés perdus et trouvés (déclaré par quelqu'un, trouvé par au moins quelqu'un),
+    path(
+        "objets/perdus-trouves/",
+        views.objets_perdus_trouves,
+        name="objets_perdus_trouves"
+    ),
+
+    # Objets déclarés trouvés et réclamés (trouvé par quelqu'un, réclamé par quelqu'un d'autre)
+    path(
+        "objets/trouves-reclames/",
+        views.objets_trouves_reclames,
+        name="objets_trouves_reclames"
+    ),
+
+    
 ]

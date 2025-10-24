@@ -49,6 +49,12 @@ class Objet(models.Model):
         return f"{self.nom} ({self.get_etat_display()})"
 
 # --- DECLARATION ---
+from django.db import models
+from django.conf import settings
+from django.utils import timezone
+from backend.objets.models import Objet, EtatObjet
+
+
 class Declaration(models.Model):
     citoyen = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -57,17 +63,20 @@ class Declaration(models.Model):
         null=True,
         verbose_name="Citoyen"
     )
+
     objet = models.ForeignKey(
         Objet,
         on_delete=models.CASCADE,
         null=True,
         verbose_name="Objet déclaré"
     )
+
     date_declaration = models.DateTimeField(default=timezone.now, verbose_name="Date de déclaration")
     lieu = models.CharField(max_length=200, blank=True, null=True, verbose_name="Lieu")
     description = models.TextField(blank=True, null=True, verbose_name="Description")
     image = models.ImageField(upload_to='declarations/', blank=True, null=True, verbose_name="Image")
 
+    # --- Relations avec les citoyens ---
     trouve_par = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
         blank=True,
@@ -75,27 +84,55 @@ class Declaration(models.Model):
         limit_choices_to={'role': 'citoyen'},
         verbose_name="Trouvé par"
     )
-
-    reclame_par = models.ForeignKey(
+    reclame_par = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
-        on_delete=models.SET_NULL,
-        null=True,
         blank=True,
         related_name='objets_reclames',
         limit_choices_to={'role': 'citoyen'},
         verbose_name="Réclamé par"
     )
 
-    # --- Nouveau champ : état initial de l'objet lors de la déclaration ---
+    # --- État initial de la déclaration ---
     etat_initial = models.CharField(
         max_length=20,
         choices=EtatObjet.choices,
-        default=EtatObjet.PERDU,
         verbose_name="État initial"
+    )
+
+    # --- Nouveau champ pour clarifier le type de déclaration ---
+    TYPE_CHOICES = [
+        ('perdu', 'Objet perdu'),
+        ('trouve', 'Objet trouvé'),
+    ]
+    type_declaration = models.CharField(
+        max_length=10,
+        choices=TYPE_CHOICES,
+        verbose_name="Type de déclaration"
     )
 
     def __str__(self):
         return f"Déclaration - {self.objet.nom if self.objet else 'Objet inconnu'}"
+
+    def premier_reclamant(self):
+        """Retourne le premier réclamant ou None si aucun"""
+        return self.reclame_par.first() if self.reclame_par.exists() else None
+
+    def save(self, *args, **kwargs):
+        """Assure la cohérence entre le type de déclaration et l'état initial"""
+        if not self.etat_initial:
+            if self.type_declaration == 'perdu':
+                self.etat_initial = EtatObjet.PERDU
+                if self.objet:
+                    self.objet.etat = EtatObjet.PERDU
+            elif self.type_declaration == 'trouve':
+                self.etat_initial = EtatObjet.TROUVE
+                if self.objet:
+                    self.objet.etat = EtatObjet.TROUVE
+
+        if self.objet:
+            self.objet.save()
+
+        super().save(*args, **kwargs)
 
 # --- RESTITUTION ---
 class Restitution(models.Model):
@@ -147,13 +184,14 @@ class Restitution(models.Model):
     )
 
     def save(self, *args, **kwargs):
+        """Met à jour l'état de l'objet si restitution effectuée"""
         super().save(*args, **kwargs)
         if self.objet and self.statut == StatutRestitution.EFFECTUEE:
             self.objet.etat = EtatObjet.RESTITUE
             self.objet.save()
 
     def __str__(self):
-        return f"Restitution de {self.objet} à {self.citoyen}"
+        return f"Restitution de {self.objet.nom if self.objet else 'Objet inconnu'} à {self.citoyen.username if self.citoyen else 'Inconnu'}"
 
     class Meta:
         verbose_name = "Restitution"

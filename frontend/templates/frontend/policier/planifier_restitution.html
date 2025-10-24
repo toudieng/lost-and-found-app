@@ -23,13 +23,16 @@
                             <input type="hidden" name="objet" value="{{ restitution.objet.id }}">
                         </div>
 
-                        <!-- Réclamant -->
+                        <!-- Réclamant (liste déroulante) -->
                         <div class="mb-3">
                             <label class="form-label fw-semibold">Réclamé par</label>
                             {% if declaration %}
-                                <input type="text" class="form-control" 
-                                       value="{{ declaration.reclame_par.username }}" disabled>
-                                <input type="hidden" name="citoyen" value="{{ declaration.reclame_par.id }}">
+                                <select class="form-select" name="citoyen" required>
+                                    <option value="" disabled selected>-- Sélectionnez le réclamant --</option>
+                                    {% for user in declaration.reclame_par.all %}
+                                        <option value="{{ user.id }}">{{ user.username }}</option>
+                                    {% endfor %}
+                                </select>
                             {% else %}
                                 <input type="text" class="form-control" 
                                        value="{{ restitution.citoyen.username }}" disabled>

@@ -5,6 +5,7 @@
 
 {% block extra_css %}
 <style>
+    /* Styles existants pour sidebar, main-content, stats-card, chart-container... */
     body { display: flex; flex-direction: column; min-height: 100vh; }
     .sidebar { background: linear-gradient(180deg, #343a40, #1d1f21); color: #fff; min-height: 100vh; padding: 2rem 1rem; position: sticky; top: 0; }
     .sidebar h4 { color: #ffc107; text-align: center; margin-bottom: 1.5rem; }
@@ -26,16 +27,20 @@
         <h4>👮 Policier</h4>
         <ul class="nav flex-column">
             <li class="nav-item mb-2">
-                <a class="nav-link {% if request.resolver_match.url_name == 'historique_restitutions' %}active{% endif %}"
-                   href="{% url 'historique_restitutions' %}">📂 Historique des restitutions</a>
+                <a class="nav-link {% if request.resolver_match.url_name == 'objets_perdus_trouves' %}active{% endif %}"
+                   href="{% url 'objets_perdus_trouves' %}">📌 Objets perdus & trouvés</a>
             </li>
             <li class="nav-item mb-2">
-                <a class="nav-link {% if request.resolver_match.url_name == 'objets_reclames' %}active{% endif %}"
-                   href="{% url 'objets_reclames' %}">📍 Objets à restituer (réclamés)</a>
+                <a class="nav-link {% if request.resolver_match.url_name == 'objets_trouves_reclames' %}active{% endif %}"
+                   href="{% url 'objets_trouves_reclames' %}">📌 Objets trouvés & réclamés</a>
             </li>
             <li class="nav-item mb-2">
                 <a class="nav-link {% if request.resolver_match.url_name == 'objets_trouves_attente' %}active{% endif %}"
                    href="{% url 'objets_trouves_attente' %}">📦 Objets retrouvés (en attente)</a>
+            </li>
+            <li class="nav-item mb-2">
+                <a class="nav-link {% if request.resolver_match.url_name == 'historique_restitutions' %}active{% endif %}"
+                   href="{% url 'historique_restitutions' %}">📂 Historique des restitutions</a>
             </li>
         </ul>
     </div>
@@ -45,31 +50,42 @@
         <h2 class="welcome-title">Bienvenue, Policier 👋</h2>
         <p class="text-muted mb-4">Gérez les objets et planifiez les restitutions depuis ce tableau de bord.</p>
 
-        <!-- Statistiques -->
+        <!-- Statistiques rapides -->
         <div class="row g-3 mb-4">
-            <div class="col-md-4">
+            <div class="col-md-3">
+                <a href="{% url 'objets_perdus_trouves' %}" class="text-decoration-none">
+                    <div class="stats-card">
+                        <span class="stats-icon">📌</span>
+                        <div>
+                            <h5 class="mb-0">{{ nb_objets_perdus_trouves|default:"0" }}</h5>
+                            <small class="text-muted">Objets perdus & trouvés</small>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="{% url 'objets_trouves_reclames' %}" class="text-decoration-none">
+                    <div class="stats-card">
+                        <span class="stats-icon">📌</span>
+                        <div>
+                            <h5 class="mb-0">{{ nb_objets_trouves_reclames|default:"0" }}</h5>
+                            <small class="text-muted">Objets trouvés & réclamés</small>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-3">
                 <a href="{% url 'objets_trouves_attente' %}" class="text-decoration-none">
                     <div class="stats-card">
                         <span class="stats-icon">📦</span>
                         <div>
-                            <h5 class="mb-0">{{ nb_objets_trouves|default:"0" }}</h5>
+                            <h5 class="mb-0">{{ nb_objets_trouves_attente|default:"0" }}</h5>
                             <small class="text-muted">Objets retrouvés (en attente)</small>
                         </div>
                     </div>
                 </a>
             </div>
-            <div class="col-md-4">
-                <a href="{% url 'objets_reclames' %}" class="text-decoration-none">
-                    <div class="stats-card">
-                        <span class="stats-icon">📍</span>
-                        <div>
-                            <h5 class="mb-0">{{ nb_objets_a_restituer|default:"0" }}</h5>
-                            <small class="text-muted">Objets à restituer</small>
-                        </div>
-                    </div>
-                </a>
-            </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <a href="{% url 'historique_restitutions' %}" class="text-decoration-none">
                     <div class="stats-card">
                         <span class="stats-icon">📂</span>
@@ -86,14 +102,14 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="chart-container">
-                    <h5 class="mb-3">Objets retrouvés par mois</h5>
-                    <canvas id="chartTrouves"></canvas>
+                    <h5 class="mb-3">Objets perdus & trouvés par mois</h5>
+                    <canvas id="chartPerdusTrouves"></canvas>
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="chart-container">
-                    <h5 class="mb-3">Objets restitués par mois</h5>
-                    <canvas id="chartRestitues"></canvas>
+                    <h5 class="mb-3">Objets trouvés & réclamés par mois</h5>
+                    <canvas id="chartTrouvesReclames"></canvas>
                 </div>
             </div>
         </div>
@@ -103,14 +119,14 @@
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-const ctxTrouves = document.getElementById('chartTrouves').getContext('2d');
-new Chart(ctxTrouves, {
+const ctxPerdus = document.getElementById('chartPerdusTrouves').getContext('2d');
+new Chart(ctxPerdus, {
     type: 'bar',
     data: {
-        labels: {{ labels_trouves|safe }},
+        labels: {{ labels_perdus_trouves|safe }},
         datasets: [{
-            label: 'Objets retrouvés',
-            data: {{ data_trouves|safe }},
+            label: 'Objets perdus & trouvés',
+            data: {{ data_perdus_trouves|safe }},
             backgroundColor: '#6c1e3d'
         }]
     },
@@ -121,14 +137,14 @@ new Chart(ctxTrouves, {
     }
 });
 
-const ctxRestitues = document.getElementById('chartRestitues').getContext('2d');
-new Chart(ctxRestitues, {
+const ctxReclames = document.getElementById('chartTrouvesReclames').getContext('2d');
+new Chart(ctxReclames, {
     type: 'bar',
     data: {
-        labels: {{ labels_restitues|safe }},
+        labels: {{ labels_trouves_reclames|safe }},
         datasets: [{
-            label: 'Objets restitués',
-            data: {{ data_restitues|safe }},
+            label: 'Objets trouvés & réclamés',
+            data: {{ data_trouves_reclames|safe }},
             backgroundColor: '#28a745'
         }]
     },
