@@ -6,119 +6,169 @@
 {% block extra_css %}
 <style>
 :root {
-    --main-color: #6c1e3d;   /* 🎨 Couleur principale (menu, boutons, titres) */
-    --main-color-dark: #53162b;
+    --main-color: #495057;
+    --main-color-dark: #343a40;
+    --button-color:skyblue !important;
+    --input-bg: rgba(255,255,255,0.9);
 }
 
-body { background: linear-gradient(135deg, #f5f5f5, #e0e0e0); }
+body {
+    background: linear-gradient(135deg, #f5f5f5, #e0e0e0);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
 
 .form-container {
-    background: #fff;
+    background: var(--input-bg);
+    backdrop-filter: blur(10px);
     padding: 2.5rem 2rem;
     border-radius: 1rem;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-.form-container:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 25px rgba(0,0,0,0.15);
-}
-
-.form-title { 
-    color:  #495057; 
-    font-weight: 700; 
-    font-size: 1.5rem; 
-    text-align:center; 
-}
-
-input, select, textarea {
+    box-shadow: 0 10px 30px rgba(0,0,0,0.12);
     width: 100%;
-    height: 42px;
-    font-size: 0.95rem;
-    padding: 0.375rem 0.75rem;
-    border: 1px solid #ccc;
-    border-radius: 0.5rem;
-    transition: border-color 0.3s, box-shadow 0.3s;
+    max-width: 400px;
 }
-input:focus, select:focus, textarea:focus {
+
+.form-title {
+    color: var(--button-color);
+    font-weight: 700;
+    font-size: 1.7rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+.form-title::after {
+    content: '';
+    display: block;
+    width: 50px;
+    height: 3px;
+    background: var(--button-color);
+    margin: 8px auto 0;
+    border-radius: 2px;
+}
+
+.input-group {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.input-group i.icon-left {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--main-color);
+    font-size: 1.1rem;
+}
+
+.input-group input {
+    width: 100%;
+    height: 45px;
+    padding: 0.375rem 2.5rem 0.375rem 2.5rem;
+    border-radius: 0.6rem;
+    border: 1px solid #ced4da;
+    transition: 0.3s ease;
+}
+
+.input-group input:focus {
     border-color: var(--main-color);
-    box-shadow: 0 0 5px rgba(108,30,61,0.5);
+    box-shadow: 0 0 6px rgba(73,80,87,0.4);
     outline: none;
 }
 
-.form-label { font-weight: 600; margin-bottom: 0.3rem; display:block; }
-
-.password-wrapper { position: relative; }
-.password-wrapper .form-control { padding-right: 2.5rem; }
-.toggle-password {
+.input-group i.toggle-password {
     position: absolute;
+    right: 0.75rem;
     top: 50%;
-    right: 12px;
     transform: translateY(-50%);
     cursor: pointer;
     color: var(--main-color);
 }
 
 .btn-submit {
-    background-color:  #495057;
-    border-color:  #495057;
-    color: #fff;
+    background: var(--button-color) !important;
+    color: #495057;
+    border: none;
+    border-radius: 0.6rem;
+    height: 45px;
     font-weight: 700;
-    transition: all 0.3s;
+    width: 100%;
 }
 .btn-submit:hover {
-    background-color: var(--main-color-dark);
-    border-color: var(--main-color-dark);
-    transform: translateY(-1px);
+    background: #0096e6 !important;
 }
 
 .text-error { color: #dc3545; font-size: 0.85rem; }
+.alert { border-radius: 0.5rem; font-size: 0.9rem; text-align:center; }
+
+.register-link {
+    text-align: center;
+    margin-top: 1rem;
+}
+.register-link a {
+    color: var(--main-color);
+    font-weight: 600;
+    text-decoration: none;
+}
+.register-link a:hover { color: var(--main-color-dark); }
 
 @media (max-width:576px) {
-    .form-container { padding: 1.5rem; }
-    .form-title { font-size: 1.3rem; }
+    .form-container { padding: 2rem 1rem; }
+    .form-title { font-size: 1.5rem; }
 }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="row justify-content-center mt-5">
-    <div class="col-md-6 col-lg-5 col-xl-4">
+<div class="row justify-content-center">
+    <div class="col-12 d-flex justify-content-center">
         <div class="form-container">
-            <h4 class="mb-4 form-title">📝 Inscription</h4>
+            <h4 class="form-title">📝 Inscription</h4>
 
             {% if form.errors %}
-            <div class="alert alert-danger py-2 px-3 small">Veuillez corriger les erreurs ci-dessous.</div>
+                <div class="alert alert-danger py-2 px-3">
+                    Veuillez corriger les erreurs ci-dessous.
+                </div>
             {% endif %}
 
             <form method="POST" novalidate>
                 {% csrf_token %}
-
                 {% for field in form %}
-                <div class="mb-3">
-                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-
-                    {% if field.name|slice:":8" == "password" %}
-                    <div class="password-wrapper">
-                        {{ field }}
-                        <i class="bi bi-eye-slash toggle-password" onclick="togglePassword('{{ field.id_for_label }}', this)"></i>
-                    </div>
-                    {% else %}
-                        {{ field }}
+                <div class="input-group">
+                    {# Icônes à gauche selon le type de champ #}
+                    {% if field.name == 'username' %}
+                        <i class="fa fa-user icon-left"></i>
+                    {% elif field.name == 'email' %}
+                        <i class="fa fa-envelope icon-left"></i>
+                    {% elif field.name == 'telephone' %}
+                        <i class="fa fa-phone icon-left"></i>
+                    {% elif field.name|slice:":8" == "password" %}
+                        <i class="fa fa-lock icon-left"></i>
                     {% endif %}
 
+                    {{ field }}
+
+                    {# Toggle password #}
+                    {% if field.name|slice:":8" == "password" %}
+                        <i class="fa fa-eye-slash toggle-password" onclick="togglePassword('{{ field.id_for_label }}', this)"></i>
+                    {% endif %}
+
+                    {# Affichage des erreurs #}
                     {% for error in field.errors %}
                         <div class="text-error">{{ error }}</div>
                     {% endfor %}
                 </div>
                 {% endfor %}
 
-                <button type="submit" class="btn btn-submit w-100">✅ S'inscrire</button>
+                <button type="submit" class="btn-submit">
+                    ✅ S'inscrire
+                </button>
             </form>
 
-            <p class="mt-3 text-center small">
-                Vous avez déjà un compte ? 
-                <a href="{% url 'login' %}" class="fw-bold" style="color:var(--main-color);">Connectez-vous ici</a>
+            <p class="register-link small">
+                Vous avez déjà un compte ? <a href="{% url 'login' %}">Connectez-vous ici</a>
             </p>
         </div>
     </div>
@@ -127,12 +177,12 @@ input:focus, select:focus, textarea:focus {
 <script>
 function togglePassword(fieldId, icon) {
     const input = document.getElementById(fieldId);
-    if(input.type === "password") {
+    if (input.type === "password") {
         input.type = "text";
-        icon.classList.replace('bi-eye-slash','bi-eye');
+        icon.classList.replace('fa-eye-slash','fa-eye');
     } else {
         input.type = "password";
-        icon.classList.replace('bi-eye','bi-eye-slash');
+        icon.classList.replace('fa-eye','fa-eye-slash');
     }
 }
 </script>

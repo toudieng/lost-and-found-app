@@ -8,7 +8,7 @@
 <style>
 :root {
   --main-color: #495057;
-  --accent-color: #ffc107;
+  --accent-color: skyblue;
   --light-bg: #f8f9fa;
   --gradient-main: linear-gradient(135deg, #495057, #343a40);
   --radius: 1rem;
@@ -87,7 +87,7 @@ body {
 .carousel-caption h5 {
   font-weight: 700;
   font-size: 1.6rem;
-  color: #ffc107;
+  color: skyblue;
   text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
   margin-bottom: 0.5rem;
 }
@@ -187,7 +187,7 @@ body {
   color: var(--main-color);
   transition: all 0.3s ease;
 }
-.cta .btn-cta:hover { background: #ffca28; transform: scale(1.07); box-shadow: var(--shadow); }
+.cta .btn-cta:hover { background: skyblue; transform: scale(1.07); box-shadow: var(--shadow); }
 
 /* Animations */
 @keyframes fadeInUp {
@@ -214,16 +214,16 @@ body {
 <!-- HERO INTRO -->
 <section class="hero-intro text-center py-5 fade-up">
   <div class="container">
-    <h1 class="display-5 fw-bold mb-4">📦 Bienvenue sur la plateforme Lost & Found</h1>
+    <h1 style="color: skyblue;" class="display-5 fw-bold mb-4">📦 Bienvenue sur la plateforme Lost & Found</h1>
     <p class="lead mb-4 fs-5">Déclarez un objet perdu, consultez les objets retrouvés et suivez vos démarches en toute sécurité.</p>
-    <a href="{% url 'declarer_objet' %}" class="btn btn-warning btn-lg fw-bold shadow mt-3">Faire une déclaration</a>
+  
   </div>
 </section>
 
 <!-- CAROUSEL MODERNE -->
 <section class="py-5 fade-up">
   <div class="container">
-    <h2 class="text-center fw-bold mb-4">🌀 Objets récents</h2>
+    <h2 class="text-center fw-bold mb-4" style="color: skyblue;">🌀 Objets récents</h2>
     {% if all_slides %}
     <div id="carouselAll" class="carousel slide carousel-fade position-relative" data-bs-ride="carousel" data-bs-interval="4500">
       <div class="carousel-progress position-absolute bottom-0 start-0 w-100">
@@ -267,7 +267,7 @@ body {
 <!-- AVANTAGES -->
 <section id="about" class="features-section py-5 fade-up">
   <div class="container">
-    <h2 class="text-center fw-bold mb-5">✨ Les avantages de notre plateforme</h2>
+    <h2 class="text-center fw-bold mb-5" style="color: skyblue;">✨ Les avantages de notre plateforme</h2>
     <div class="row text-center g-4">
       <div class="col-md-4">
         <div class="card shadow-sm p-4 h-100">
@@ -297,7 +297,7 @@ body {
 <!-- RESTITUTION PAR LA POLICE -->
 <section id="restitution" class="py-5 fade-up">
   <div class="container">
-    <h2 class="text-center fw-bold mb-5" style="color:#6c1e3d; font-size:2rem;">👮‍♂️ Comment se passe la restitution</h2>
+    <h2 class="text-center fw-bold mb-5" style="color:skyblue; font-size:2rem;">👮‍♂️ Comment se passe la restitution</h2>
     <div class="row align-items-center g-4">
       <div class="col-md-6">
         <img src="{% static 'frontend/images/preuve_restitution.png' %}" alt="Restitution par la police"
@@ -358,7 +358,7 @@ body {
 <!-- PARTENAIRES -->
 <section class="partners py-6 bg-light text-center fade-up">
   <div class="container">
-    <h2 class="display-6 fw-bold mb-4">🤝 Nos Partenaires</h2>
+    <h2 class="display-6 fw-bold mb-4" style="color: skyblue;">🤝 Nos Partenaires</h2>
     <p class="text-muted mb-5">Nous collaborons avec des organismes de confiance.</p>
     <div class="row justify-content-center align-items-center g-4">
       <div class="col-4 col-md-2"><img src="{% static 'frontend/img/partenaire1.png' %}" class="img-fluid" alt=""></div>

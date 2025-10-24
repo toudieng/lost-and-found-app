@@ -92,13 +92,13 @@
     font-size: 1.1rem;
     padding: 0.9rem 2rem;
     border-radius: 0.7rem;
-    background: #ffc107;
+    background: skyblue;
     color: #343a40;
     transition: all 0.35s ease;
 }
 
 .cta .btn:hover {
-    background: #ffd966;
+    background: skyblue;
     transform: scale(1.06);
     box-shadow: 0 8px 25px rgba(0,0,0,0.32);
 }

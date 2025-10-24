@@ -9,28 +9,31 @@ from .models import Utilisateur, Commissariat, Message
 # =========================
 # 👤 Formulaire de création citoyen
 # =========================
+
+
 class UtilisateurCreationForm(UserCreationForm):
     telephone = forms.CharField(
         required=False,
-        widget=forms.TextInput(attrs={'class': 'form-control input-xs'})
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Téléphone'})
+    )
+
+    password1 = forms.CharField(
+        label="Mot de passe",
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Mot de passe'})
+    )
+    password2 = forms.CharField(
+        label="Confirmez le mot de passe",
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Confirmez le mot de passe'})
     )
 
     class Meta:
         model = Utilisateur
         fields = ['username', 'email', 'telephone', 'password1', 'password2']
         widgets = {
-            'username': forms.TextInput(attrs={'class': 'form-control input-xs'}),
-            'email': forms.EmailInput(attrs={'class': 'form-control input-xs'}),
-            'password1': forms.PasswordInput(attrs={'class': 'form-control input-xs'}),
-            'password2': forms.PasswordInput(attrs={'class': 'form-control input-xs'}),
+            'username': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nom d’utilisateur'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email'}),
         }
 
-    def save(self, commit=True):
-        user = super().save(commit=False)
-        user.role = "citoyen"
-        if commit:
-            user.save()
-        return user
 
 
 # =========================

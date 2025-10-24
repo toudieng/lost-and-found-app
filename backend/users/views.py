@@ -3,18 +3,17 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from backend.objets.models import Objet
-from .forms import UtilisateurCreationForm
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
-from .forms import ProfilForm
+from .forms import UtilisateurCreationForm, ProfilForm
+from .models import Notification
+
+# -------------------- AUTHENTIFICATION --------------------
+
 def login_view(request):
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
 
-        # Authentification par email
         user = authenticate(request, email=email, password=password)
-
         if user:
             login(request, user)
             
@@ -30,44 +29,33 @@ def login_view(request):
                 return redirect("home")
         else:
             messages.error(request, "Adresse e-mail ou mot de passe incorrect.")
-
-    return render(request, 'users/login.html')
     
+    return render(request, 'users/login.html')
+
 
 def logout_view(request):
     logout(request)
     return redirect('home')
 
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from django.contrib.auth import login
-from .forms import UtilisateurCreationForm
 
 def register_view(request):
     if request.method == 'POST':
         form = UtilisateurCreationForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
-
-            # Rôle par défaut sécurisé
-            user.role = "citoyen"
+            user.role = "citoyen"  # rôle par défaut
             user.save()
-
             messages.success(request, "✅ Compte citoyen créé avec succès ! Vous pouvez vous connecter.")
-            
-            # 👉 Si tu veux connecter automatiquement :
-            # login(request, user)
-            # return redirect("dashboard")
-
             return redirect('login')
         else:
             messages.error(request, "❌ Erreurs dans le formulaire. Merci de corriger.")
     else:
         form = UtilisateurCreationForm()
-
+    
     return render(request, 'users/register.html', {'form': form})
 
 
+# -------------------- DASHBOARDS --------------------
 
 @login_required
 def admin_dashboard(request):
@@ -88,8 +76,22 @@ def admin_dashboard(request):
 
 
 @login_required
+def dashboard_citoyen(request):
+    # Ici tu peux ajouter des infos spécifiques au citoyen
+    return render(request, "frontend/citoyen/dashboard.html")
+
+
+@login_required
+def dashboard_policier(request):
+    return render(request, "frontend/policier/dashboard.html")
+
+
+# -------------------- PROFILS --------------------
+
+@login_required
 def profil_admin(request):
     return render(request, "frontend/admin/profil.html", {"user": request.user})
+
 
 @login_required
 def modifier_profil_admin(request):
@@ -98,42 +100,33 @@ def modifier_profil_admin(request):
         form = ProfilForm(request.POST, request.FILES, instance=user)
         if form.is_valid():
             form.save()
+            messages.success(request, "✅ Profil mis à jour avec succès.")
             return redirect("profil_admin")
     else:
         form = ProfilForm(instance=user)
-
+    
     return render(request, "frontend/admin/modifier_profil.html", {"form": form})
+
 
 @login_required
 def profil_police(request):
-    return render(request, "frontend/policier/profil.html")
+    return render(request, "frontend/policier/profil.html", {"user": request.user})
 
 
 @login_required
 def modifier_profil_police(request):
-    from.forms import ProfilForm  
-
     user = request.user
     if request.method == "POST":
         form = ProfilForm(request.POST, request.FILES, instance=user)
         if form.is_valid():
             form.save()
-            return redirect('profil_police')
+            messages.success(request, "✅ Profil mis à jour avec succès.")
+            return redirect("profil_police")
     else:
         form = ProfilForm(instance=user)
-
+    
     return render(request, "frontend/policier/modifier_profil.html", {"form": form})
-from .models import Notification
 
-def some_view(request):
-    Notification.objects.create(
-        user=request.user,
-        message="Un nouvel objet à restituer a été ajouté."
-    )
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from .forms import ProfilForm
 
 @login_required
 def profil_citoyen(request):
@@ -146,8 +139,9 @@ def profil_citoyen(request):
             return redirect('profil_citoyen')
     else:
         form = ProfilForm(instance=user)
-
+    
     return render(request, 'frontend/citoyen/profil_citoyen.html', {'form': form})
+
 
 @login_required
 def modifier_profil_citoyen(request):
@@ -156,8 +150,21 @@ def modifier_profil_citoyen(request):
         form = ProfilForm(request.POST, request.FILES, instance=user)
         if form.is_valid():
             form.save()
+            messages.success(request, "✅ Profil mis à jour avec succès.")
             return redirect("dashboard_citoyen")
     else:
         form = ProfilForm(instance=user)
+    
+    return render(request, "frontend/citoyen/modifier_profil_citoyen.html", {"form": form})
 
-    return render(request, "frontend/modifier_profil_citoyen.html", {"form": form})
+
+# -------------------- NOTIFICATIONS --------------------
+
+@login_required
+def some_view(request):
+    Notification.objects.create(
+        user=request.user,
+        message="Un nouvel objet à restituer a été ajouté."
+    )
+    messages.success(request, "Notification créée.")
+    return redirect("home")
