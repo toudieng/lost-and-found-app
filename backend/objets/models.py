@@ -49,10 +49,6 @@ class Objet(models.Model):
         return f"{self.nom} ({self.get_etat_display()})"
 
 # --- DECLARATION ---
-from django.db import models
-from django.conf import settings
-from django.utils import timezone
-from backend.objets.models import Objet, EtatObjet
 
 
 class Declaration(models.Model):
