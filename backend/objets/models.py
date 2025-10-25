@@ -60,12 +60,15 @@ class Declaration(models.Model):
         verbose_name="Citoyen"
     )
 
+   
     objet = models.ForeignKey(
-        Objet,
-        on_delete=models.CASCADE,
-        null=True,
-        verbose_name="Objet déclaré"
-    )
+    Objet,
+    on_delete=models.CASCADE,
+    null=True,
+    related_name='declarations_trouvees',  # ✅ ajout ici
+    verbose_name="Objet déclaré"
+)
+
 
     date_declaration = models.DateTimeField(default=timezone.now, verbose_name="Date de déclaration")
     lieu = models.CharField(max_length=200, blank=True, null=True, verbose_name="Lieu")

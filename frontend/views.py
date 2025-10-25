@@ -1,5 +1,6 @@
 # views.py (réorganisé)
 
+from email.message import EmailMessage
 from functools import wraps
 import calendar
 import random
@@ -502,21 +503,28 @@ def objets_trouves_reclames(request):
     return render(request, "frontend/objets/objets_trouves_reclames.html", {
         "declarations": declarations
     })
-# frontend/views.py
-from django.shortcuts import render
-from backend.objets.models import Declaration
-from django.db.models import Q
 
-@login_required
+
+
+
+
 def objets_perdus_trouves(request):
+    """
+    Affiche les objets dont :
+    - l'état initial est 'perdu'
+    - l'état actuel de l'objet est 'reclamé'
+    - et qui ont été réclamés par le citoyen qui les a déclarés
+    """
     query = request.GET.get('q', '')
 
-    # Filtre : objets dont l'état initial est 'perdu' OU état actuel 'perdu' ou 'reclamé'
+    # Objets perdus réclamés par leur déclarant et avec objet actuellement réclamé
     declarations = Declaration.objects.filter(
-        Q(etat_initial='perdu') | Q(etat__in=['perdu', 'reclamé'])
-    )
+        etat_initial=EtatObjet.PERDU,
+        objet__etat=EtatObjet.RECLAME,
+        reclame_par__id__in=Declaration.objects.values_list('citoyen_id', flat=True)
+    ).distinct()
 
-    # Si une recherche est faite
+    # Filtrage par recherche
     if query:
         declarations = declarations.filter(
             Q(objet__nom__icontains=query) |
@@ -524,14 +532,21 @@ def objets_perdus_trouves(request):
             Q(citoyen__username__icontains=query)
         )
 
-    # On peut précharger les relations ManyToMany pour éviter N+1
-    declarations = declarations.prefetch_related('reclame_par', 'trouve_par', 'citoyen', 'objet')
+    # Préfetch pour optimiser le template
+    declarations = declarations.prefetch_related('trouve_par', 'reclame_par', 'citoyen', 'objet')
+
+    # Ajouter attributs pour le template
+    for dec in declarations:
+        dec.reclamant_principal = dec.citoyen  # le déclarant est le réclamant
 
     context = {
         'declarations': declarations,
         'query': query
     }
-    return render(request, 'frontend/objets_perdus.html', context)
+    return render(request, 'frontend/objets/objets_perdus_trouves.html', context)
+
+
+
 
 
 @policier_required
@@ -546,118 +561,178 @@ def objets_trouves_attente(request):
         objet__etat=EtatObjet.EN_ATTENTE
     )
 
+    # Précharger les déclarations de type "trouve" et leurs utilisateurs
     declarations_prefetch = Prefetch(
-        'objet__declaration_set',
-        queryset=Declaration.objects.prefetch_related('trouve_par'),
-        to_attr='declarations_trouvees'
+        'objet__declarations_trouvees',  # <-- ici on utilise le related_name
+        queryset=Declaration.objects.filter(type_declaration='trouve').prefetch_related('trouve_par'),
+        to_attr='trouvees_prefetch'  # attribut temporaire pour le template
     )
 
     restitutions = restitutions.prefetch_related(declarations_prefetch)
+
     return render(request, "frontend/objets/objets_trouves_attente.html", {
         "restitutions": restitutions
     })
 
 
 
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from django.core.mail import send_mail
+from django.conf import settings
+from django.utils import timezone
+from backend.objets.models import Declaration, Restitution, EtatObjet, StatutRestitution
+from backend.users.models import Commissariat
 
-@policier_required
 def planifier_restitution(request, objet_id, type_objet="declaration"):
-    declaration = None
+    """Planifie la restitution d’un objet et le met en attente."""
+    declaration = get_object_or_404(Declaration, id=objet_id)
 
-    # --- Récupération de la déclaration ---
-    if type_objet == "declaration":
-        declaration = get_object_or_404(Declaration, id=objet_id)
-    else:
-        messages.error(request, "Type d'objet inconnu pour la restitution.")
+    # --- Création de la restitution ---
+    commissariat = Commissariat.objects.first()  # par défaut, le premier
+    citoyen = declaration.premier_reclamant()
+
+    if not citoyen:
+        messages.error(request, "Aucun réclamant associé à cet objet.")
         return redirect("objets_reclames")
 
-    # --- Formulaire ---
-    form = RestitutionForm(request.POST or None)
+    # Création ou mise à jour de la restitution
+    restitution, created = Restitution.objects.get_or_create(
+        objet=declaration.objet,
+        citoyen=citoyen,
+        defaults={
+            "policier": request.user,
+            "commissariat": commissariat,
+            "date_restitution": timezone.now().date(),
+            "heure_restitution": timezone.now().time(),
+            "statut": StatutRestitution.PLANIFIEE,
+        },
+    )
 
-    # Limiter le choix du citoyen si nécessaire
-    if declaration:
-        form.fields['citoyen'].queryset = declaration.reclame_par.all()
+    # Mise à jour du statut de l’objet
+    declaration.objet.etat = EtatObjet.EN_ATTENTE
+    declaration.objet.save()
 
-    if request.method == "POST" and form.is_valid():
-        # ⚡ Mettre la déclaration en attente
-        declaration.statut = EtatObjet.EN_ATTENTE
-        declaration.save()
+    # Envoi d’un email
+    destinataires = [
+        citoyen.email,
+        request.user.email,
+    ]
+    if declaration.trouve_par.exists():
+        destinataires += [u.email for u in declaration.trouve_par.all() if u.email]
 
-        # Récupération des données du formulaire pour l'email
-        citoyen = form.cleaned_data.get("citoyen")
-        date_restitution = form.cleaned_data.get("date_restitution")
-        heure_restitution = form.cleaned_data.get("heure_restitution")
-        commissariat = form.cleaned_data.get("commissariat")
+    send_mail(
+        subject=f"[Restitution planifiée] {declaration.objet.nom}",
+        message=f"""
+        Bonjour,
+        La restitution de l'objet '{declaration.objet.nom}' a été planifiée.
+        Commissariat : {commissariat.nom if commissariat else 'Non défini'}
+        Date : {timezone.now().date().strftime('%d/%m/%Y')}
+        Heure : {timezone.now().time().strftime('%H:%M')}
+        Merci de vous présenter avec vos pièces justificatives.
+        """,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=list(set(destinataires)),
+        fail_silently=True,
+    )
 
-        # Liste des destinataires
-        destinataires = [
-            email for email in [
-                citoyen.email if citoyen else None,
-                declaration.trouve_par.first().email if declaration.trouve_par.exists() else None,
-                request.user.email
-            ] if email
-        ]
-
-        # Envoi de l'email
-        if destinataires:
-            send_mail(
-                subject=f"[Restitution planifiée] {declaration.objet.nom}",
-                message=(
-                    f"La restitution de '{declaration.objet.nom}' a été planifiée.\n"
-                    f"📍 Commissariat: {commissariat.nom if commissariat else 'Non assigné'}\n"
-                    f"📅 Date: {date_restitution}\n"
-                    f"⏰ Heure: {heure_restitution}"
-                ),
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=destinataires,
-                fail_silently=False
-            )
-
-        messages.success(request, f"La restitution de '{declaration.objet.nom}' a été planifiée ✅")
-        return redirect("objets_perdus_trouves")
-
-    # --- Liste des commissariats pour le <select> ---
-    commissariats = Commissariat.objects.all()
-
-    return render(request, "frontend/policier/planifier_restitution.html", {
-        "declaration": declaration,
-        "form": form,
-        "commissariats": commissariats,
-        "type_objet": type_objet,
-    })
+    messages.success(request, f"La restitution de '{declaration.objet.nom}' a été planifiée ✅")
+    return redirect("objets_en_attente")
 
 
 
-@policier_required
+
 def marquer_restitue(request, restitution_id):
-    restitution = get_object_or_404(Restitution, id=restitution_id)
+    restitution = Restitution.objects.select_related('objet', 'citoyen').get(id=restitution_id)
+    restitution.statut = 'effectuee'
+    restitution.save()
 
-    if restitution.policier != request.user:
-        messages.error(request, "Vous n’êtes pas autorisé à valider cette restitution.")
-        return redirect("objets_trouves_attente")
+    # Génération du PDF de preuve
+    html_string = render_to_string(
+        'frontend/policier/preuve_restitution_pdf.html',
+        {'restitution': restitution}
+    )
+    pdf_file = HTML(string=html_string).write_pdf()
 
-    objet = restitution.objet
-    try:
-        with transaction.atomic():
-            objet.etat = EtatObjet.RESTITUE
-            objet.save()
+    # Préparer le mail
+    subject = f"Restitution de l'objet '{restitution.objet.nom}' effectuée ✅"
+    message = (
+        f"Bonjour,\n\nLa restitution de l'objet '{restitution.objet.nom}' "
+        f"a été effectuée avec succès.\nVeuillez trouver la preuve en pièce jointe."
+    )
 
-            # Tenter de déterminer le trouveur (si présent)
-            if objet.declaration_set.exists():
-                first_decl = objet.declaration_set.first()
-                trouveur = first_decl.trouve_par.first() if first_decl else None
-                restitution.restitue_par = trouveur if trouveur else None
-            else:
-                restitution.restitue_par = None
+    recipients = []
+    if restitution.citoyen and restitution.citoyen.email:
+        recipients.append(restitution.citoyen.email)
 
-            restitution.save()
-            # mettre à jour déclarations si besoin (placeholder)
-            Declaration.objects.filter(objet=objet).update()
-        messages.success(request, f"L'objet '{objet.nom}' a été marqué comme restitué ✅")
-    except Exception as e:
-        messages.error(request, f"Une erreur est survenue : {str(e)}")
+    # ✅ Parcours correct des déclarations liées à l'objet
+    for dec in restitution.objet.declarations_trouvees.all():
+        for user in dec.trouve_par.all():
+            if user.email and user.email not in recipients:
+                recipients.append(user.email)
 
-    return redirect("objets_trouves_attente")
+    # Envoi du mail
+    email = EmailMessage(
+        subject=subject,
+        body=message,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to=recipients,
+    )
+    email.attach(f"preuve_{restitution.objet.nom}.pdf", pdf_file, 'application/pdf')
+    email.send(fail_silently=True)
+
+    return redirect('objets_trouves_attente')
+
+
+def marquer_restitue(request, restitution_id):
+    restitution = get_object_or_404(
+        Restitution.objects.select_related('objet', 'citoyen'),
+        id=restitution_id
+    )
+
+    # 🔹 Marquer la restitution comme effectuée
+    restitution.statut = 'effectuee'
+    restitution.save()  # 🔸 Ceci met aussi l'objet à "restitue" automatiquement
+
+    # 🔹 Génération du PDF de preuve
+    html_string = render_to_string('frontend/policier/preuve_restitution_pdf.html', {'restitution': restitution})
+    pdf_file = HTML(string=html_string).write_pdf()
+
+    # 🔹 Préparer le mail
+    subject = f"Restitution de l'objet '{restitution.objet.nom}' effectuée ✅"
+    message = (
+        f"Bonjour,\n\n"
+        f"La restitution de l'objet '{restitution.objet.nom}' a été effectuée avec succès.\n"
+        f"Veuillez trouver la preuve en pièce jointe."
+    )
+
+    recipients = []
+
+    # Ajouter le citoyen concerné
+    if restitution.citoyen and restitution.citoyen.email:
+        recipients.append(restitution.citoyen.email)
+
+    # Ajouter les trouveurs de l'objet (via les déclarations liées)
+    for dec in restitution.objet.declaration_set.all():  # ✅ ici la correction
+        for user in dec.trouve_par.all():
+            if user.email:
+                recipients.append(user.email)
+
+    # Supprimer les doublons
+    recipients = list(set(recipients))
+
+    # 🔹 Envoyer l’e-mail avec le PDF
+    email = EmailMessage(
+        subject=subject,
+        body=message,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        to=recipients,
+    )
+    email.attach(f"preuve_{restitution.objet.nom}.pdf", pdf_file, 'application/pdf')
+    email.send(fail_silently=True)
+
+    # 🔹 Redirection
+    return redirect('objets_trouves_attente')
 
 
 @policier_required

@@ -1,92 +1,146 @@
 {% extends 'frontend/policier/base_policier.html' %}
 
-{% block title %}Objets perdus et trouvés{% endblock %}
+{% block title %}Objets perdus et réclamés{% endblock %}
+
+{% block extra_css %}
+<style>
+:root {
+    --main-color: #3E4C49;       
+    --accent-color: #C8A048;    
+    --light-color: #FFFFFF;      
+}
+
+.card {
+    border-radius: 1rem;
+    border: none;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.card-body {
+    padding: 1rem;
+    background: var(--light-color);
+    color: var(--main-color);
+}
+
+.card-title {
+    color: var(--main-color);
+}
+
+.btn-toggle {
+    background: var(--main-color);
+    color: var(--light-color);
+    border: none;
+    font-weight: 500;
+    transition: background 0.3s;
+    cursor: pointer;
+}
+.btn-toggle:hover {
+    background: #2e3a38;
+}
+
+.details-card {
+    background: rgba(62,76,73,0.05);
+    border-left: 4px solid var(--accent-color);
+    padding: 0.75rem 1rem;
+    margin-top: 0.5rem;
+    border-radius: 0.5rem;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease, padding 0.5s ease;
+}
+.details-card.open {
+    max-height: 1000px;
+    padding: 0.75rem 1rem;
+}
+.details-card p {
+    margin: 0.2rem 0;
+    font-size: 0.9rem;
+    color: var(--main-color);
+}
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
-    <h2 class="fw-bold mb-4">📌 Objets déclarés perdus et trouvés</h2>
+    <h2 class="fw-bold mb-4">📌 Objets déclarés perdus et réclamés</h2>
 
     {% if declarations %}
         {% for dec in declarations %}
-        <div class="card my-3 shadow-sm border-0">
-            <div class="card-body p-3">
-                <!-- Nom de l'objet -->
+        <div class="card my-3">
+            <div class="card-body">
                 <h5 class="card-title fw-bold mb-2">
-                    {{ dec.objet.nom|default:"Objet inconnu" }}
+                    {% if dec.objet %}{{ dec.objet.nom }}{% else %}Objet inconnu{% endif %}
                 </h5>
 
-                <!-- État initial -->
                 <p><b>État initial :</b> {{ dec.get_etat_initial_display }}</p>
 
-                <!-- Réclamant -->
-                <div class="mb-2">
-                    <b>Réclamant :</b>
-                    {% if dec.reclamant_principal %}
-                        <table class="table table-sm table-bordered mt-1">
-                            <thead>
-                                <tr>
-                                    <th>Nom</th>
-                                    <th>Email</th>
-                                    <th>Téléphone</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>{{ dec.reclamant_principal.username }}</td>
-                                    <td>{{ dec.reclamant_principal.email|default:"-" }}</td>
-                                    <td>{{ dec.reclamant_principal.telephone|default:"-" }}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    {% else %}
-                        <span class="text-muted">Aucun réclamant défini</span>
-                    {% endif %}
-                </div>
+                <!-- Bouton Infos -->
+                <button class="btn btn-sm btn-toggle mb-2" type="button" 
+                        data-target="#details-{{ dec.id }}">
+                    ℹ️ Infos Complètes
+                </button>
 
-                <!-- Trouveurs -->
-                <div class="mb-2">
-                    <b>Trouveurs :</b>
+                <!-- Détails déroulants -->
+                <div class="details-card" id="details-{{ dec.id }}">
+                    <!-- Réclamant principal -->
+                    <p><b>Réclamant (déclarant) :</b> {{ dec.reclamant_principal.username }}</p>
+                    <p>Email : {{ dec.reclamant_principal.email|default:"-" }}</p>
+                    <p>Téléphone : {{ dec.reclamant_principal.telephone|default:"-" }}</p>
+                    <hr>
+
+                    <!-- Trouveurs -->
+                    <p><b>Trouveurs :</b></p>
                     {% if dec.trouve_par.all %}
-                        <table class="table table-sm table-bordered mt-1">
-                            <thead>
-                                <tr>
-                                    <th>Nom</th>
-                                    <th>Email</th>
-                                    <th>Téléphone</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for user in dec.trouve_par.all %}
-                                <tr>
-                                    <td>{{ user.username }}</td>
-                                    <td>{{ user.email|default:"-" }}</td>
-                                    <td>{{ user.telephone|default:"-" }}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                        <ul class="list-unstyled">
+                            {% for user in dec.trouve_par.all %}
+                                <li>{{ user.username }} | Email: {{ user.email|default:"-" }} | Téléphone: {{ user.telephone|default:"-" }}</li>
+                            {% endfor %}
+                        </ul>
                     {% else %}
-                        <span class="text-muted">Aucun trouveur enregistré</span>
+                        <p class="text-muted">Aucun trouveur enregistré</p>
                     {% endif %}
+                    <hr>
+
+                    <p class="text-muted mb-0">
+                        <small>📅 Date déclaration : {{ dec.date_declaration|date:"d/m/Y H:i" }}</small>
+                    </p>
                 </div>
 
-                <!-- Bouton planification restitution -->
                 <a href="{% url 'planifier_restitution' dec.id 'declaration' %}" 
-                   class="btn btn-primary btn-sm mb-2">
+                   class="btn btn-primary btn-sm mt-2">
                     📅 Planifier restitution
                 </a>
-
-                <!-- Date déclaration -->
-                <p class="text-muted mb-0">
-                    <small>📅 Date déclaration : {{ dec.date_declaration|date:"d/m/Y H:i" }}</small>
-                </p>
             </div>
         </div>
         {% endfor %}
     {% else %}
         <div class="alert alert-info text-center mt-2">
-            Aucun objet disponible.
+            Aucun objet perdu et réclamé.
         </div>
     {% endif %}
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const toggleButtons = document.querySelectorAll('.btn-toggle');
+
+    toggleButtons.forEach(btn => {
+        const target = document.querySelector(btn.dataset.target);
+        btn.addEventListener('click', () => {
+            target.classList.toggle('open');
+            if (target.classList.contains('open')) {
+                btn.innerHTML = '⬆️ Réduire';
+                btn.style.background = '#C8A048';
+                btn.style.color = '#3E4C49';
+            } else {
+                btn.innerHTML = 'ℹ️ Infos Complètes';
+                btn.style.background = 'var(--main-color)';
+                btn.style.color = 'var(--light-color)';
+            }
+        });
+    });
+});
+</script>
 {% endblock %}

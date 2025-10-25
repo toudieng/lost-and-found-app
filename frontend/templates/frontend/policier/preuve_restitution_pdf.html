@@ -12,7 +12,7 @@
             color: #333;
         }
 
-        /* Header avec logos en table */
+        /* Header */
         .header-table {
             width: 100%;
             border-bottom: 2px solid #003366;
@@ -21,63 +21,53 @@
             border-collapse: collapse;
         }
 
-        .header-table td {
-            vertical-align: middle;
-        }
+        .header-table td { vertical-align: middle; }
+        .header-table td.left { text-align: left; width: 20%; }
+        .header-table td.center { text-align: center; width: 60%; }
+        .header-table td.right { text-align: right; width: 20%; }
+        .header-table img { height: 80px; width: auto; }
 
-        .header-table td.left {
-            text-align: left;
-            width: 20%;
-        }
-
-        .header-table td.center {
-            text-align: center;
-            width: 60%;
-        }
-
-        .header-table td.right {
-            text-align: right;
-            width: 20%;
-        }
-
-        .header-table img {
-            height: 80px;
-            width: auto;
-        }
-
+        /* Title */
         .title {
             text-align: center;
             color: #003366;
             margin-bottom: 25px;
         }
 
+        /* Sections */
         .section {
             margin-bottom: 20px;
         }
-
         .section h4 {
             color: #003366;
             margin-bottom: 8px;
-            border-bottom: 1px solid #ccc;
+            border-bottom: 2px solid #C8A048;
             display: inline-block;
             padding-bottom: 2px;
         }
+        .section p {
+            margin: 0.2rem 0;
+            font-size: 0.95rem;
+        }
+        .section strong { color: #C8A048; }
 
-        .qr {
-            text-align: right;
-            margin-top: 30px;
+        /* Trouveurs */
+        .trouveurs {
+            padding-left: 1rem;
         }
 
-        .qr img {
-            height: 100px;
-        }
+        /* QR code */
+        .qr { text-align: right; margin-top: 30px; }
+        .qr img { height: 100px; }
 
+        /* Signature */
         .signature {
             margin-top: 40px;
             text-align: right;
             font-style: italic;
         }
 
+        /* Footer */
         .footer {
             position: fixed;
             bottom: 1cm;
@@ -86,11 +76,14 @@
             color: #888;
             width: 100%;
         }
+
+        /* Highlight objet important */
+        .highlight { color: #C8A048; font-weight: 600; }
     </style>
 </head>
 <body>
 
-    <!-- Header avec logos -->
+    <!-- Header -->
     <table class="header-table">
         <tr>
             <td class="left">
@@ -106,58 +99,82 @@
         </tr>
     </table>
 
-    <!-- Titre principal -->
+    <!-- Titre -->
     <div class="title">
         <h3>Attestation de Restitution N°{{ restitution.id }}</h3>
         <p>Date : {{ restitution.date_restitution|date:"d/m/Y" }} — Heure : {{ restitution.heure_restitution|time:"H:i" }}</p>
     </div>
 
-    <!-- Informations citoyen -->
-    <div class="section">
-        <h4>Citoyen</h4>
-        <p>Nom d'utilisateur : <strong>{{ restitution.citoyen.username|default:"Non renseigné" }}</strong></p>
-        <p>Email : {{ restitution.citoyen.email|default:"Non renseigné" }}</p>
-    </div>
-
-    <!-- Informations objet -->
+    <!-- Objet restitué -->
     <div class="section">
         <h4>Objet Restitué</h4>
-        <p><strong>{{ restitution.objet.nom|default:"Non renseigné" }}</strong></p>
+        <p><strong class="highlight">{{ restitution.objet.nom|default:"Non renseigné" }}</strong></p>
         <p>{{ restitution.objet.description|default:"Aucune description disponible" }}</p>
     </div>
 
-    <!-- Informations policier -->
+    <!-- Réclamant -->
+    <div class="section">
+        <h4>Réclamant</h4>
+        {% if restitution.reclamant_principal %}
+            <p>Nom : <strong>{{ restitution.reclamant_principal.username }}</strong></p>
+            <p>Email : {{ restitution.reclamant_principal.email|default:"Non renseigné" }}</p>
+            <p>Téléphone : {{ restitution.reclamant_principal.telephone|default:"Non renseigné" }}</p>
+        {% else %}
+            <p>Nom : <strong>Non renseigné</strong></p>
+            <p>Email : Non renseigné</p>
+            <p>Téléphone : Non renseigné</p>
+        {% endif %}
+    </div>
+
+    <!-- Citoyen (destinataire) -->
+    <div class="section">
+        <h4>Citoyen</h4>
+        <p>Nom : <strong>{{ restitution.citoyen.username|default:"Non renseigné" }}</strong></p>
+        <p>Email : {{ restitution.citoyen.email|default:"Non renseigné" }}</p>
+    </div>
+
+    <!-- Trouveurs -->
+    <div class="section">
+        <h4>Trouveurs</h4>
+        {% if restitution.objet.declaration_set.all %}
+            <ul class="trouveurs">
+                {% for declaration in restitution.objet.declaration_set.all %}
+                    {% for user in declaration.trouve_par.all %}
+                        <li>{{ user.username }} | Email: {{ user.email|default:"-" }} | Téléphone: {{ user.telephone|default:"-" }}</li>
+                    {% endfor %}
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-muted">Aucun trouveur enregistré</p>
+        {% endif %}
+    </div>
+
+    <!-- Policier -->
     <div class="section">
         <h4>Policier</h4>
         {% if restitution.restitue_par %}
-            <p>Nom d'utilisateur : <strong>{{ restitution.restitue_par.username }}</strong></p>
+            <p>Nom : <strong>{{ restitution.restitue_par.username }}</strong></p>
             <p>Email : {{ restitution.restitue_par.email|default:"Non renseigné" }}</p>
         {% elif restitution.policier %}
-            <p>Nom d'utilisateur : <strong>{{ restitution.policier.username }}</strong></p>
+            <p>Nom : <strong>{{ restitution.policier.username }}</strong></p>
             <p>Email : {{ restitution.policier.email|default:"Non renseigné" }}</p>
         {% else %}
-            <p>Nom d'utilisateur : <strong>Non renseigné</strong></p>
+            <p>Nom : <strong>Non renseigné</strong></p>
             <p>Email : Non renseigné</p>
         {% endif %}
     </div>
 
-    <!-- Informations commissariat -->
-   
+    <!-- Commissariat -->
     <div class="section">
-    <h4>Commissariat</h4>
-    {% if restitution.commissariat %}
-        <p>{{ restitution.commissariat.nom|default:"Non renseigné" }}</p>
-        {% if restitution.commissariat.adresse %}
-            <p>{{ restitution.commissariat.adresse }}</p>
+        <h4>Commissariat</h4>
+        {% if restitution.commissariat %}
+            <p>{{ restitution.commissariat.nom|default:"Non renseigné" }}</p>
+            <p>{{ restitution.commissariat.adresse|default:"Adresse non renseignée" }}</p>
         {% else %}
+            <p>Commissariat non renseigné</p>
             <p>Adresse non renseignée</p>
         {% endif %}
-    {% else %}
-        <p>Commissariat non renseigné</p>
-        <p>Adresse non renseignée</p>
-    {% endif %}
-</div>
-
+    </div>
 
     <!-- QR Code -->
     {% if qr_code %}
@@ -170,12 +187,9 @@
     <!-- Signature -->
     <div class="signature">
         <p>Signé par : 
-            {% if restitution.restitue_par %}
-                {{ restitution.restitue_par.username }}
-            {% elif restitution.policier %}
-                {{ restitution.policier.username }}
-            {% else %}
-                Non renseigné
+            {% if restitution.restitue_par %}{{ restitution.restitue_par.username }}
+            {% elif restitution.policier %}{{ restitution.policier.username }}
+            {% else %}Non renseigné
             {% endif %}
         </p>
         <p>Fait à {{ restitution.commissariat.nom|default:"Lieu non précisé" }}, le {{ restitution.date_restitution|date:"d/m/Y" }}</p>
