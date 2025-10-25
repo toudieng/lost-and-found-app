@@ -467,47 +467,64 @@ def objets_reclames(request):
         "declarations": declarations
     })
 from django.shortcuts import render
-from backend.objets.models import Declaration
+from django.db.models import Q
 from backend.objets.models import Declaration, EtatObjet
 
-def objets_perdus_trouves(request):
-    """
-    Affiche les objets déclarés perdus et qui ont été trouvés par au moins un citoyen.
-    Réclamant = celui qui a déclaré la perte
-    Trouveur = celui qui a trouvé l'objet
-    """
-    declarations = Declaration.objects.filter(
-        etat_initial=EtatObjet.PERDU,   # uniquement les PERDUS
-        trouve_par__isnull=False         # et trouvés par au moins un citoyen
-    ).distinct()
 
-    for dec in declarations:
-        dec.reclamant_principal = dec.citoyen  # celui qui a déclaré la perte
-        dec.trouveur_principal = dec.trouve_par.first()  # premier trouveur
 
-    return render(request, "frontend/objets/objets_perdus_trouves.html", {
-        "declarations": declarations
-    })
 
 
 
 def objets_trouves_reclames(request):
     """
-    Affiche uniquement les objets déclarés comme TROUVÉS 
-    et qui ont été réclamés par au moins un citoyen.
+    Affiche uniquement les objets dont :
+    - l'état initial est TROUVE
+    - et qui ont été réclamés par au moins un citoyen
     """
+    # Récupération des déclarations
     declarations = Declaration.objects.filter(
-        etat_initial=EtatObjet.TROUVE,     # uniquement les TROUVÉS
-        reclame_par__isnull=False          # et déjà réclamés
+        etat_initial=EtatObjet.TROUVE,
+        reclame_par__isnull=False
     ).distinct()
 
+    # Ajout des attributs pour le template
     for dec in declarations:
-        dec.trouveur_principal = dec.citoyen  # celui qui a trouvé (déclarant)
+        dec.trouveur_principal = dec.citoyen           # celui qui a trouvé (déclarant)
         dec.reclamant_principal = dec.reclame_par.first()  # premier réclamant
 
     return render(request, "frontend/objets/objets_trouves_reclames.html", {
         "declarations": declarations
     })
+# frontend/views.py
+from django.shortcuts import render
+from backend.objets.models import Declaration
+from django.db.models import Q
+
+@login_required
+def objets_perdus_trouves(request):
+    query = request.GET.get('q', '')
+
+    # Filtre : objets dont l'état initial est 'perdu' OU état actuel 'perdu' ou 'reclamé'
+    declarations = Declaration.objects.filter(
+        Q(etat_initial='perdu') | Q(etat__in=['perdu', 'reclamé'])
+    )
+
+    # Si une recherche est faite
+    if query:
+        declarations = declarations.filter(
+            Q(objet__nom__icontains=query) |
+            Q(description__icontains=query) |
+            Q(citoyen__username__icontains=query)
+        )
+
+    # On peut précharger les relations ManyToMany pour éviter N+1
+    declarations = declarations.prefetch_related('reclame_par', 'trouve_par', 'citoyen', 'objet')
+
+    context = {
+        'declarations': declarations,
+        'query': query
+    }
+    return render(request, 'frontend/objets_perdus.html', context)
 
 
 @policier_required
