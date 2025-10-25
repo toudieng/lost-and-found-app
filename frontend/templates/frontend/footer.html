@@ -1,61 +1,51 @@
-<footer class="footer-custom mt-auto py-5" style="background:#343a40; color:#f8f9fa;">
-  <div class="container">
-    <div class="row align-items-center gy-4">
-
-      <!-- Liens informatifs -->
-      <div class="col-md-4 text-center text-md-start">
-        <ul class="footer-links list-unstyled d-flex flex-wrap justify-content-center justify-content-md-start gap-3 mb-0">
-          <li><a href="#faq" class="text-decoration-none text-light fw-semibold">FAQ & Aide</a></li>
-          <li><a href="#confidentialite" class="text-decoration-none text-light fw-semibold">Confidentialité</a></li>
-          <li><a href="#conditions" class="text-decoration-none text-light fw-semibold">Conditions d’utilisation</a></li>
-          <li><a href="#mentions" class="text-decoration-none text-light fw-semibold">Mentions légales</a></li>
+<footer class="footer-custom mt-auto py-5" style="background: var(--main-color); color: var(--light-color);">
+  <div class="container text-center">
+    <div class="row gy-3 align-items-center">
+      
+      <!-- Liens -->
+      <div class="col-md-4">
+        <ul class="list-unstyled mb-0 d-flex flex-wrap justify-content-center gap-3">
+          <li><a href="#faq" class="footer-link">FAQ & Aide</a></li>
+          <li><a href="#confidentialite" class="footer-link">Confidentialité</a></li>
+          <li><a href="#conditions" class="footer-link">Conditions d’utilisation</a></li>
+          <li><a href="#mentions" class="footer-link">Mentions légales</a></li>
         </ul>
       </div>
 
       <!-- Réseaux sociaux -->
-      <div class="col-md-4 text-center">
-        <div class="social-icons d-flex justify-content-center gap-4">
-          <a href="#" title="Facebook" class="text-light fs-5 social-hover"><i class="bi bi-facebook"></i></a>
-          <a href="#" title="X / Twitter" class="text-light fs-5 social-hover"><i class="bi bi-twitter-x"></i></a>
-          <a href="#" title="LinkedIn" class="text-light fs-5 social-hover"><i class="bi bi-linkedin"></i></a>
-          <a href="#" title="Instagram" class="text-light fs-5 social-hover"><i class="bi bi-instagram"></i></a>
+      <div class="col-md-4">
+        <div class="d-flex justify-content-center gap-4">
+          <a href="#" class="social-link"><i class="bi bi-facebook"></i></a>
+          <a href="#" class="social-link"><i class="bi bi-twitter-x"></i></a>
+          <a href="#" class="social-link"><i class="bi bi-linkedin"></i></a>
+          <a href="#" class="social-link"><i class="bi bi-instagram"></i></a>
         </div>
       </div>
 
-      <!-- Informations -->
-      <div class="col-md-4 text-center text-md-end">
-        <p class="mb-1 small">
-          &copy; 2025 <strong>Lost & Found</strong> – Tous droits réservés
-        </p>
-        <p class="small text-muted">
-          Un projet citoyen pour faciliter la restitution des objets perdus
-        </p>
+      <!-- Infos -->
+      <div class="col-md-4">
+        <p class="mb-1 small">&copy; 2025 <strong style="color: var(--accent-color);">Lost & Found</strong></p>
+        <p class="small text-light">Un projet citoyen pour faciliter la restitution des objets perdus</p>
       </div>
-    </div>
-
-    <hr class="my-3 border-light opacity-25">
-
-    <!-- Bas du footer -->
-    <div class="text-center small text-muted">
-      Dernière mise à jour : Octobre 2025 — Version 2.0 • Inspiré par la confiance et la solidarité
     </div>
   </div>
 </footer>
 
 <style>
-.footer-custom a {
-  transition: all 0.3s ease;
+.footer-link {
+  color: var(--accent-color);
+  text-decoration: none;
+  transition: color 0.3s ease;
 }
-.footer-custom a:hover {
-  color:   #e6b800 !important;
-  text-decoration: underline;
+.footer-link:hover {
+  color: var(--light-color);
 }
-
-.social-hover {
-  transition: transform 0.3s, color 0.3s;
+.social-link {
+  color: var(--light-color);
+  transition: color 0.3s, transform 0.3s;
 }
-.social-hover:hover {
+.social-link:hover {
+  color: var(--accent-color);
   transform: scale(1.2);
-  color:  #e6b800 !important;
 }
 </style>

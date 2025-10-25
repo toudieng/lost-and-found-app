@@ -3,15 +3,15 @@
 {% block extra_css %}
 <style>
 :root {
-    --jaune: #ffc107;
-    --jaune-fonce: #e0a800;
-    --bleu-clair: #0d6efd;
-    --bleu-fonce: #084298;
-    --bleu-transparent: rgba(13,110,253,0.15);
+    --main-color: #3E4C49;       /* vert-gris foncé */
+    --accent-color: #C8A048;     /* doré */
+    --light-color: #FFFFFF;       /* blanc */
+    --main-color-light: rgba(62,76,73,0.1); /* pour alertes et bordures */
+    --accent-color-dark: #b88f38; /* doré foncé pour hover */
 }
 
 .form-container {
-    background: #fff;
+    background: var(--light-color);
     padding: 2rem;
     border-radius: 1rem;
     box-shadow: 0 8px 20px rgba(0,0,0,0.1);
@@ -23,7 +23,7 @@
 }
 
 .form-title {
-    color: var(--jaune-fonce);
+    color: var(--accent-color);
     font-weight: 700;
     font-size: 1.6rem;
     text-align: center;
@@ -41,26 +41,26 @@ input, select, textarea {
 textarea { height: auto; }
 
 input:focus, select:focus, textarea:focus {
-    border-color: var(--jaune);
-    box-shadow: 0 0 6px rgba(255,193,7,0.4);
+    border-color: var(--accent-color);
+    box-shadow: 0 0 6px rgba(200,160,72,0.4);
     outline: none;
 }
 
 .form-check-input:checked {
-    background-color: var(--jaune);
-    border-color: var(--jaune);
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
 }
 
 .form-check-label {
-    color: #333;
+    color: var(--main-color);
     font-weight: 500;
 }
 
 .btn-submit {
     position: relative;
-    background-color: var(--jaune);
+    background-color: var(--accent-color);
     border: none;
-    color: #212529;
+    color: var(--main-color);
     font-weight: 700;
     transition: all 0.3s ease-in-out;
     border-radius: 0.5rem;
@@ -86,8 +86,8 @@ input:focus, select:focus, textarea:focus {
     transition: left 0.8s ease-in-out;
 }
 .btn-submit:hover {
-    background-color: var(--jaune-fonce);
-    color: #fff;
+    background-color: var(--accent-color-dark);
+    color: var(--light-color);
     transform: translateY(-1px);
     box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
@@ -98,9 +98,9 @@ input:focus, select:focus, textarea:focus {
 }
 
 .alert {
-    background-color: var(--bleu-transparent);
-    color: var(--bleu-fonce);
-    border: 1px solid var(--bleu-clair);
+    background-color: var(--main-color-light);
+    color: var(--main-color);
+    border: 1px solid var(--accent-color);
     border-radius: 0.5rem;
 }
 
@@ -114,7 +114,7 @@ input:focus, select:focus, textarea:focus {
     max-height: 200px;
     margin-top: 0.5rem;
     border-radius: 0.5rem;
-    border: 2px solid var(--bleu-transparent);
+    border: 2px solid var(--main-color-light);
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 </style>
@@ -124,7 +124,7 @@ input:focus, select:focus, textarea:focus {
 <div class="row justify-content-center mt-5">
     <div class="col-md-6 col-lg-5 col-xl-4">
         <div class="form-container">
-            <h4 class="form-title">🟡 Déclarer un objet</h4>
+            <h4 class="form-title">📌 Déclarer un objet</h4>
 
             {% if messages %}
                 {% for message in messages %}
@@ -166,7 +166,7 @@ input:focus, select:focus, textarea:focus {
 
                 <!-- Bloc Type de déclaration -->
                 <div class="mb-4 text-center">
-                    <p class="fw-bold mb-2 text-warning">📌 Type de déclaration</p>
+                    <p class="fw-bold mb-2" style="color: var(--accent-color);">📌 Type de déclaration</p>
                     {% for radio in form.etat_initial %}
                         <div class="form-check form-check-inline">
                             {{ radio.tag }}

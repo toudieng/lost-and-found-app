@@ -1,13 +1,51 @@
 {% extends "frontend/admin/base_profil.html" %}
 {% block title %}Modifier Profil{% endblock %}
 
+{% block extra_css %}
+<style>
+    h2 {
+        font-weight: 700;
+        color: var(--main-color);
+        margin-bottom: 1.5rem;
+    }
+
+    form.card {
+        max-width: 600px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        padding: 2rem;
+    }
+
+    .form-control {
+        border-radius: 6px;
+        border: 1px solid #ced4da;
+    }
+
+    .btn-success {
+        background-color: var(--accent-color);
+        border-color: var(--accent-color);
+        color: var(--light-color);
+        transition: 0.2s;
+    }
+    .btn-success:hover {
+        background-color: var(--accent-color-dark);
+        border-color: var(--accent-color-dark);
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container mt-5">
-    <h2>✏️ Modifier mon profil</h2>
-    <form method="post" enctype="multipart/form-data" class="card p-4">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-success">💾 Enregistrer</button>
-    </form>
+<div class="container mt-5 d-flex justify-content-center">
+    <div class="w-100">
+        <h2>✏️ Modifier mon profil</h2>
+        <form method="post" enctype="multipart/form-data" class="card">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <div class="mt-3">
+                <button type="submit" class="btn btn-success">💾 Enregistrer</button>
+                <a href="{% url 'profil_admin' %}" class="btn btn-secondary ms-2">❌ Annuler</a>
+            </div>
+        </form>
+    </div>
 </div>
 {% endblock %}

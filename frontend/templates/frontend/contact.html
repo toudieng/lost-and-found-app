@@ -3,18 +3,59 @@
 
 {% block content %}
 <div class="container mt-4 mb-5">
-    <h2 class="mb-4 text-center">📩 Contactez l'administration</h2>
+    <h2 class="mb-4 text-center" style="color: var(--accent-color); font-weight: 700;">
+        📩 Contactez l'administration
+    </h2>
 
-    <form method="post" class="card shadow p-4">
+    <form method="post" class="card shadow p-4 border-0" 
+          style="background-color: var(--light-color); border-radius: 1rem;">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary mt-2">Envoyer</button>
+        
+        <div class="form-content" style="color: var(--main-color);">
+            {{ form.as_p }}
+        </div>
+
+        <button type="submit" 
+                class="btn mt-3"
+                style="background-color: var(--accent-color); 
+                       color: var(--light-color);
+                       font-weight: 600;
+                       border: none;
+                       border-radius: 0.6rem;
+                       transition: 0.3s ease;">
+            Envoyer
+        </button>
     </form>
 
     {% if messages %}
         {% for message in messages %}
-            <div class="alert alert-info mt-3">{{ message }}</div>
+            <div class="alert mt-3 text-center"
+                 style="background-color: rgba(200,160,72,0.1);
+                        color: var(--main-color);
+                        border: 1px solid var(--accent-color);
+                        border-radius: 0.6rem;">
+                {{ message }}
+            </div>
         {% endfor %}
     {% endif %}
 </div>
+
+<style>
+    form input, form textarea, form select {
+        border: 1px solid rgba(62, 76, 73, 0.3);
+        border-radius: 0.5rem;
+        transition: 0.3s ease;
+    }
+
+    form input:focus, form textarea:focus, form select:focus {
+        border-color: var(--accent-color);
+        box-shadow: 0 0 6px rgba(200,160,72,0.3);
+        outline: none;
+    }
+
+    button.btn:hover {
+        background-color: #A88433;
+        transform: translateY(-2px);
+    }
+</style>
 {% endblock %}

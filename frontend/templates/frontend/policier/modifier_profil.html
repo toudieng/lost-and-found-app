@@ -3,23 +3,81 @@
 
 {% block title %}Modifier Profil{% endblock %}
 
-{% block content %}
-<h2>✏️ Modifier Profil</h2>
+{% block extra_css %}
+<style>
+.card {
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
 
-<div class="card p-4 mt-3">
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {% for field in form %}
-            <div class="mb-3">
-                <label class="form-label">{{ field.label }}</label>
-                {{ field }}
-                {% if field.errors %}
-                    <div class="text-danger small">{{ field.errors|striptags }}</div>
-                {% endif %}
+h2 {
+    color: var(--main-color);
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+}
+
+label {
+    font-weight: 500;
+    color: #495057;
+}
+
+input, select, textarea {
+    border-radius: 6px;
+    border: 1px solid #ced4da;
+    padding: 6px 10px;
+}
+
+input:focus, select:focus, textarea:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 0.2rem rgba(200,160,72,0.25);
+}
+
+.btn-success {
+    background-color: var(--accent-color);
+    border: none;
+    transition: 0.2s;
+}
+
+.btn-success:hover {
+    background-color: var(--accent-color-dark);
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    border: none;
+    transition: 0.2s;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>✏️ Modifier Profil</h2>
+
+    <div class="card p-4 mt-3">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="mb-3">
+                    <label class="form-label">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.help_text %}
+                        <small class="form-text text-muted">{{ field.help_text }}</small>
+                    {% endif %}
+                    {% if field.errors %}
+                        <div class="text-danger small mt-1">{{ field.errors|striptags }}</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-success">💾 Enregistrer</button>
+                <a href="{% url 'profil_police' %}" class="btn btn-secondary">Annuler</a>
             </div>
-        {% endfor %}
-        <button type="submit" class="btn btn-success">💾 Enregistrer</button>
-        <a href="{% url 'profil_police' %}" class="btn btn-secondary">Annuler</a>
-    </form>
+        </form>
+    </div>
 </div>
 {% endblock %}

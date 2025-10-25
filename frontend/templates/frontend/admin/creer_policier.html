@@ -17,7 +17,7 @@
             <form method="POST" novalidate>
                 {% csrf_token %}
                 {% for field in form %}
-                    <div class="mb-3">
+                    <div class="mb-3 position-relative input-icon-wrapper">
                         <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
                         {{ field }}
                         {% for error in field.errors %}
@@ -26,70 +26,157 @@
                     </div>
                 {% endfor %}
 
-                <button type="submit" class="btn btn-submit w-100">✅ Créer</button>
+                <button type="submit" class="btn btn-submit w-100"> Créer</button>
             </form>
         </div>
     </div>
 </div>
 {% endblock %}
 
+
 {% block extra_css %}
 <style>
+:root {
+    --main-color: #6c1e3d;      /* Couleur sombre principale */
+    --accent-color: #ffc107;    /* Couleur dorée pour détails et focus */
+    --light-color: #f8f9fa;     /* Fond clair */
+}
+
+/* ======================
+   CONTENEUR FORMULAIRE
+====================== */
 .form-container {
-    background: #fff;
-    padding: 2rem;
+    background: var(--light-color);
+    padding: 2.5rem 2rem;
     border-radius: 1rem;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    transition: transform 0.35s ease, box-shadow 0.35s ease;
 }
 .form-container:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 25px rgba(0,0,0,0.15);
+    transform: translateY(-6px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.15);
 }
+
+/* ======================
+   TITRE FORMULAIRE
+====================== */
 .form-title {
-    color: #6c1e3d;
+    color: var(--main-color);
     font-weight: 700;
-    font-size: 1.5rem;
+    font-size: 1.6rem;
     text-align: center;
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
+    position: relative;
 }
-input, select, textarea {
+.form-title::after {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 3px;
+    background: var(--accent-color);
+    margin: 0.5rem auto 0;
+    border-radius: 2px;
+}
+
+/* ======================
+   CHAMPS FORMULAIRE AVEC ICÔNES
+====================== */
+.input-icon-wrapper {
+    position: relative;
+}
+.input-icon-wrapper input,
+.input-icon-wrapper select,
+.input-icon-wrapper textarea {
     width: 100%;
-    height: 42px;
+    height: 45px;
     font-size: 0.95rem;
-    padding: 0.375rem 0.75rem;
-    border: 1px solid #ccc;
-    border-radius: 0.5rem;
-    transition: border-color 0.3s, box-shadow 0.3s;
+    padding: 0.5rem 0.75rem 0.5rem 2.5rem; /* espace pour l’icône */
+    border: 1.5px solid var(--main-color);
+    border-radius: 0.6rem;
+    transition: all 0.35s ease;
+    background: #fff;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
 }
-input:focus, select:focus, textarea:focus {
-    border-color: #6c1e3d;
-    box-shadow: 0 0 5px rgba(108,30,61,0.5);
+.input-icon-wrapper:hover input,
+.input-icon-wrapper:hover select,
+.input-icon-wrapper:hover textarea {
+    border-color: var(--accent-color);
+}
+.input-icon-wrapper input:focus,
+.input-icon-wrapper select:focus,
+.input-icon-wrapper textarea:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 8px rgba(255,193,7,0.4);
     outline: none;
 }
+
+/* icônes à gauche */
+.input-icon-wrapper::before {
+    content: "🔑"; /* icône par défaut, tu peux ajuster selon le champ */
+    position: absolute;
+    top: 50%;
+    left: 12px;
+    transform: translateY(-50%);
+    font-size: 1rem;
+    color: var(--main-color);
+    pointer-events: none;
+}
+
+/* ======================
+   LABEL
+====================== */
 .form-label {
     font-weight: 600;
-    margin-bottom: 0.3rem;
+    margin-bottom: 0.4rem;
     display: block;
+    color: var(--main-color);
 }
+
+/* ======================
+   BOUTON SUBMIT
+====================== */
 .btn-submit {
-    background-color: #0d3b66; /* bleu foncé */
-    border-color: #0d3b66;
-    color: #fff;
+    background-color: var(--main-color);
+    border-color: var(--main-color);
+    color: var(--light-color);
     font-weight: 700;
-    transition: all 0.3s;
+    padding: 0.55rem 1rem;
+    border-radius: 0.6rem;
+    font-size: 1rem;
+    transition: all 0.35s ease;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
 }
 .btn-submit:hover {
-    background-color: #092a4f;
-    transform: translateY(-1px);
+    background-color: #4d1530;
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
 }
+
+/* ======================
+   MESSAGES D’ERREUR
+====================== */
 .text-error {
     color: #dc3545;
     font-size: 0.85rem;
+    margin-top: 0.25rem;
+    background-color: #ffe5e5;
+    padding: 2px 6px;
+    border-radius: 4px;
 }
+
+/* ======================
+   RESPONSIVE
+====================== */
 @media (max-width:576px) {
-    .form-container { padding: 1.5rem; }
-    .form-title { font-size: 1.3rem; }
+    .form-container {
+        padding: 2rem 1.5rem;
+    }
+    .form-title {
+        font-size: 1.4rem;
+    }
+    .btn-submit {
+        font-size: 0.95rem;
+    }
 }
 </style>
 {% endblock %}

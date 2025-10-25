@@ -11,11 +11,20 @@
 
     <!-- Styles globaux -->
     <style>
+        :root {
+            --main-color: #3E4C49;           /* vert-gris foncé */
+            --accent-color: #C8A048;         /* doré */
+            --accent-color-dark: #b88f38;    /* doré foncé pour hover */
+            --light-color: #FFFFFF;           /* blanc */
+            --main-color-light: rgba(62,76,73,0.1);
+        }
+
         body {
             display: flex;
             flex-direction: column;
             min-height: 100vh;
-            background-color: #f8f9fa;
+            background-color: var(--light-color);
+            font-family: "Poppins", sans-serif;
         }
 
         .content-wrapper {
@@ -25,42 +34,73 @@
 
         footer {
             flex-shrink: 0;
-            background-color: #343a40;
-            color: #fff;
+            background-color: var(--main-color);
+            color: var(--light-color);
             padding: 1rem 0;
             text-align: center;
+            font-size: 0.9rem;
         }
 
         footer a {
-            color: #ffc107;
+            color: var(--accent-color);
             text-decoration: none;
+            transition: color 0.2s;
         }
 
         footer a:hover {
+            color: var(--light-color);
             text-decoration: underline;
         }
 
         .navbar {
-            background-color: #343a40 !important;
+            background-color: var(--main-color) !important;
         }
 
         .navbar-brand {
             font-weight: bold;
             font-size: 1.25rem;
+            color: var(--accent-color) !important;
+        }
+
+        .nav-link {
+            color: var(--light-color) !important;
+            transition: color 0.3s;
+        }
+
+        .nav-link:hover {
+            color: var(--accent-color) !important;
         }
 
         .dropdown-menu {
             min-width: 200px;
+            border-radius: 0.6rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .dropdown-item:hover {
+            background-color: var(--main-color-light);
+            color: var(--main-color);
         }
 
         .profile-img {
             width: 32px;
             height: 32px;
             object-fit: cover;
+            border: 2px solid var(--accent-color);
+            border-radius: 50%;
         }
 
-        .nav-link img {
-            border-radius: 50%;
+        /* Boutons principaux */
+        .btn-primary {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+            color: var(--light-color);
+            transition: 0.2s;
+        }
+        .btn-primary:hover {
+            background-color: var(--accent-color-dark);
+            border-color: var(--accent-color-dark);
+            color: var(--light-color);
         }
     </style>
 
@@ -82,9 +122,9 @@
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="profilDropdown" role="button" data-bs-toggle="dropdown">
                             {% if user.photo %}
-                                <img src="{{ user.photo.url }}" alt="Profil" class="profile-img me-2 rounded-circle">
+                                <img src="{{ user.photo.url }}" alt="Profil" class="profile-img me-2">
                             {% else %}
-                                <img src="{% static 'images/default-avatar.png' %}" alt="Profil" class="profile-img me-2 rounded-circle">
+                                <img src="{% static 'images/default-avatar.png' %}" alt="Profil" class="profile-img me-2">
                             {% endif %}
                             {{ user.username }}
                         </a>
@@ -113,11 +153,8 @@
 
 <!-- Footer -->
 <footer>
-    &copy; {{ now.year }} Objets Perdus. Tous droits réservés. | <a href="#">Politique de confidentialité</a>
+    &copy; {{ now.year }} <strong>Objets Perdus</strong>. Tous droits réservés. | <a href="#">Politique de confidentialité</a>
 </footer>
 
 <!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-{% block extra_js %}{% endblock %}
-</body>
-</html>
+<script src="https://cdn.jsde

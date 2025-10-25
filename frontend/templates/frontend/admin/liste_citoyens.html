@@ -4,83 +4,86 @@
 {% block title %}Gestion des Citoyens{% endblock %}
 
 {% block extra_css %}
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+
 <style>
-    /* Titres */
-    .page-title {
-        font-weight: 700;
-        color: #343a40;
-        font-size: 1.4rem;
-    }
+:root {
+    --main-color: #3E4C49;
+    --accent-color: #C8A048;
+    --accent-color-dark: #b88f38;
+    --light-color: #FFFFFF;
+    --main-color-light: rgba(62,76,73,0.1);
+}
 
-    /* Table */
-    .table thead {
-        background-color: #343a40;
-        color: white;
-    }
-    .table tbody tr:hover {
-        background-color: #f1f3f5;
-    }
+/* Titres */
+.page-title {
+    font-weight: 700;
+    color: var(--main-color);
+    font-size: 1.4rem;
+}
 
-    /* Boutons */
-    .btn-blacklist, .btn-unban {
-        padding: 6px 12px;
-        border-radius: 6px;
-        font-size: 0.85rem;
-        border: none;
-        font-weight: 500;
-        transition: 0.2s;
-    }
-    .btn-blacklist {
-        background-color: #dc3545;
-        color: white;
-    }
-    .btn-blacklist:hover {
-        background-color: #c82333;
-    }
-    .btn-unban {
-        background-color: #6c757d;
-        color: white;
-    }
-    .btn-unban:hover {
-        background-color: #5a6268;
-    }
+/* Card */
+.card {
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    padding: 1rem;
+}
 
-    /* Barre de recherche */
-    .search-bar {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-        justify-content: space-between;
-        align-items: center;
-    }
+/* Table */
+.table thead {
+    background-color: var(--main-color);
+    color: var(--light-color);
+}
+.table tbody tr:hover {
+    background-color: var(--main-color-light);
+}
+
+/* Badges */
+.badge {
+    font-size: 0.75rem;
+    padding: 4px 8px;
+}
+
+/* Boutons */
+.btn-blacklist, .btn-unban {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    border: none;
+    font-weight: 500;
+    transition: 0.2s;
+}
+.btn-blacklist {
+    background-color: #dc3545;
+    color: #fff;
+}
+.btn-blacklist:hover {
+    background-color: #c82333;
+}
+.btn-unban {
+    background-color: #6c757d;
+    color: #fff;
+}
+.btn-unban:hover {
+    background-color: #5a6268;
+}
+
+/* Search-bar */
+.search-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
     .search-bar input {
-        width: 250px;
-        border-radius: 6px;
-        border: 1px solid #ced4da;
-        padding: 6px 10px;
+        width: 100%;
     }
-    .search-bar button {
-        height: 36px;
-    }
-
-    /* Card */
-    .card {
-        border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    }
-
-    /* Badge */
-    .badge {
-        font-size: 0.75rem;
-        padding: 4px 8px;
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-        .search-bar input {
-            width: 100%;
-        }
-    }
+}
 </style>
 {% endblock %}
 
@@ -91,64 +94,101 @@
         <a href="{% url 'dashboard_admin' %}" class="btn btn-dark">⬅ Retour Dashboard</a>
     </div>
 
-    <div class="card p-3">
-        <div class="search-bar mb-3">
-            <form method="get" class="d-flex gap-2 flex-wrap">
-                <input type="text" name="q" class="form-control" placeholder="Rechercher un citoyen..." value="{{ request.GET.q }}">
-                <button type="submit" class="btn btn-secondary">🔍 Rechercher</button>
-            </form>
+    <div class="card">
+        <div class="search-bar">
+            <input type="text" id="globalSearch" placeholder="Rechercher un citoyen..." class="form-control">
         </div>
 
         {% if citoyens %}
-            <div class="table-responsive">
-                <table class="table table-striped align-middle mb-0">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Nom complet</th>
-                            <th>Email</th>
-                            <th>Téléphone</th>
-                            <th>Date d’inscription</th>
-                            <th>Statut</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for citoyen in citoyens %}
-                            <tr>
-                                <td>{{ forloop.counter }}</td>
-                                <td>{{ citoyen.first_name }} {{ citoyen.last_name }}</td>
-                                <td>{{ citoyen.email }}</td>
-                                <td>{{ citoyen.telephone|default:"—" }}</td>
-                                <td>{{ citoyen.date_joined|date:"d/m/Y" }}</td>
-                                <td>
-                                    {% if citoyen.est_banni %}
-                                        <span class="badge bg-danger">Banni</span>
-                                    {% else %}
-                                        <span class="badge bg-success">Actif</span>
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    {% if not citoyen.est_banni %}
-                                        <form method="post" action="{% url 'bannir_citoyen' citoyen.id %}" style="display:inline;">
-                                            {% csrf_token %}
-                                            <button type="submit" class="btn-blacklist">🛑 Bannir</button>
-                                        </form>
-                                    {% else %}
-                                        <form method="post" action="{% url 'debannir_citoyen' citoyen.id %}" style="display:inline;">
-                                            {% csrf_token %}
-                                            <button type="submit" class="btn-unban">♻️ Débannir</button>
-                                        </form>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+        <div class="table-responsive">
+            <table id="citoyensTable" class="table table-striped align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Nom complet</th>
+                        <th>Email</th>
+                        <th>Téléphone</th>
+                        <th>Date d’inscription</th>
+                        <th>Statut</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for citoyen in citoyens %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ citoyen.first_name }} {{ citoyen.last_name }}</td>
+                        <td>{{ citoyen.email }}</td>
+                        <td>{{ citoyen.telephone|default:"—" }}</td>
+                        <td>{{ citoyen.date_joined|date:"d/m/Y" }}</td>
+                        <td>
+                            {% if citoyen.est_banni %}
+                                <span class="badge bg-danger">Banni</span>
+                            {% else %}
+                                <span class="badge bg-success">Actif</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if not citoyen.est_banni %}
+                            <form method="post" action="{% url 'bannir_citoyen' citoyen.id %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-blacklist">🛑 Bannir</button>
+                            </form>
+                            {% else %}
+                            <form method="post" action="{% url 'debannir_citoyen' citoyen.id %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-unban">♻️ Débannir</button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
         {% else %}
-            <p class="text-muted">Aucun citoyen trouvé.</p>
+        <p class="text-muted">Aucun citoyen trouvé.</p>
         {% endif %}
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- DataTables JS -->
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+<script>
+// Initialiser DataTable
+$(document).ready(function() {
+    const table = $('#citoyensTable').DataTable({
+        paging: true,
+        pageLength: 10,
+        lengthMenu: [5,10,20,50],
+        ordering: true,
+        order: [[0, 'asc']],
+        language: {
+            search: "🔍 Rechercher :",
+            lengthMenu: "Afficher _MENU_ entrées",
+            info: "Affichage _START_ à _END_ sur _TOTAL_ citoyens",
+            infoEmpty: "Aucun citoyen",
+            zeroRecords: "Aucun résultat trouvé",
+            paginate: {
+                first: "⏮️",
+                last: "⏭️",
+                next: "➡️",
+                previous: "⬅️"
+            }
+        },
+        columnDefs: [
+            { orderable: false, targets: 6 } // Action non triable
+        ]
+    });
+
+    // Recherche globale personnalisée
+    $('#globalSearch').on('keyup', function(){
+        table.search(this.value).draw();
+    });
+});
+</script>
 {% endblock %}

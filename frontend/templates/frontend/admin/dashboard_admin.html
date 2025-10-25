@@ -5,12 +5,20 @@
 
 {% block extra_css %}
 <style>
+:root {
+    --main-color: #3E4C49;          
+    --accent-color: #C8A048;        
+    --accent-color-dark: #b88f38;   
+    --light-color: #FFFFFF;          
+    --main-color-light: rgba(62,76,73,0.1);
+}
+
 /* =========================
    SIDEBAR
 ========================= */
 .sidebar {
-    background: linear-gradient(180deg, #343a40, #212529);
-    color: #fff;
+    background: linear-gradient(180deg, var(--main-color), #2f3b37);
+    color: var(--light-color);
     min-height: 100vh;
     padding: 1.5rem 0.8rem;
     position: sticky;
@@ -18,7 +26,7 @@
     transition: all 0.3s;
 }
 .sidebar h4 {
-    color: #ffc107;
+    color: var(--accent-color);
     text-align: center;
     margin-bottom: 1rem;
     font-size: 1.2rem;
@@ -27,7 +35,7 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    color: #cfd8dc;
+    color: var(--light-color);
     border-radius: 0.4rem;
     padding: 0.5rem 0.8rem;
     font-weight: 500;
@@ -36,8 +44,8 @@
 }
 .sidebar .nav-link:hover,
 .sidebar .nav-link.active {
-    background: rgba(255, 255, 255, 0.15);
-    color: #ffc107;
+    background: var(--main-color-light);
+    color: var(--accent-color);
 }
 
 /* =========================
@@ -45,11 +53,11 @@
 ========================= */
 .main-content {
     padding: 1.5rem;
-    background: #f8f9fa;
+    background: var(--light-color);
     min-height: 100vh;
 }
 .welcome-title {
-    color: #343a40;
+    color: var(--main-color);
     font-weight: 700;
     margin-bottom: 0.5rem;
     font-size: 1.8rem;
@@ -58,8 +66,8 @@
     font-weight: 700;
     font-size: 1.3rem;
     margin-top: 2rem;
-    color: #212529;
-    border-left: 5px solid #ffc107;
+    color: var(--main-color);
+    border-left: 5px solid var(--accent-color);
     padding-left: 0.7rem;
 }
 
@@ -75,7 +83,7 @@
 .stats-card {
     border-radius: 1rem;
     padding: 1rem 1.2rem;
-    background: #fff;
+    background: var(--light-color);
     box-shadow: 0 5px 15px rgba(0,0,0,0.08);
     flex: 1 1 220px;
     display: flex;
@@ -83,12 +91,11 @@
     gap: 0.5rem;
     transition: all 0.3s ease-in-out;
     cursor: pointer;
-    position: relative;
     min-width: 220px;
 }
 .stats-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    box-shadow: 0 8px 25px rgba(62,76,73,0.15);
 }
 .stats-icon {
     font-size: 2rem;
@@ -106,14 +113,14 @@
     border-radius: 12px;
     font-size: 0.75rem;
     font-weight: 600;
-    color: #fff;
+    color: var(--light-color);
 }
 
 /* Couleurs badges */
-.badge-commissariat { background: #007bff; }
-.badge-policiers { background: #28a745; }
+.badge-commissariat { background: var(--main-color); }
+.badge-policiers { background: #2a5d63; }
 .badge-citoyens { background: #17a2b8; }
-.badge-objets-perdus { background: #ffc107; color: #212529; }
+.badge-objets-perdus { background: var(--accent-color); color: var(--main-color); }
 .badge-objets-trouves { background: #6f42c1; }
 .badge-restitutions { background: #20c997; }
 .badge-messages { background: #fd7e14; }
@@ -136,7 +143,7 @@
 }
 .stats-card ul li.new {
     font-weight: 600;
-    background: #fff3cd;
+    background: var(--main-color-light);
 }
 
 /* =========================

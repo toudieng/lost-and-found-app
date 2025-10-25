@@ -2,20 +2,85 @@
 
 {% block title %}Historique des restitutions{% endblock %}
 
+{% block extra_css %}
+<style>
+.table-responsive {
+    overflow-x: auto;
+}
+
+h2 {
+    color: var(--main-color);
+    font-weight: 700;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.table thead {
+    background-color: var(--main-color);
+    color: var(--light-color);
+}
+
+.table tbody tr:hover {
+    background-color: var(--main-color-light);
+}
+
+.badge-restaure {
+    background-color: var(--accent-color);
+    color: #fff;
+    font-weight: 500;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    border: none;
+    transition: 0.2s;
+}
+
+.btn-danger:hover {
+    background-color: #b02a37;
+}
+
+/* Responsive pour mobile */
+@media (max-width: 768px) {
+    .table thead {
+        display: none;
+    }
+    .table tbody tr {
+        display: block;
+        margin-bottom: 1rem;
+        border-bottom: 1px solid #dee2e6;
+    }
+    .table tbody td {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem;
+    }
+    .table tbody td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        flex: 1 0 40%;
+    }
+    .table tbody td span.badge-restaure {
+        margin-top: 0.3rem;
+    }
+}
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container my-5">
-    <h2 class="text-center mb-4">📜 Historique des restitutions</h2>
+    <h2>📜 Historique des restitutions</h2>
 
     {% if restitutions %}
-        <div class="table-responsive">
-            <table class="table table-striped table-hover align-middle shadow-sm">
-                <thead class="table-dark">
+        <div class="table-responsive shadow-sm">
+            <table class="table table-striped table-hover align-middle mb-0">
+                <thead>
                     <tr>
                         <th>#</th>
                         <th>Objet</th>
-                        <th>Propriétaire (Réclamant)</th>
-                        <th>Restitué par (Trouveurs)</th>
-                        <th>Policier planificateur</th>
+                        <th>Propriétaire</th>
+                        <th>Restitué par</th>
+                        <th>Policier</th>
                         <th>Date</th>
                         <th>Heure</th>
                         <th>Commissariat</th>
@@ -26,11 +91,9 @@
                 <tbody>
                     {% for restitution in restitutions %}
                     <tr>
-                        <td>{{ forloop.counter }}</td>
-                        <td>{{ restitution.objet.nom }}</td>
-
-                        <!-- Propriétaire (Réclamant) -->
-                        <td>
+                        <td data-label="#"> {{ forloop.counter }} </td>
+                        <td data-label="Objet"> {{ restitution.objet.nom }} </td>
+                        <td data-label="Propriétaire">
                             {% if restitution.proprietaire %}
                                 👤 {{ restitution.proprietaire.username }} <br>
                                 <small class="text-muted">{{ restitution.proprietaire.email|default:"N/A" }}</small>
@@ -38,9 +101,7 @@
                                 <span class="text-muted">N/A</span>
                             {% endif %}
                         </td>
-
-                        <!-- Trouveurs (Restitué par) -->
-                        <td>
+                        <td data-label="Restitué par">
                             {% if restitution.trouveurs %}
                                 {% for user in restitution.trouveurs %}
                                     👤 {{ user.username }}
@@ -50,9 +111,7 @@
                                 <span class="text-muted">N/A</span>
                             {% endif %}
                         </td>
-
-                        <!-- Policier planificateur -->
-                        <td>
+                        <td data-label="Policier">
                             {% if restitution.policier %}
                                 👮 {{ restitution.policier.username }} <br>
                                 <small class="text-muted">{{ restitution.policier.email|default:"N/A" }}</small>
@@ -60,17 +119,14 @@
                                 <span class="text-muted">N/A</span>
                             {% endif %}
                         </td>
-
-                        <td>{{ restitution.date_restitution|date:"d/m/Y" }}</td>
-                        <td>{{ restitution.heure_restitution|time:"H:i" }}</td>
-                        <td>{{ restitution.commissariat.nom|default:"N/A" }}</td>
-                        <td><span class="badge bg-success">✅ Restitué</span></td>
-                        <td>
+                        <td data-label="Date"> {{ restitution.date_restitution|date:"d/m/Y" }} </td>
+                        <td data-label="Heure"> {{ restitution.heure_restitution|time:"H:i" }} </td>
+                        <td data-label="Commissariat"> {{ restitution.commissariat.nom|default:"N/A" }} </td>
+                        <td data-label="Statut"><span class="badge-restaure">✅ Restitué</span></td>
+                        <td data-label="Action">
                             <form action="{% url 'supprimer_restitution' restitution.id %}" method="post" style="display:inline;" onsubmit="return confirm('Voulez-vous vraiment supprimer cette restitution ?');">
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-sm btn-danger">
-                                    🗑 Supprimer
-                                </button>
+                                <button type="submit" class="btn btn-sm btn-danger">🗑 Supprimer</button>
                             </form>
                         </td>
                     </tr>

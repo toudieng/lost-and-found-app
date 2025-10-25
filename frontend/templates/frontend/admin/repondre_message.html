@@ -1,8 +1,62 @@
 {% extends "frontend/admin/base_admin.html" %}
 {% block title %}Répondre à un message{% endblock %}
 
+{% block extra_css %}
+<style>
+:root {
+    --main-color: #3E4C49;           /* vert-gris foncé */
+    --accent-color: #C8A048;         /* doré */
+    --accent-color-dark: #b88f38;    /* doré foncé pour hover */
+    --light-color: #FFFFFF;           /* blanc */
+    --main-color-light: rgba(62,76,73,0.1);
+}
+
+/* Titres */
+h3 {
+    color: var(--main-color);
+    font-weight: 700;
+}
+
+/* Card */
+.card {
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+/* Boutons */
+.btn-success {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+    color: var(--light-color);
+    transition: 0.2s;
+}
+.btn-success:hover {
+    background-color: var(--accent-color-dark);
+    border-color: var(--accent-color-dark);
+    color: var(--light-color);
+}
+.btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    color: #fff;
+}
+.btn-secondary:hover {
+    background-color: #5a6268;
+    border-color: #5a6268;
+}
+
+/* Texte du message */
+.card p {
+    color: #343a40;
+}
+.card small {
+    color: #6c757d;
+}
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container mt-4">
+<div class="container py-4">
     <h3 class="mb-4">✉️ Répondre à {{ message_obj.nom }}</h3>
 
     <div class="card shadow p-3 mb-4">

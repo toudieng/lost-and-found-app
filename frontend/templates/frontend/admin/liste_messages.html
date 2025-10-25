@@ -1,59 +1,92 @@
 {% extends "frontend/admin/base_admin.html" %}
+{% load static %}
+
 {% block title %}Messages citoyens{% endblock %}
 
 {% block extra_css %}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
 <style>
-/* Table responsive */
-.table-responsive {
-    overflow-x: auto;
+:root {
+    --main-color: #3E4C49;           /* vert-gris foncé */
+    --accent-color: #C8A048;         /* doré */
+    --accent-color-dark: #b88f38;    /* doré foncé pour hover */
+    --light-color: #FFFFFF;           /* blanc */
+    --main-color-light: rgba(62,76,73,0.1);
+    --success-color: #28a745;        /* vert pour messages répondu */
+    --warning-color: #ffc107;        /* jaune pour messages en attente */
 }
 
-/* Boutons */
+/* Table */
+.table thead {
+    background-color: var(--main-color);
+    color: var(--light-color);
+}
+.table tbody tr:hover {
+    background-color: var(--main-color-light);
+}
+.message-cell {
+    cursor: pointer;
+    color: var(--accent-color);
+    text-decoration: underline;
+}
+
+/* Badges statut */
+.status-repondu {
+    background-color: var(--success-color);
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.8rem;
+}
+.status-attente {
+    background-color: var(--warning-color);
+    color: #343a40;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.8rem;
+}
+
+/* Bouton */
 .btn-outline-primary {
     font-size: 0.85rem;
     padding: 0.25rem 0.6rem;
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+    transition: 0.2s;
+}
+.btn-outline-primary:hover {
+    background-color: var(--accent-color-dark);
+    color: var(--light-color);
+    border-color: var(--accent-color-dark);
 }
 
-/* Statut des messages */
-.status-repondu {
-    color: #28a745;
-    font-weight: 600;
-}
-.status-attente {
-    color: #ffc107;
-    font-weight: 600;
-}
-
-/* Responsive */
+/* Responsive pour mobile */
 @media (max-width: 768px) {
-    .table thead {
-        display: none;
-    }
-    .table tbody tr {
-        display: block;
-        margin-bottom: 1rem;
-        border-bottom: 1px solid #dee2e6;
-    }
-    .table tbody td {
-        display: flex;
-        justify-content: space-between;
-        padding: 0.5rem;
-    }
-    .table tbody td::before {
-        content: attr(data-label);
-        font-weight: 600;
-    }
+    .table thead { display: none; }
+    .table tbody tr { display: block; margin-bottom: 1rem; border-bottom: 1px solid #dee2e6; }
+    .table tbody td { display: flex; justify-content: space-between; padding: 0.5rem; }
+    .table tbody td::before { content: attr(data-label); font-weight: 600; }
 }
+
+/* Search-bar */
+#globalSearch { margin-bottom: 1rem; max-width: 300px; }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h3 class="mb-4">📬 Messages reçus</h3>
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <h3 class="mb-0">📬 Messages reçus</h3>
+        <a href="{% url 'dashboard_admin' %}" class="btn btn-dark">⬅ Retour Dashboard</a>
+    </div>
+
+    <input type="text" id="globalSearch" class="form-control" placeholder="🔍 Rechercher un message...">
 
     <div class="table-responsive">
-        <table class="table table-hover align-middle">
-            <thead class="table-light">
+        <table id="messagesTable" class="table table-striped align-middle mb-0">
+            <thead>
                 <tr>
                     <th>Nom</th>
                     <th>Email</th>
@@ -68,7 +101,9 @@
                 <tr>
                     <td data-label="Nom">{{ msg.nom }}</td>
                     <td data-label="Email">{{ msg.email }}</td>
-                    <td data-label="Message">{{ msg.contenu|truncatewords:10 }}</td>
+                    <td data-label="Message" class="message-cell" data-full="{{ msg.contenu|escape }}">
+                        {{ msg.contenu|truncatewords:10 }}
+                    </td>
                     <td data-label="Date">{{ msg.date_envoi|date:"d/m/Y H:i" }}</td>
                     <td data-label="Statut">
                         {% if msg.reponse %}
@@ -83,11 +118,68 @@
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="6" class="text-center">Aucun message reçu</td>
+                    <td colspan="6" class="text-center text-muted">Aucun message reçu</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
 </div>
+
+<!-- Modal pour afficher le message complet -->
+<div class="modal fade" id="messageModal" tabindex="-1" aria-labelledby="messageModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header" style="background-color: var(--main-color); color: var(--light-color);">
+        <h5 class="modal-title" id="messageModalLabel">Message complet</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+      </div>
+      <div class="modal-body">
+        <p id="modalMessageContent"></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    const table = $('#messagesTable').DataTable({
+        paging: true,
+        pageLength: 10,
+        lengthMenu: [5, 10, 20, 50],
+        ordering: true,
+        order: [[3, 'desc']],
+        columnDefs: [{ orderable: false, targets: 5 }],
+        language: {
+            search: "🔍 Rechercher :",
+            lengthMenu: "Afficher _MENU_ entrées",
+            info: "Affichage _START_ à _END_ sur _TOTAL_ messages",
+            infoEmpty: "Aucun message",
+            zeroRecords: "Aucun résultat trouvé",
+            paginate: { first: "⏮️", last: "⏭️", next: "➡️", previous: "⬅️" }
+        }
+    });
+
+    // Recherche globale
+    $('#globalSearch').on('keyup', function(){
+        table.search(this.value).draw();
+    });
+
+    // Affichage du message complet dans la modal
+    $('.message-cell').on('click', function(){
+        const fullMessage = $(this).data('full');
+        $('#modalMessageContent').text(fullMessage);
+        const modal = new bootstrap.Modal(document.getElementById('messageModal'));
+        modal.show();
+    });
+});
+</script>
 {% endblock %}

@@ -15,210 +15,123 @@
 
     <style>
         :root {
-            --main-color: #495057;
-            --main-color-dark: #343a40;
-            --button-color:  #e6b800;         /* jaune principal */
-            --button-color-hover: #e6b800;   /* jaune clair au survol */
-            --input-bg: rgba(255,255,255,0.95);
+            --main-color: #3E4C49;         /* vert gris foncé */
+            --accent-color: #C8A048;       /* doré */
+            --light-color: #FFFFFF;        /* blanc */
         }
 
         /* =========================
            Body
         ========================= */
-        body.light-mode {
-            background: linear-gradient(135deg, #f5f5f5, #e0e0e0);
-            color: #212529;
-            transition: background 0.5s ease, color 0.5s ease;
-        }
-        body.dark-mode {
-            background: linear-gradient(135deg, #121212, #2c2c2c);
-            color: #f5f5f5;
+        body {
+            background-color: var(--light-color);
+            color: var(--main-color);
+            font-family: 'Poppins', sans-serif;
+            transition: background 0.4s ease, color 0.4s ease;
         }
 
         /* =========================
            Navbar
         ========================= */
         .navbar-custom {
-            background: var(--main-color-dark) !important;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-            padding: 0.6rem 1rem;
+            background-color: var(--main-color) !important;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
         }
         .navbar-custom .navbar-brand {
+            color: var(--accent-color) !important;
             font-weight: 700;
             font-size: 1.3rem;
-            color: var(--button-color) !important;
         }
         .navbar-custom .nav-link {
-            font-weight: 500;
-            color: #ddd !important;
+            color: var(--light-color) !important;
             position: relative;
+            transition: color 0.3s ease;
         }
-        .navbar-custom .nav-link::after {
-            content: "";
-            position: absolute;
-            width: 0%;
-            height: 2px;
-            left: 0;
-            bottom: -3px;
-            background: var(--button-color);
-            transition: width 0.3s ease-in-out;
+        .navbar-custom .nav-link:hover,
+        .navbar-custom .nav-link.active {
+            color: var(--accent-color) !important;
         }
-        .navbar-custom .nav-link:hover::after,
-        .navbar-custom .nav-link.active::after { width: 100%; }
 
         .navbar-custom .btn {
+            background-color: var(--accent-color);
+            color: var(--light-color);
             border-radius: 25px;
-            padding: 6px 14px;
-            background: var(--button-color);
-            color: white !important;
+            padding: 6px 16px;
             border: none;
-            transition: all 0.3s ease;
+            transition: background 0.3s ease;
         }
-        .navbar-custom .btn:hover { 
-            background: var(--button-color-hover); 
+        .navbar-custom .btn:hover {
+            background-color: #A88433; /* version plus sombre du doré */
         }
 
         /* =========================
            Footer
         ========================= */
         footer {
-            background: var(--main-color-dark);
-            color: #ddd;
+            background-color: var(--main-color);
+            color: var(--light-color);
             padding: 25px 0;
-            width: 100%;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            font-size: 0.95rem;
-            transition: all 0.3s ease-in-out;
-            opacity: 0;
-            transform: translateY(10px);
-            animation: fadeInFooter 1s ease forwards;
-        }
-        @keyframes fadeInFooter {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            text-align: center;
         }
         footer a {
-            color: var(--button-color);
+            color: var(--accent-color);
             text-decoration: none;
-            font-weight: 500;
-            transition: color 0.3s ease, transform 0.2s ease;
+            transition: color 0.3s ease;
         }
-        footer a:hover { color: #fff; transform: translateY(-2px); }
-        footer .social-icons a {
-            font-size: 1.3rem;
-            color: var(--button-color);
-            margin: 0 10px;
-            transition: transform 0.3s ease, color 0.3s ease;
+        footer a:hover {
+            color: var(--light-color);
         }
-        footer .social-icons a:hover { color: #fff; transform: scale(1.2) rotate(5deg); }
-        footer hr { border-color: rgba(255,255,255,0.1); margin: 1rem 0; }
-        footer p { margin: 0; line-height: 1.6; }
-        footer small { font-size: 0.85rem; color: #aaa; }
-        footer .text-muted { color: #fff !important; }
 
         /* =========================
            Form containers (connexion / inscription)
         ========================= */
         .form-container {
-            width: 100%;
             max-width: 400px;
-            padding: 2.5rem 1.5rem;
-            background: var(--input-bg);
-            backdrop-filter: blur(12px);
+            background-color: var(--light-color);
+            border: 1px solid rgba(62, 76, 73, 0.1);
             border-radius: 1rem;
-            box-shadow: 0 12px 30px rgba(0,0,0,0.12);
-            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            padding: 2.5rem 1.5rem;
             margin: auto;
         }
-        .form-container:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 18px 35px rgba(0,0,0,0.2);
-        }
         .form-title {
-            color: var(--button-color);
+            color: var(--accent-color);
             font-weight: 700;
-            font-size: 1.8rem;
+            font-size: 1.7rem;
             text-align: center;
-            margin-bottom: 1.8rem;
-            position: relative;
-            letter-spacing: 1px;
-        }
-        .form-title::after {
-            content: '';
-            display: block;
-            width: 50px;
-            height: 3px;
-            background: var(--button-color);
-            margin: 8px auto 0;
-            border-radius: 2px;
-            animation: slide-in 1s ease forwards;
-        }
-        @keyframes slide-in {
-            0% { width: 0; opacity: 0; }
-            100% { width: 50px; opacity: 1; }
-        }
-        .input-group {
-            position: relative;
             margin-bottom: 1.5rem;
         }
         .input-group input {
-            width: 100%;
-            height: 45px;
-            padding: 0.375rem 2.5rem 0.375rem 2.5rem;
             border-radius: 0.6rem;
-            border: 1px solid #ced4da;
-            transition: 0.3s ease, box-shadow 0.3s ease;
-            background: #fff;
+            border: 1px solid rgba(62, 76, 73, 0.3);
+            background: var(--light-color);
+            padding: 10px 12px;
+            transition: 0.3s;
         }
         .input-group input:focus {
-            border-color: var(--main-color);
-            box-shadow: 0 0 10px rgba(204,85,0,0.3);
+            border-color: var(--accent-color);
+            box-shadow: 0 0 6px rgba(200,160,72,0.3);
             outline: none;
         }
-        .input-group i.icon-left {
-            position: absolute;
-            left: 0.75rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--main-color);
-            font-size: 1.2rem;
-        }
-        .input-group .toggle-password {
-            position: absolute;
-            right: 2rem;
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: pointer;
-            color: var(--main-color);
-        }
         .btn-submit {
-            background: linear-gradient(90deg, var(--button-color), var(--button-color-hover));
-            color: #fff;
+            background-color: var(--accent-color);
+            color: var(--light-color);
             border: none;
             border-radius: 0.6rem;
             height: 45px;
-            font-weight: 700;
-            font-size: 1rem;
             width: 100%;
-            transition: all 0.3s ease;
+            font-weight: 700;
+            transition: background 0.3s ease, transform 0.2s ease;
         }
         .btn-submit:hover {
-            background: linear-gradient(90deg, var(--button-color-hover), var(--button-color));
-            transform: translateY(-2px) scale(1.02);
-            box-shadow: 0 6px 18px rgba(204,85,0,0.3);
-        }
-        .text-error { color: #dc3545; font-size: 0.85rem; }
-        .alert { border-radius: 0.5rem; font-size: 0.9rem; text-align:center; }
-
-        @media (max-width:576px) {
-            .form-container { padding: 2rem 1rem; }
-            .form-title { font-size: 1.6rem; }
+            background-color: #A88433;
+            transform: translateY(-2px);
         }
     </style>
 
     {% block extra_css %}{% endblock %}
 </head>
-<body class="d-flex flex-column min-vh-100 light-mode">
+<body class="d-flex flex-column min-vh-100">
 
     <!-- Navbar -->
     {% include "frontend/navbar.html" %}
@@ -236,15 +149,6 @@
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        const btn = document.getElementById('bg-btn');
-        if (btn) {
-            btn.addEventListener('click', () => {
-                document.body.classList.toggle('dark-mode');
-                document.body.classList.toggle('light-mode');
-            });
-        }
-    </script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>

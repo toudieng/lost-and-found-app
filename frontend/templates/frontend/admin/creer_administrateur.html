@@ -35,8 +35,15 @@
 
 {% block extra_css %}
 <style>
+:root {
+    --main-color: #343a40;   /* Couleur principale (foncé) */
+    --accent-color: #ffc107; /* Couleur accent (doré) */
+    --light-color: #f8f9fa;  /* Fond / clair */
+}
+
+/* Conteneur du formulaire */
 .form-container {
-    background: #fff;
+    background: var(--light-color);
     padding: 2rem;
     border-radius: 1rem;
     box-shadow: 0 8px 20px rgba(0,0,0,0.1);
@@ -46,13 +53,17 @@
     transform: translateY(-4px);
     box-shadow: 0 12px 25px rgba(0,0,0,0.15);
 }
+
+/* Titre du formulaire */
 .form-title {
-    color: #6c1e3d;
+    color: var(--main-color);
     font-weight: 700;
     font-size: 1.5rem;
     text-align: center;
     margin-bottom: 1.5rem;
 }
+
+/* Champs du formulaire */
 input, select, textarea {
     width: 100%;
     height: 42px;
@@ -63,30 +74,37 @@ input, select, textarea {
     transition: border-color 0.3s, box-shadow 0.3s;
 }
 input:focus, select:focus, textarea:focus {
-    border-color: #6c1e3d;
-    box-shadow: 0 0 5px rgba(108,30,61,0.5);
+    border-color: var(--accent-color);
+    box-shadow: 0 0 5px rgba(255,193,7,0.4);
     outline: none;
 }
+
 .form-label {
     font-weight: 600;
     margin-bottom: 0.3rem;
     display: block;
 }
+
+/* Bouton submit */
 .btn-submit {
-    background-color: #0d3b66; /* bleu foncé */
-    border-color: #0d3b66;
-    color: #fff;
+    background-color: var(--main-color);
+    border-color: var(--main-color);
+    color: var(--light-color);
     font-weight: 700;
     transition: all 0.3s;
 }
 .btn-submit:hover {
-    background-color: #092a4f;
+    background-color: #212529; /* un peu plus foncé */
     transform: translateY(-1px);
 }
+
+/* Messages d’erreur */
 .text-error {
     color: #dc3545;
     font-size: 0.85rem;
 }
+
+/* Responsive */
 @media (max-width:576px) {
     .form-container { padding: 1.5rem; }
     .form-title { font-size: 1.3rem; }

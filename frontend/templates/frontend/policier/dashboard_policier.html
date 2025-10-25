@@ -5,18 +5,107 @@
 
 {% block extra_css %}
 <style>
-    /* Styles existants pour sidebar, main-content, stats-card, chart-container... */
-    body { display: flex; flex-direction: column; min-height: 100vh; }
-    .sidebar { background: linear-gradient(180deg, #343a40, #1d1f21); color: #fff; min-height: 100vh; padding: 2rem 1rem; position: sticky; top: 0; }
-    .sidebar h4 { color: #ffc107; text-align: center; margin-bottom: 1.5rem; }
-    .sidebar .nav-link { color: #adb5bd; border-radius: 0.5rem; padding: 0.6rem 1rem; transition: all 0.2s; }
-    .sidebar .nav-link:hover, .sidebar .nav-link.active { background: #495057; color: #ffc107; }
-    .main-content { flex: 1 0 auto; padding: 2rem; background: #f8f9fa; min-height: 100vh; }
-    .welcome-title { color: #6c1e3d; font-weight: 700; margin-bottom: 0.5rem; }
-    .stats-card { border-radius: 1rem; padding: 1.5rem; background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 1rem; transition: transform 0.2s; }
-    .stats-card:hover { transform: translateY(-3px); }
-    .stats-icon { font-size: 2.5rem; color: #6c1e3d; display: flex; align-items: center; justify-content: center; width: 3rem; height: 3rem; background: #f0e5f0; border-radius: 50%; }
-    .chart-container { background: #fff; padding: 1rem; border-radius: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 2rem; }
+:root {
+    --main-color: #3E4C49;       /* vert-gris foncé */
+    --accent-color: #C8A048;     /* doré */
+    --accent-color-dark: #b88f38; /* doré foncé pour hover */
+    --light-color: #FFFFFF;       /* blanc */
+    --main-color-light: rgba(62,76,73,0.15); /* léger overlay pour hover */
+}
+
+/* Layout */
+body { 
+    font-family: 'Segoe UI', sans-serif; 
+    background: #f8f9fa; 
+    display: flex; 
+    flex-direction: column;
+}
+.main-content {
+    flex: 1 0 auto;
+    padding: 2rem;
+    background: var(--light-color);
+    min-height: 80vh;
+    border-radius: 1rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+/* Sidebar */
+.sidebar {
+    background: var(--main-color); /* vert-gris foncé */
+    color: var(--light-color);
+    min-height: 100vh;
+    padding: 2rem 1rem;
+    position: sticky;
+    top: 0;
+}
+.sidebar h4 {
+    color: var(--accent-color); /* doré */
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+.sidebar .nav-link {
+    color: #f0e5f0; /* gris clair lisible */
+    border-radius: 0.5rem;
+    padding: 0.6rem 1rem;
+    transition: all 0.2s;
+}
+.sidebar .nav-link:hover,
+.sidebar .nav-link.active {
+    background: var(--accent-color-dark); /* doré foncé */
+    color: var(--light-color);
+}
+
+/* Welcome */
+.welcome-title { 
+    color: var(--main-color); 
+    font-weight: 700; 
+    margin-bottom: 0.5rem; 
+}
+
+/* Stat cards */
+.stats-card {
+    border-radius: 1rem;
+    padding: 1.5rem;
+    background: var(--main-color); /* fond principal */
+    color: var(--light-color);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+}
+.stats-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+}
+.stats-icon {
+    font-size: 2.5rem;
+    color: var(--main-color); /* icône couleur fond du dashboard */
+    width: 3rem;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--accent-color); /* icône dorée */
+    border-radius: 50%;
+}
+
+/* Charts */
+.chart-container {
+    background: var(--light-color);
+    padding: 1rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    margin-bottom: 2rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .main-content { padding: 1rem; margin-top: 1rem; }
+    .sidebar h4 { font-size: 1.3rem; }
+}
+
 </style>
 {% endblock %}
 
@@ -52,50 +141,19 @@
 
         <!-- Statistiques rapides -->
         <div class="row g-3 mb-4">
+            {% for card in stats_cards %}
             <div class="col-md-3">
-                <a href="{% url 'objets_perdus_trouves' %}" class="text-decoration-none">
+                <a href="{{ card.url }}" class="text-decoration-none">
                     <div class="stats-card">
-                        <span class="stats-icon">📌</span>
+                        <span class="stats-icon">{{ card.icon }}</span>
                         <div>
-                            <h5 class="mb-0">{{ nb_objets_perdus_trouves|default:"0" }}</h5>
-                            <small class="text-muted">Objets perdus & trouvés</small>
+                            <h5 class="mb-0">{{ card.count|default:"0" }}</h5>
+                            <small>{{ card.label }}</small>
                         </div>
                     </div>
                 </a>
             </div>
-            <div class="col-md-3">
-                <a href="{% url 'objets_trouves_reclames' %}" class="text-decoration-none">
-                    <div class="stats-card">
-                        <span class="stats-icon">📌</span>
-                        <div>
-                            <h5 class="mb-0">{{ nb_objets_trouves_reclames|default:"0" }}</h5>
-                            <small class="text-muted">Objets trouvés & réclamés</small>
-                        </div>
-                    </div>
-                </a>
-            </div>
-            <div class="col-md-3">
-                <a href="{% url 'objets_trouves_attente' %}" class="text-decoration-none">
-                    <div class="stats-card">
-                        <span class="stats-icon">📦</span>
-                        <div>
-                            <h5 class="mb-0">{{ nb_objets_trouves_attente|default:"0" }}</h5>
-                            <small class="text-muted">Objets retrouvés (en attente)</small>
-                        </div>
-                    </div>
-                </a>
-            </div>
-            <div class="col-md-3">
-                <a href="{% url 'historique_restitutions' %}" class="text-decoration-none">
-                    <div class="stats-card">
-                        <span class="stats-icon">📂</span>
-                        <div>
-                            <h5 class="mb-0">{{ nb_restitutions|default:"0" }}</h5>
-                            <small class="text-muted">Historique</small>
-                        </div>
-                    </div>
-                </a>
-            </div>
+            {% endfor %}
         </div>
 
         <!-- Graphiques -->
@@ -127,7 +185,7 @@ new Chart(ctxPerdus, {
         datasets: [{
             label: 'Objets perdus & trouvés',
             data: {{ data_perdus_trouves|safe }},
-            backgroundColor: '#6c1e3d'
+            backgroundColor: 'var(--main-color)'
         }]
     },
     options: {
@@ -145,7 +203,7 @@ new Chart(ctxReclames, {
         datasets: [{
             label: 'Objets trouvés & réclamés',
             data: {{ data_trouves_reclames|safe }},
-            backgroundColor: '#28a745'
+            backgroundColor: 'var(--accent-color)'
         }]
     },
     options: {

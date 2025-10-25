@@ -2,10 +2,88 @@
 
 {% block title %}Gérer les policiers{% endblock %}
 
+{% block extra_css %}
+<style>
+:root {
+    --main-color: #3E4C49;
+    --accent-color: #C8A048;
+    --accent-color-dark: #b88f38;
+    --light-color: #FFFFFF;
+    --main-color-light: rgba(62,76,73,0.1);
+}
+
+/* Titre */
+h2 {
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--main-color);
+}
+
+/* Table */
+.table {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+}
+thead {
+    background-color: var(--main-color);
+    color: var(--light-color);
+}
+tbody tr:hover {
+    background-color: var(--main-color-light);
+}
+
+/* Boutons Actions */
+.btn-warning {
+    background-color: var(--accent-color);
+    color: var(--main-color);
+    border: none;
+    transition: background 0.3s;
+}
+.btn-warning:hover {
+    background-color: var(--accent-color-dark);
+    color: var(--light-color);
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    color: #fff;
+    border: none;
+    transition: background 0.3s;
+}
+.btn-danger:hover {
+    background-color: #b02a37;
+    color: #fff;
+}
+
+.btn-primary {
+    background-color: var(--accent-color);
+    color: var(--main-color);
+    border: none;
+    transition: background 0.3s;
+}
+.btn-primary:hover {
+    background-color: var(--accent-color-dark);
+    color: var(--light-color);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .table {
+        font-size: 0.85rem;
+    }
+    .btn {
+        font-size: 0.85rem;
+    }
+}
+</style>
+{% endblock %}
+
 {% block content %}
 <h2>👮 Gestion des Policiers</h2>
 
-<table class="table table-striped mt-3">
+<div class="table-responsive">
+<table class="table table-bordered align-middle mt-3">
     <thead>
         <tr>
             <th>ID</th>
@@ -25,13 +103,7 @@
             <td>{{ p.last_name }}</td>
             <td>{{ p.email }}</td>
             <td>{{ p.telephone }}</td>
-            <td>
-                {% if p.commissariat %}
-                    {{ p.commissariat.nom }}
-                {% else %}
-                    N/A
-                {% endif %}
-            </td>
+            <td>{% if p.commissariat %}{{ p.commissariat.nom }}{% else %}N/A{% endif %}</td>
             <td>
                 <a href="{% url 'modifier_policier' p.id %}" class="btn btn-sm btn-warning">Modifier</a>
                 <a href="{% url 'supprimer_policier' p.id %}" class="btn btn-sm btn-danger"
@@ -40,11 +112,12 @@
         </tr>
         {% empty %}
         <tr>
-            <td colspan="7">Aucun policier trouvé.</td>
+            <td colspan="7" class="text-center text-muted">Aucun policier trouvé.</td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
+</div>
 
 <a href="{% url 'creer_policier' %}" class="btn btn-primary mt-3">➕ Ajouter un policier</a>
 {% endblock %}

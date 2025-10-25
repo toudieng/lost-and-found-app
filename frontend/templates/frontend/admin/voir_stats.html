@@ -12,7 +12,7 @@
 }
 
 h2 {
-    color: #6c1e3d;
+    color: var(--main-color);
     font-weight: 700;
     margin-bottom: 2rem;
     text-align: center;
@@ -27,7 +27,7 @@ h2 {
 .stats-card {
     border-radius: 1rem;
     padding: 1.5rem;
-    background: linear-gradient(135deg, #fefefe, #f8f9fa);
+    background-color: var(--light-color);
     box-shadow: 0 6px 15px rgba(0,0,0,0.08);
     display: flex;
     flex-direction: column;
@@ -43,14 +43,14 @@ h2 {
 .stats-icon {
     font-size: 3rem;
     margin-bottom: 0.5rem;
-    color: #6c1e3d;
+    color: var(--main-color);
 }
 
 .stats-card h5 {
     margin: 0;
     font-size: 2rem;
     font-weight: 700;
-    color: #343a40;
+    color: var(--main-color);
 }
 
 .stats-card small {
@@ -155,12 +155,12 @@ function createSparkline(chartId, data, color) {
     });
 }
 
-// Données exemple (à remplacer par des données réelles)
-createSparkline('chartObjets', [5, 10, 8, 12, 15, 18, 20], '#6c1e3d');
-createSparkline('chartRestitutions', [2, 5, 4, 7, 6, 8, 10], '#198754');
-createSparkline('chartCitoyens', [1, 3, 5, 7, 8, 10, 12], '#0d6efd');
-createSparkline('chartPoliciers', [1, 2, 2, 3, 4, 5, 6], '#ffc107');
-createSparkline('chartAdmins', [1, 1, 2, 2, 3, 4, 4], '#6f42c1');
-createSparkline('chartObjetsDeclare', [3, 6, 8, 10, 12, 15, 18], '#fd7e14');
+// Utiliser les couleurs personnalisées
+createSparkline('chartObjets', [5, 10, 8, 12, 15, 18, 20], 'var(--main-color)');
+createSparkline('chartRestitutions', [2, 5, 4, 7, 6, 8, 10], 'var(--accent-color)');
+createSparkline('chartCitoyens', [1, 3, 5, 7, 8, 10, 12], 'var(--main-color)');
+createSparkline('chartPoliciers', [1, 2, 2, 3, 4, 5, 6], 'var(--accent-color-dark)');
+createSparkline('chartAdmins', [1, 1, 2, 2, 3, 4, 4], 'var(--accent-color)');
+createSparkline('chartObjetsDeclare', [3, 6, 8, 10, 12, 15, 18], 'var(--main-color-light)');
 </script>
 {% endblock %}

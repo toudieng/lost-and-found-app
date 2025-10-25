@@ -60,9 +60,9 @@
                             {% if user in declaration.reclame_par.all %}
                                 <button type="button" class="btn btn-sm btn-primary" disabled>💙 Déjà réclamé</button>
                             {% else %}
-                                <form method="POST" action="{% url 'ca_m_appartient' declaration.id %}" class="d-inline">
+                                <form method="POST" action="{% url 'je_le_trouve' declaration.id %}" class="d-inline">
                                     {% csrf_token %}
-                                    <button type="submit" class="btn btn-sm btn-primary">💙 Ça m’appartient</button>
+                                    <button type="submit" class="btn btn-sm btn-primary">Reclamer </button>
                                 </form>
                             {% endif %}
                         {% endif %}

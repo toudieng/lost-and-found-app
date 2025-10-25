@@ -67,7 +67,7 @@
                             {% else %}
                                 <form method="POST" action="{% url 'ca_m_appartient' declaration.id %}" class="d-inline">
                                     {% csrf_token %}
-                                    <button type="submit" class="btn btn-sm btn-primary">💙 Ça m’appartient</button>
+                                    <button type="submit" class="btn btn-sm btn-primary">Reclamer cet objet</button>
                                 </form>
                             {% endif %}
                         {% endif %}

@@ -274,17 +274,9 @@ def supprimer_objet(request, objet_id):
 # =============================
 #       DASHBOARD POLICIER
 # =============================
-from django.shortcuts import render
-from django.utils import timezone
-from collections import defaultdict
 
 
 @policier_required
-
-
-
-
-
 
 def dashboard_policier(request):
     current_year = timezone.now().year
@@ -310,49 +302,64 @@ def dashboard_policier(request):
         objet__etat=EtatObjet.RESTITUE
     ).count()
 
+    # --- Préparer les stat-cards dynamiques ---
+    stats_cards = [
+        {
+            'label': "Objets perdus & trouvés",
+            'count': nb_objets_perdus_trouves,
+            'icon': "📌",
+            'url': "/policier/objets-perdus-trouves/"
+        },
+        {
+            'label': "Objets trouvés & réclamés",
+            'count': nb_objets_trouves_reclames,
+            'icon': "📌",
+            'url': "/policier/objets-trouves-reclames/"
+        },
+        {
+            'label': "Objets retrouvés (en attente)",
+            'count': nb_objets_trouves_attente,
+            'icon': "📦",
+            'url': "/policier/objets-trouves-attente/"
+        },
+        {
+            'label': "Historique",
+            'count': nb_restitutions,
+            'icon': "📂",
+            'url': "/policier/historique-restitutions/"
+        },
+    ]
+
     # --- Graphiques mois par mois ---
-    # Objets déclarés perdus et trouvés
-    declarations_perdus_trouves = Declaration.objects.filter(
+    data_perdus_trouves = [0] * 12
+    for decl in Declaration.objects.filter(
         etat_initial=EtatObjet.PERDU,
         trouve_par__isnull=False,
         date_declaration__year=current_year
-    ).distinct()
-
-    data_perdus_trouves = [0] * 12
-    for decl in declarations_perdus_trouves:
+    ).distinct():
         month = decl.date_declaration.month - 1
         data_perdus_trouves[month] += 1
 
-    # Objets déclarés trouvés et réclamés
-    declarations_trouves_reclames = Declaration.objects.filter(
+    data_trouves_reclames = [0] * 12
+    for decl in Declaration.objects.filter(
         etat_initial=EtatObjet.TROUVE,
         objet__etat=EtatObjet.RECLAME,
         date_declaration__year=current_year
-    ).distinct()
-
-    data_trouves_reclames = [0] * 12
-    for decl in declarations_trouves_reclames:
+    ).distinct():
         month = decl.date_declaration.month - 1
         data_trouves_reclames[month] += 1
 
-    # --- Contexte à envoyer au template ---
     context = {
-        # Statistiques
-        'nb_objets_perdus_trouves': nb_objets_perdus_trouves,
-        'nb_objets_trouves_reclames': nb_objets_trouves_reclames,
-        'nb_objets_trouves_attente': nb_objets_trouves_attente,
-        'nb_restitutions': nb_restitutions,
-
-        # Graphiques
+        'stats_cards': stats_cards,
         'labels_perdus_trouves': months_labels,
         'data_perdus_trouves': data_perdus_trouves,
         'labels_trouves_reclames': months_labels,
         'data_trouves_reclames': data_trouves_reclames,
-
         'current_year': current_year,
     }
 
     return render(request, 'frontend/policier/dashboard_policier.html', context)
+
 
 @policier_required
 def liste_objets_declares(request):
@@ -557,79 +564,68 @@ def objets_trouves_attente(request):
 def planifier_restitution(request, objet_id, type_objet="declaration"):
     declaration = None
 
-    # --- Récupération de l'objet / restitution ---
+    # --- Récupération de la déclaration ---
     if type_objet == "declaration":
         declaration = get_object_or_404(Declaration, id=objet_id)
-        trouveurs = declaration.trouve_par.all()
-        trouveur_unique = trouveurs.first() if trouveurs.count() == 1 else None
-
-        restitution, created = Restitution.objects.get_or_create(
-            objet=declaration.objet,
-            defaults={
-                "policier": request.user,
-                "restitue_par": trouveur_unique
-            }
-        )
-
-    elif type_objet == "restitution":
-        restitution = get_object_or_404(Restitution, id=objet_id)
     else:
         messages.error(request, "Type d'objet inconnu pour la restitution.")
         return redirect("objets_reclames")
 
     # --- Formulaire ---
-    form = RestitutionForm(request.POST or None, instance=restitution)
+    form = RestitutionForm(request.POST or None)
 
-    # Si c'est une déclaration, limiter le choix du citoyen
+    # Limiter le choix du citoyen si nécessaire
     if declaration:
         form.fields['citoyen'].queryset = declaration.reclame_par.all()
 
-    # --- POST: traitement du formulaire ---
     if request.method == "POST" and form.is_valid():
-        restitution = form.save(commit=False)
-        restitution.policier = request.user
-        restitution.save()
+        # ⚡ Mettre la déclaration en attente
+        declaration.statut = EtatObjet.EN_ATTENTE
+        declaration.save()
 
-        # ⚡ Changer le statut de la déclaration en "EN_ATTENTE" via Enum
-        if declaration:
-            declaration.statut = EtatObjet.EN_ATTENTE
-            declaration.save()
+        # Récupération des données du formulaire pour l'email
+        citoyen = form.cleaned_data.get("citoyen")
+        date_restitution = form.cleaned_data.get("date_restitution")
+        heure_restitution = form.cleaned_data.get("heure_restitution")
+        commissariat = form.cleaned_data.get("commissariat")
 
-        # Envoi email aux parties concernées
+        # Liste des destinataires
         destinataires = [
             email for email in [
-                restitution.citoyen.email if restitution.citoyen else None,
-                restitution.restitue_par.email if restitution.restitue_par else None,
+                citoyen.email if citoyen else None,
+                declaration.trouve_par.first().email if declaration.trouve_par.exists() else None,
                 request.user.email
             ] if email
         ]
+
+        # Envoi de l'email
         if destinataires:
             send_mail(
-                subject=f"[Restitution planifiée] {restitution.objet.nom}",
+                subject=f"[Restitution planifiée] {declaration.objet.nom}",
                 message=(
-                    f"La restitution de '{restitution.objet.nom}' a été planifiée.\n"
-                    f"📍 Commissariat: {restitution.commissariat.nom if restitution.commissariat else 'Non assigné'}\n"
-                    f"📅 Date: {restitution.date_restitution}\n"
-                    f"⏰ Heure: {restitution.heure_restitution}"
+                    f"La restitution de '{declaration.objet.nom}' a été planifiée.\n"
+                    f"📍 Commissariat: {commissariat.nom if commissariat else 'Non assigné'}\n"
+                    f"📅 Date: {date_restitution}\n"
+                    f"⏰ Heure: {heure_restitution}"
                 ),
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=destinataires,
                 fail_silently=False
             )
 
-        messages.success(request, f"La restitution de '{restitution.objet.nom}' a été planifiée ✅")
+        messages.success(request, f"La restitution de '{declaration.objet.nom}' a été planifiée ✅")
         return redirect("objets_perdus_trouves")
 
     # --- Liste des commissariats pour le <select> ---
     commissariats = Commissariat.objects.all()
 
     return render(request, "frontend/policier/planifier_restitution.html", {
-        "restitution": restitution,
         "declaration": declaration,
         "form": form,
-        "type_objet": type_objet,
         "commissariats": commissariats,
+        "type_objet": type_objet,
     })
+
 
 
 @policier_required
