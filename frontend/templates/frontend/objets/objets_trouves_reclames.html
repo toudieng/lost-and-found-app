@@ -16,14 +16,52 @@
 
                 <p><b>État initial :</b> {{ dec.get_etat_initial_display }}</p>
 
+                <!-- Trouveur -->
                 <div class="mb-2">
                     <b>Trouveur :</b>
-                    <span class="badge bg-info">👤 {{ dec.trouveur_principal.username }}</span>
+                    <table class="table table-sm table-bordered mt-1">
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Email</th>
+                                <th>Téléphone</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{{ dec.trouveur_principal.username }}</td>
+                                <td>{{ dec.trouveur_principal.email|default:"-" }}</td>
+                                <td>{{ dec.trouveur_principal.telephone|default:"-" }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
 
+                <!-- Réclamants -->
                 <div class="mb-2">
-                    <b>Réclamant :</b>
-                    <span class="badge bg-primary">👤 {{ dec.reclamant_principal.username }}</span>
+                    <b>Réclamants :</b>
+                    {% if dec.reclame_par.all %}
+                        <table class="table table-sm table-bordered mt-1">
+                            <thead>
+                                <tr>
+                                    <th>Nom</th>
+                                    <th>Email</th>
+                                    <th>Téléphone</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in dec.reclame_par.all %}
+                                <tr>
+                                    <td>{{ user.username }}</td>
+                                    <td>{{ user.email|default:"-" }}</td>
+                                    <td>{{ user.telephone|default:"-" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <span class="text-muted">Aucun réclamant pour l’instant</span>
+                    {% endif %}
                 </div>
 
                 <a href="{% url 'planifier_restitution' dec.id 'declaration' %}" 

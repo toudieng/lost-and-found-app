@@ -29,7 +29,7 @@
 
     <div class="row g-4">
         {% for declaration in declarations %}
-            {% if declaration.objet.etat == "trouvé" %}
+            {% if declaration.objet.etat == EtatObjet.TROUVE or declaration.objet.etat == EtatObjet.RECLAME %}
             <div class="col-md-4">
                 <div class="card objet-card shadow-sm h-100 border-0">
 

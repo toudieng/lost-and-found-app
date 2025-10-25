@@ -207,29 +207,53 @@ def repondre_message(request, message_id):
     return render(request, 'frontend/admin/repondre_message.html', {'message_obj': message_obj})
 
 
+
+
 @login_required
 def objets_perdus(request):
-    """Liste publique d'objets déclarés perdus, avec recherche simple."""
-    declarations = Declaration.objects.filter(objet__etat=EtatObjet.PERDU)
+    """Liste publique d'objets déclarés perdus ou réclamés, avec recherche simple."""
     query = request.GET.get('q', '').strip()
+
+    # Objets perdus ou réclamés
+    declarations = Declaration.objects.filter(
+        objet__etat__in=[EtatObjet.PERDU, EtatObjet.RECLAME]
+    ).order_by('-date_declaration')
+
+    # Filtre par nom si recherche
     if query:
         declarations = declarations.filter(objet__nom__icontains=query)
+
+    # Préparer les attributs pour le template
+    for dec in declarations:
+        dec.reclamant_principal = dec.citoyen  # le déclarant est le réclamant
+        dec.trouveurs = dec.trouve_par.all()   # tous les citoyens ayant trouvé
+
     return render(request, "frontend/objets/objets_perdus.html", {
         "declarations": declarations,
         "query": query
     })
 
 
+
+
 @login_required
 def objets_trouves(request):
     query = request.GET.get("q", "").strip()
-    declarations = Declaration.objects.filter(objet__etat=EtatObjet.TROUVE).order_by('-date_declaration')
+    # Inclure les objets trouvés et réclamés
+    declarations = Declaration.objects.filter(
+        objet__etat__in=[EtatObjet.TROUVE, EtatObjet.RECLAME]
+    ).order_by('-date_declaration')
+
     if query:
         declarations = declarations.filter(objet__nom__icontains=query)
-    return render(request, "frontend/objets/objets_trouves.html", {
+
+    context = {
         "declarations": declarations,
-        "query": query
-    })
+        "query": query,
+        "EtatObjet": EtatObjet,  # pour pouvoir utiliser l'enum dans le template
+    }
+    return render(request, "frontend/objets/objets_trouves.html", context)
+
 
 
 def objet_detail(request, pk):
@@ -260,15 +284,23 @@ from collections import defaultdict
 
 
 
+
+
 def dashboard_policier(request):
+    current_year = timezone.now().year
+    months_labels = ["Jan", "Fév", "Mar", "Avr", "Mai", "Juin",
+                     "Juil", "Août", "Sep", "Oct", "Nov", "Déc"]
+
     # --- Statistiques globales ---
     nb_objets_perdus_trouves = Declaration.objects.filter(
-        objet__etat__in=[EtatObjet.PERDU, EtatObjet.TROUVE]
-    ).count()
+        etat_initial=EtatObjet.PERDU,
+        trouve_par__isnull=False
+    ).distinct().count()
 
     nb_objets_trouves_reclames = Declaration.objects.filter(
+        etat_initial=EtatObjet.TROUVE,
         objet__etat=EtatObjet.RECLAME
-    ).count()
+    ).distinct().count()
 
     nb_objets_trouves_attente = Declaration.objects.filter(
         objet__etat=EtatObjet.EN_ATTENTE
@@ -278,32 +310,32 @@ def dashboard_policier(request):
         objet__etat=EtatObjet.RESTITUE
     ).count()
 
-    # --- Graphiques ---
-    current_year = timezone.now().year
-    months_labels = ["Jan", "Fév", "Mar", "Avr", "Mai", "Juin",
-                     "Juil", "Août", "Sep", "Oct", "Nov", "Déc"]
-
-    # Objets perdus & trouvés par mois
+    # --- Graphiques mois par mois ---
+    # Objets déclarés perdus et trouvés
     declarations_perdus_trouves = Declaration.objects.filter(
-        objet__etat__in=[EtatObjet.PERDU, EtatObjet.TROUVE],
+        etat_initial=EtatObjet.PERDU,
+        trouve_par__isnull=False,
         date_declaration__year=current_year
-    )
+    ).distinct()
+
     data_perdus_trouves = [0] * 12
     for decl in declarations_perdus_trouves:
         month = decl.date_declaration.month - 1
         data_perdus_trouves[month] += 1
 
-    # Objets trouvés & réclamés par mois
+    # Objets déclarés trouvés et réclamés
     declarations_trouves_reclames = Declaration.objects.filter(
+        etat_initial=EtatObjet.TROUVE,
         objet__etat=EtatObjet.RECLAME,
         date_declaration__year=current_year
-    )
+    ).distinct()
+
     data_trouves_reclames = [0] * 12
     for decl in declarations_trouves_reclames:
         month = decl.date_declaration.month - 1
         data_trouves_reclames[month] += 1
 
-    # --- Contexte ---
+    # --- Contexte à envoyer au template ---
     context = {
         # Statistiques
         'nb_objets_perdus_trouves': nb_objets_perdus_trouves,
@@ -321,7 +353,6 @@ def dashboard_policier(request):
     }
 
     return render(request, 'frontend/policier/dashboard_policier.html', context)
-
 
 @policier_required
 def liste_objets_declares(request):
@@ -503,15 +534,18 @@ def objets_trouves_attente(request):
     })
 
 
+
+
 @policier_required
 def planifier_restitution(request, objet_id, type_objet="declaration"):
     declaration = None
+
+    # --- Récupération de l'objet / restitution ---
     if type_objet == "declaration":
         declaration = get_object_or_404(Declaration, id=objet_id)
         trouveurs = declaration.trouve_par.all()
         trouveur_unique = trouveurs.first() if trouveurs.count() == 1 else None
 
-        # Si aucune restitution existante, en créer une temporaire sans citoyen
         restitution, created = Restitution.objects.get_or_create(
             objet=declaration.objet,
             defaults={
@@ -526,17 +560,25 @@ def planifier_restitution(request, objet_id, type_objet="declaration"):
         messages.error(request, "Type d'objet inconnu pour la restitution.")
         return redirect("objets_reclames")
 
-    # --- Formulaire avec liste déroulante des réclamants ---
+    # --- Formulaire ---
     form = RestitutionForm(request.POST or None, instance=restitution)
+
+    # Si c'est une déclaration, limiter le choix du citoyen
     if declaration:
         form.fields['citoyen'].queryset = declaration.reclame_par.all()
 
+    # --- POST: traitement du formulaire ---
     if request.method == "POST" and form.is_valid():
         restitution = form.save(commit=False)
         restitution.policier = request.user
         restitution.save()
 
-        # Envoi email
+        # ⚡ Changer le statut de la déclaration en "EN_ATTENTE" via Enum
+        if declaration:
+            declaration.statut = EtatObjet.EN_ATTENTE
+            declaration.save()
+
+        # Envoi email aux parties concernées
         destinataires = [
             email for email in [
                 restitution.citoyen.email if restitution.citoyen else None,
@@ -559,13 +601,17 @@ def planifier_restitution(request, objet_id, type_objet="declaration"):
             )
 
         messages.success(request, f"La restitution de '{restitution.objet.nom}' a été planifiée ✅")
-        return redirect("objets_reclames")
+        return redirect("objets_perdus_trouves")
+
+    # --- Liste des commissariats pour le <select> ---
+    commissariats = Commissariat.objects.all()
 
     return render(request, "frontend/policier/planifier_restitution.html", {
         "restitution": restitution,
         "declaration": declaration,
         "form": form,
-        "type_objet": type_objet
+        "type_objet": type_objet,
+        "commissariats": commissariats,
     })
 
 
@@ -918,30 +964,30 @@ def debannir_citoyen(request, pk):
 # =============================
 #       ACTIONS CITOYEN
 # =============================
+
 @login_required
 def je_le_trouve(request, declaration_id):
     declaration = get_object_or_404(Declaration, id=declaration_id)
     objet = declaration.objet
 
-    # Si l'utilisateur a déjà signalé l'objet
+    # Vérification si l'utilisateur a déjà signalé l'objet
     if request.user in declaration.trouve_par.all():
         messages.warning(request, "⚠️ Vous avez déjà signalé cet objet.")
         return redirect("objets_perdus")
 
     # Ajouter l'utilisateur à la liste des citoyens ayant trouvé l'objet
     declaration.trouve_par.add(request.user)
-    declaration.save()
 
-    # Changer l'état et notifier seulement si c'est le premier signalement
+    # Si l'objet était perdu, passer à RECLAME
     if objet.etat == EtatObjet.PERDU:
         objet.etat = EtatObjet.RECLAME
         objet.save()
 
-        if not declaration.reclame_par:
-            declaration.reclame_par = request.user  # Premier trouveur devient le réclameur
-            declaration.save()
+        # Ajouter le premier trouveur comme réclamant
+        if not declaration.reclame_par.exists():
+            declaration.reclame_par.add(request.user)
 
-        # Notification au citoyen propriétaire
+        # Notification au propriétaire
         if declaration.citoyen and declaration.citoyen.email:
             try:
                 send_mail(
@@ -963,36 +1009,44 @@ def je_le_trouve(request, declaration_id):
 
     return redirect("objets_perdus")
 
+
 @login_required
 
 
 
 
+
+
+
+@login_required
 def ca_m_appartient(request, declaration_id):
-    if not request.user.is_authenticated:
-        messages.error(request, "⚠️ Vous devez être connecté pour réclamer un objet.")
-        return redirect("login")
-
+    # Récupération de la déclaration
     declaration = get_object_or_404(Declaration, id=declaration_id)
-
-    if declaration.objet.etat != EtatObjet.TROUVE:
+    
+    # Vérification si l'objet est réclamable (TROUVE ou déjà RECLAME)
+    if declaration.objet.etat not in [EtatObjet.TROUVE, EtatObjet.RECLAME]:
         messages.error(request, "⚠️ Cet objet n'est pas disponible pour réclamation.")
         return redirect("objets_trouves")
-
+    
+    # Vérifier si l'utilisateur a déjà réclamé
     if declaration.reclame_par.filter(id=request.user.id).exists():
         messages.warning(request, "⚠️ Vous avez déjà réclamé cet objet.")
         return redirect("objets_trouves")
-
+    
     try:
         with transaction.atomic():
+            # Ajouter l'utilisateur à la liste des réclamants
             declaration.reclame_par.add(request.user)
-            declaration.objet.etat = EtatObjet.RECLAME
-            declaration.objet.save()
+
+            # Si c'est la première réclamation, mettre l'objet en RECLAME
+            if declaration.objet.etat == EtatObjet.TROUVE:
+                declaration.objet.etat = EtatObjet.RECLAME
+                declaration.objet.save()
     except Exception as e:
         messages.error(request, f"⚠️ Une erreur est survenue : {e}")
         return redirect("objets_trouves")
-
-    # Envoi mail au déclarant
+    
+    # Envoi d'un email au déclarant
     if declaration.citoyen and declaration.citoyen.email:
         objet_url = request.build_absolute_uri(reverse('objet_detail', args=[declaration.objet.id]))
         try:
@@ -1009,9 +1063,11 @@ def ca_m_appartient(request, declaration_id):
             )
         except (BadHeaderError, ConnectionError, OSError) as e:
             messages.warning(request, f"⚠️ Impossible d'envoyer l'email : {e}")
-
+    
     messages.success(request, f"✅ Vous avez réclamé l'objet '{declaration.objet.nom}'.")
     return redirect("objets_trouves")
+
+
 
 
 # =============================
