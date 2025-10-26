@@ -67,14 +67,15 @@
                             <p><b>Email :</b> {{ r.citoyen.email|default:"-" }}</p>
 
                             {% if r.objet.declarations_prefetch %}
-                                {% with dec=r.objet.declarations_prefetch.0 %}
+                                {% for dec in r.objet.declarations_prefetch %}
                                     {% if dec.trouve_par.first %}
                                         <p><b>🔍 Trouveur :</b> {{ dec.trouve_par.first.username }} — 
                                            <span class="text-muted">{{ dec.trouve_par.first.email|default:"-" }}</span>
                                         </p>
                                     {% endif %}
                                     <p><b>État de la déclaration :</b> {{ dec.get_etat_initial_display }}</p>
-                                {% endwith %}
+                                    <hr>
+                                {% endfor %}
                             {% else %}
                                 <p>Aucune déclaration trouvée pour cet objet.</p>
                             {% endif %}

@@ -6,22 +6,19 @@
 {% block extra_css %}
 <style>
 :root {
-    --main-color: #3E4C49;       /* vert-gris foncé */
-    --accent-color: #C8A048;     /* doré */
-    --accent-color-dark: #b88f38; /* doré foncé pour hover */
-    --light-color: #FFFFFF;       /* blanc */
-    --main-color-light: rgba(62,76,73,0.15); /* léger overlay pour hover */
+    --main-color: #3E4C49;          
+    --accent-color: #C8A048;        
+    --accent-color-dark: #b88f38;   
+    --light-color: #FFFFFF;          
+    --main-color-light: rgba(62,76,73,0.1);
 }
 
 /* Layout */
 body { 
     font-family: 'Segoe UI', sans-serif; 
     background: #f8f9fa; 
-    display: flex; 
-    flex-direction: column;
 }
 .main-content {
-    flex: 1 0 auto;
     padding: 2rem;
     background: var(--light-color);
     min-height: 80vh;
@@ -31,7 +28,7 @@ body {
 
 /* Sidebar */
 .sidebar {
-    background: var(--main-color); /* vert-gris foncé */
+    background: var(--main-color);
     color: var(--light-color);
     min-height: 100vh;
     padding: 2rem 1rem;
@@ -39,19 +36,19 @@ body {
     top: 0;
 }
 .sidebar h4 {
-    color: var(--accent-color); /* doré */
+    color: var(--accent-color);
     text-align: center;
     margin-bottom: 1.5rem;
 }
 .sidebar .nav-link {
-    color: #f0e5f0; /* gris clair lisible */
+    color: #f0e5f0;
     border-radius: 0.5rem;
     padding: 0.6rem 1rem;
     transition: all 0.2s;
 }
 .sidebar .nav-link:hover,
 .sidebar .nav-link.active {
-    background: var(--accent-color-dark); /* doré foncé */
+    background: var(--accent-color-dark);
     color: var(--light-color);
 }
 
@@ -66,8 +63,7 @@ body {
 .stats-card {
     border-radius: 1rem;
     padding: 1.5rem;
-    background: var(--main-color); /* fond principal */
-    color: var(--light-color);
+    background: var(--light-color);
     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     display: flex;
     align-items: center;
@@ -81,31 +77,29 @@ body {
 }
 .stats-icon {
     font-size: 2.5rem;
-    color: var(--main-color); /* icône couleur fond du dashboard */
-    width: 3rem;
-    height: 3rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--accent-color); /* icône dorée */
-    border-radius: 50%;
 }
 
-/* Charts */
-.chart-container {
-    background: var(--light-color);
-    padding: 1rem;
-    border-radius: 1rem;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    margin-bottom: 2rem;
+/* Badge */
+.stats-badge {
+    padding: 0.2rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--light-color);
+    margin-left: 0.5rem;
 }
+
+/* Couleurs badges */
+.badge-perdus-trouves { background: var(--main-color); }
+.badge-trouves-reclames { background: #6f42c1; }
+.badge-attente { background: #fd7e14; }
+.badge-historique { background: #20c997; }
 
 /* Responsive */
 @media (max-width: 768px) {
     .main-content { padding: 1rem; margin-top: 1rem; }
     .sidebar h4 { font-size: 1.3rem; }
 }
-
 </style>
 {% endblock %}
 
@@ -147,7 +141,12 @@ body {
                     <div class="stats-card">
                         <span class="stats-icon">{{ card.icon }}</span>
                         <div>
-                            <h5 class="mb-0">{{ card.count|default:"0" }}</h5>
+                            <h5 class="mb-0">
+                                {{ card.count|default:"0" }}
+                                <span class="stats-badge {% if card.label == 'Objets perdus & trouvés' %}badge-perdus-trouves{% elif card.label == 'Objets trouvés & réclamés' %}badge-trouves-reclames{% elif card.label == 'Objets retrouvés (en attente)' %}badge-attente{% else %}badge-historique{% endif %}">
+                                    {{ card.count|default:"0" }}
+                                </span>
+                            </h5>
                             <small>{{ card.label }}</small>
                         </div>
                     </div>
@@ -155,62 +154,6 @@ body {
             </div>
             {% endfor %}
         </div>
-
-        <!-- Graphiques -->
-        <div class="row">
-            <div class="col-md-6">
-                <div class="chart-container">
-                    <h5 class="mb-3">Objets perdus & trouvés par mois</h5>
-                    <canvas id="chartPerdusTrouves"></canvas>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="chart-container">
-                    <h5 class="mb-3">Objets trouvés & réclamés par mois</h5>
-                    <canvas id="chartTrouvesReclames"></canvas>
-                </div>
-            </div>
-        </div>
     </div>
 </div>
-
-<!-- Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-const ctxPerdus = document.getElementById('chartPerdusTrouves').getContext('2d');
-new Chart(ctxPerdus, {
-    type: 'bar',
-    data: {
-        labels: {{ labels_perdus_trouves|safe }},
-        datasets: [{
-            label: 'Objets perdus & trouvés',
-            data: {{ data_perdus_trouves|safe }},
-            backgroundColor: 'var(--main-color)'
-        }]
-    },
-    options: {
-        responsive: true,
-        plugins: { legend: { display: false } },
-        scales: { y: { beginAtZero: true } }
-    }
-});
-
-const ctxReclames = document.getElementById('chartTrouvesReclames').getContext('2d');
-new Chart(ctxReclames, {
-    type: 'bar',
-    data: {
-        labels: {{ labels_trouves_reclames|safe }},
-        datasets: [{
-            label: 'Objets trouvés & réclamés',
-            data: {{ data_trouves_reclames|safe }},
-            backgroundColor: 'var(--accent-color)'
-        }]
-    },
-    options: {
-        responsive: true,
-        plugins: { legend: { display: false } },
-        scales: { y: { beginAtZero: true } }
-    }
-});
-</script>
 {% endblock %}

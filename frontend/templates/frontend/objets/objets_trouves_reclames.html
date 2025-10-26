@@ -1,13 +1,13 @@
 {% extends 'frontend/policier/base_policier.html' %}
 
-{% block title %}Objets trouvés et réclamés{% endblock %}
+{% block title %}Objets réclamés{% endblock %}
 
 {% block extra_css %}
 <style>
 :root {
-    --main-color: #3E4C49;       /* vert-gris foncé */
-    --accent-color: #C8A048;     /* doré */
-    --light-color: #FFFFFF;       /* blanc */
+    --main-color: #3E4C49;
+    --accent-color: #C8A048;
+    --light-color: #FFFFFF;
 }
 
 /* Card */
@@ -15,19 +15,14 @@
     border-radius: 1rem;
     border: none;
     box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    margin-bottom: 1rem;
 }
-
-/* Card body */
 .card-body {
     padding: 1rem;
     background: var(--light-color);
     color: var(--main-color);
 }
-
-/* Card title */
-.card-title {
-    color: var(--main-color);
-}
+.card-title { color: var(--main-color); }
 
 /* Bouton Infos */
 .btn-toggle {
@@ -38,9 +33,7 @@
     transition: background 0.3s;
     cursor: pointer;
 }
-.btn-toggle:hover {
-    background: #2e3a38; /* foncé au hover */
-}
+.btn-toggle:hover { background: #2e3a38; }
 
 /* Détails avec animation */
 .details-card {
@@ -49,13 +42,12 @@
     padding: 0.75rem 1rem;
     margin-top: 0.5rem;
     border-radius: 0.5rem;
-
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.5s ease, padding 0.5s ease;
 }
 .details-card.open {
-    max-height: 1000px; /* suffisant pour contenir tous les contenus */
+    max-height: 1000px;
     padding: 0.75rem 1rem;
 }
 .details-card p {
@@ -68,14 +60,15 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h2 class="fw-bold mb-4">📌 Objets déclarés trouvés et réclamés</h2>
+    <h2 class="fw-bold mb-4">📌 Objets réclamés (État actuel : RECLAME)</h2>
 
     {% if declarations %}
         {% for dec in declarations %}
-        <div class="card my-3">
+        <div class="card">
             <div class="card-body">
                 <h5 class="card-title fw-bold mb-2">
                     {% if dec.objet %}{{ dec.objet.nom }}{% else %}Objet inconnu{% endif %}
+                    <span class="badge bg-warning text-dark ms-1">RECLAME</span>
                 </h5>
 
                 <p><b>État initial :</b> {{ dec.get_etat_initial_display }}</p>
@@ -96,9 +89,9 @@
 
                     <!-- Réclamants -->
                     <p><b>Réclamants :</b></p>
-                    {% if dec.reclame_par.all %}
+                    {% if dec.reclamants_list %}
                         <ul class="list-unstyled">
-                            {% for user in dec.reclame_par.all %}
+                            {% for user in dec.reclamants_list %}
                                 <li>{{ user.username }} | Email: {{ user.email|default:"-" }} | Téléphone: {{ user.telephone|default:"-" }}</li>
                             {% endfor %}
                         </ul>
@@ -121,7 +114,7 @@
         {% endfor %}
     {% else %}
         <div class="alert alert-info text-center mt-2">
-            Aucun objet trouvé ou réclamé.
+            Aucun objet réclamé actuellement.
         </div>
     {% endif %}
 </div>
@@ -137,10 +130,9 @@ document.addEventListener('DOMContentLoaded', function() {
         btn.addEventListener('click', () => {
             target.classList.toggle('open');
 
-            // Changement du texte et icône
             if (target.classList.contains('open')) {
                 btn.innerHTML = '⬆️ Réduire';
-                btn.style.background = '#C8A048'; /* accent color ouvert */
+                btn.style.background = '#C8A048'; // accent color ouvert
                 btn.style.color = '#3E4C49';
             } else {
                 btn.innerHTML = 'ℹ️ Infos Complètes';

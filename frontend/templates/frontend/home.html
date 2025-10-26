@@ -177,26 +177,37 @@ body {
 
 <!-- CAROUSEL -->
 <section class="py-5 fade-up">
-  <div class="container">
-    <h2 class="text-center fw-bold mb-4" style="color: var(--accent-color);">Objets récents</h2>
-    {% if all_slides %}
-      <div id="carouselAll" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="4500">
-        <div class="carousel-inner">
-          {% for slide in all_slides %}
-          <div class="carousel-item {% if forloop.first %}active{% endif %}">
-            <img src="{{ slide.url }}" alt="{{ slide.titre }}">
-            <div class="carousel-caption">
-              <h5>{{ slide.titre }}</h5>
-              <p>{{ slide.description }}</p>
-            </div>
-          </div>
-          {% endfor %}
-        </div>
+  <div id="carouselAll" class="carousel slide carousel-fade" data-bs-ride="carousel">
+  <div class="carousel-inner">
+    {% for slide in all_slides %}
+    <div class="carousel-item {% if forloop.first %}active{% endif %}">
+      <img src="{{ slide.url }}" alt="{{ slide.titre }}" class="d-block w-100" style="max-height: 500px; object-fit: cover;">
+      <div class="carousel-caption text-center p-3" style="background: rgba(0,0,0,0.4); border-radius: 1rem;">
+        <h5>{{ slide.titre }}</h5>
+        <p>{{ slide.description }}</p>
+        {% if slide.etat_type == 'perdu' %}
+          <span class="badge bg-danger">Perdu</span>
+        {% elif slide.etat_type == 'reclame' %}
+          <span class="badge bg-warning text-dark">Réclamé</span>
+        {% elif slide.etat_type == 'trouve' %}
+          <span class="badge bg-success">Trouvé</span>
+        {% endif %}
       </div>
-    {% else %}
-      <p class="text-center text-muted">Aucun objet disponible pour le moment.</p>
-    {% endif %}
+    </div>
+    {% endfor %}
   </div>
+
+  <!-- Contrôles du carrousel -->
+  <button class="carousel-control-prev" type="button" data-bs-target="#carouselAll" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Précédent</span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#carouselAll" data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden">Suivant</span>
+  </button>
+</div>
+
 </section>
 
 <!-- HERO ACTIONS -->

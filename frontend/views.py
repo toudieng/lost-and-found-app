@@ -5,6 +5,7 @@ from functools import wraps
 import calendar
 import random
 import string
+from venv import logger
 from dateutil.relativedelta import relativedelta
 
 from django.conf import settings
@@ -65,30 +66,29 @@ def admin_required(view_func):
 
 
 
-
-
 def home(request):
-    # 🔹 Objets perdus récents
-    objets_perdus = Objet.objects.filter(etat=EtatObjet.PERDU).order_by('-id')[:6]
+    # 🔹 Objets avec statut PERDU ou RECLAME
+    objets_perdus_reclames = Objet.objects.filter(etat__in=[EtatObjet.PERDU, EtatObjet.RECLAME]).order_by('-id')[:6]
 
     # 🔹 Objets trouvés récents
     objets_trouves = Objet.objects.filter(etat=EtatObjet.TROUVE).order_by('-id')[:6]
 
-    # 🔸 Construction des slides dynamiques avec type d'état
-    slides_perdus = [
+    # 🔸 Construction des slides dynamiques pour les objets perdus/reclamés
+    slides_perdus_reclames = [
         {
-            'url': obj.image.url if obj.image else '/static/frontend/images/default.jpg',
+            'url': obj.image.url if obj.image else None,
             'titre': obj.nom,
             'description': (obj.description[:120] + "...") if obj.description else "",
             'etat': obj.get_etat_display(),
-            'etat_type': 'perdu'
+            'etat_type': 'perdu' if obj.etat == EtatObjet.PERDU else 'reclame'
         }
-        for obj in objets_perdus
+        for obj in objets_perdus_reclames
     ]
 
+    # 🔸 Construction des slides dynamiques pour les objets trouvés
     slides_trouves = [
         {
-            'url': obj.image.url if obj.image else '/static/frontend/images/default.jpg',
+            'url': obj.image.url if obj.image else None,
             'titre': obj.nom,
             'description': (obj.description[:120] + "...") if obj.description else "",
             'etat': obj.get_etat_display(),
@@ -97,31 +97,26 @@ def home(request):
         for obj in objets_trouves
     ]
 
-    # 🔹 Fusionner les deux listes pour un seul carrousel
-    all_slides = slides_perdus + slides_trouves
+    # 🔹 Fusionner les listes pour le carrousel
+    all_slides = slides_perdus_reclames + slides_trouves
+
+    # 🔹 Slides par défaut si aucun objet réel
+    default_slides = [
+        {'url': '/static/frontend/images/head2.jpg', 'titre': 'Aucun objet', 'description': 'Slide par défaut', 'etat_type': 'default'},
+        {'url': '/static/frontend/images/head1.jpg', 'titre': 'Aucun objet', 'description': 'Slide par défaut', 'etat_type': 'default'},
+        {'url': '/static/frontend/images/head3.jpg', 'titre': 'Aucun objet', 'description': 'Slide par défaut', 'etat_type': 'default'},
+    ]
+
+    # 🔹 Si pas de slide réel, utiliser les slides par défaut
+    if not all_slides:
+        all_slides = default_slides
 
     # 🔹 Timeline restitution par la police
     steps = [
-        {
-            'icon': 'bi bi-clipboard-check',
-            'title': '⿡ Vérification de la déclaration',
-            'desc': "Le policier consulte la fiche de l’objet et valide l’identité du déclarant."
-        },
-        {
-            'icon': 'bi bi-person-badge',
-            'title': '⿢ Identification du propriétaire',
-            'desc': "Une vérification d’identité est effectuée à l’aide d’une pièce officielle."
-        },
-        {
-            'icon': 'bi bi-box-seam',
-            'title': '⿣ Restitution de l’objet',
-            'desc': "Le policier remet l’objet au propriétaire et enregistre la restitution."
-        },
-        {
-            'icon': 'bi bi-file-earmark-text',
-            'title': '⿤ Génération d’une preuve',
-            'desc': "Une attestation PDF est générée et remise au citoyen comme preuve."
-        },
+        {'icon': 'bi bi-clipboard-check', 'title': '⿡ Vérification de la déclaration', 'desc': "Le policier consulte la fiche de l’objet et valide l’identité du déclarant."},
+        {'icon': 'bi bi-person-badge', 'title': '⿢ Identification du propriétaire', 'desc': "Une vérification d’identité est effectuée à l’aide d’une pièce officielle."},
+        {'icon': 'bi bi-box-seam', 'title': '⿣ Restitution de l’objet', 'desc': "Le policier remet l’objet au propriétaire et enregistre la restitution."},
+        {'icon': 'bi bi-file-earmark-text', 'title': '⿤ Génération d’une preuve', 'desc': "Une attestation PDF est générée et remise au citoyen comme preuve."},
     ]
 
     context = {
@@ -130,9 +125,6 @@ def home(request):
     }
 
     return render(request, "frontend/home.html", context)
-
-
-
 
 
 
@@ -277,9 +269,6 @@ def supprimer_objet(request, objet_id):
 # =============================
 
 
-from django.shortcuts import render
-from django.utils import timezone
-from backend.objets.models import Declaration, EtatObjet
 
 @policier_required
 def dashboard_policier(request):
@@ -291,12 +280,12 @@ def dashboard_policier(request):
     nb_objets_perdus_trouves = Declaration.objects.filter(
         etat_initial=EtatObjet.PERDU,
         trouve_par__isnull=False
-    ).distinct().count()
+    ).count()
 
     nb_objets_trouves_reclames = Declaration.objects.filter(
         etat_initial=EtatObjet.TROUVE,
         objet__etat=EtatObjet.RECLAME
-    ).distinct().count()
+    ).count()
 
     nb_objets_trouves_attente = Declaration.objects.filter(
         objet__etat=EtatObjet.EN_ATTENTE
@@ -306,40 +295,39 @@ def dashboard_policier(request):
         objet__etat=EtatObjet.RESTITUE
     ).count()
 
-    # --- Préparer les stat-cards dynamiques ---
+    # --- Stat-cards dynamiques avec URLs via reverse ---
     stats_cards = [
         {
-            'label': "Objets perdus & trouvés",
-            'count': nb_objets_perdus_trouves,
-            'icon': "📌",
-            'url': "/policier/objets-perdus-trouves/"
+            "label": "Objets perdus & trouvés",
+            "count": nb_objets_perdus_trouves,
+            "icon": "📌",
+            "url": reverse("objets_perdus_trouves"),
         },
         {
-            'label': "Objets trouvés & réclamés",
-            'count': nb_objets_trouves_reclames,
-            'icon': "📌",
-            'url': "/policier/objets-trouves-reclames/"
+            "label": "Objets trouvés & réclamés",
+            "count": nb_objets_trouves_reclames,
+            "icon": "📌",
+            "url": reverse("objets_trouves_reclames"),
         },
         {
-            'label': "Objets retrouvés (en attente)",
-            'count': nb_objets_trouves_attente,
-            'icon': "📦",
-            'url': "/policier/objets-trouves-attente/"
+            "label": "Objets retrouvés (en attente)",
+            "count": nb_objets_trouves_attente,
+            "icon": "📦",
+            "url": reverse("objets_trouves_attente"),
         },
         {
-            'label': "Historique",
-            'count': nb_restitutions,
-            'icon': "📂",
-            'url': "/policier/historique-restitutions/"
+            "label": "Historique",
+            "count": nb_restitutions,
+            "icon": "📂",
+            "url": reverse("historique_restitutions"),
         },
     ]
 
-    # --- Graphiques mois par mois ---
+    # --- Fonction utilitaire pour stats mois par mois ---
     def data_by_month(queryset):
         data = [0] * 12
         for decl in queryset:
-            month_index = decl.date_declaration.month - 1
-            data[month_index] += 1
+            data[decl.date_declaration.month - 1] += 1
         return data
 
     data_perdus_trouves = data_by_month(
@@ -347,7 +335,7 @@ def dashboard_policier(request):
             etat_initial=EtatObjet.PERDU,
             trouve_par__isnull=False,
             date_declaration__year=current_year
-        ).distinct()
+        )
     )
 
     data_trouves_reclames = data_by_month(
@@ -355,19 +343,20 @@ def dashboard_policier(request):
             etat_initial=EtatObjet.TROUVE,
             objet__etat=EtatObjet.RECLAME,
             date_declaration__year=current_year
-        ).distinct()
+        )
     )
 
     context = {
-        'stats_cards': stats_cards,
-        'labels_perdus_trouves': months_labels,
-        'data_perdus_trouves': data_perdus_trouves,
-        'labels_trouves_reclames': months_labels,
-        'data_trouves_reclames': data_trouves_reclames,
-        'current_year': current_year,
+        "stats_cards": stats_cards,
+        "labels_perdus_trouves": months_labels,
+        "data_perdus_trouves": data_perdus_trouves,
+        "labels_trouves_reclames": months_labels,
+        "data_trouves_reclames": data_trouves_reclames,
+        "current_year": current_year,
     }
 
-    return render(request, 'frontend/policier/dashboard_policier.html', context)
+    return render(request, "frontend/policier/dashboard_policier.html", context)
+
 
 @policier_required
 def liste_objets_declares(request):
@@ -512,28 +501,41 @@ from backend.objets.models import Declaration, EtatObjet
 
 
 
+from django.shortcuts import render
+from backend.objets.models import Declaration, EtatObjet
+
+from django.shortcuts import render
+from backend.objets.models import Declaration, EtatObjet
+
+from django.shortcuts import render
+from backend.objets.models import Declaration, EtatObjet
+
 def objets_trouves_reclames(request):
     """
-    Affiche uniquement les objets dont :
+    Affiche les déclarations dont :
     - l'état initial est TROUVE
-    - et qui ont été réclamés par au moins un citoyen
+    - l'objet est actuellement RECLAME
+    - et il y a au moins un réclamant
     """
-    # Récupération des déclarations
+
+    # 🔹 Requête avec préchargement des relations
     declarations = Declaration.objects.filter(
         etat_initial=EtatObjet.TROUVE,
+        objet__etat=EtatObjet.RECLAME,  # <-- ici
         reclame_par__isnull=False
-    ).distinct()
+    ).select_related('citoyen', 'objet') \
+     .prefetch_related('reclame_par') \
+     .distinct()
 
-    # Ajout des attributs pour le template
+    # 🔹 Attributs dynamiques pour le template
     for dec in declarations:
-        dec.trouveur_principal = dec.citoyen           # celui qui a trouvé (déclarant)
-        dec.reclamant_principal = dec.reclame_par.first()  # premier réclamant
+        dec.trouveur_principal = dec.citoyen
+        dec.reclamants_list = list(dec.reclame_par.all())
 
+    # 🔹 Passage au template
     return render(request, "frontend/objets/objets_trouves_reclames.html", {
         "declarations": declarations
     })
-
-
 
 
 
@@ -585,14 +587,13 @@ def objets_perdus_trouves(request):
 
 @policier_required
 def objets_trouves_attente(request):
-    """
-    Liste des objets en attente de restitution (planifiés).
-    Chaque objet a un réclamant et un seul trouveur.
-    """
-    # Précharger la déclaration de type 'trouve' si existante
+    from django.db.models import Prefetch
+    from backend.objets.models import Restitution, Declaration, EtatObjet, StatutRestitution
+
+    # Précharger déclarations si elles existent
     declarations_prefetch = Prefetch(
         'objet__declarations',
-        queryset=Declaration.objects.all(),
+        queryset=Declaration.objects.prefetch_related('trouve_par', 'reclame_par'),
         to_attr='declarations_prefetch'
     )
 
@@ -610,40 +611,62 @@ def objets_trouves_attente(request):
 
 
 
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
+from django.core.mail import send_mail
+from django.conf import settings
+from django.utils import timezone
+from backend.objets.models import Declaration, Restitution, EtatObjet, StatutRestitution
+from backend.users.models import Commissariat
+
 def planifier_restitution(request, objet_id, type_objet="declaration"):
     """
     Planifie la restitution d’un objet et notifie le réclamant et le trouveur.
+    Ne fonctionne que pour les objets ayant une déclaration.
     """
-    # Récupération de la déclaration
+    # 🔹 Récupération de la déclaration
     declaration = get_object_or_404(Declaration, id=objet_id)
 
-    # Options pour le formulaire
-    trouveurs_options = declaration.trouve_par.all()
-    reclamants_options = declaration.reclame_par.all()
+    if not declaration.objet:
+        messages.error(request, "Cet objet n'est pas lié à une déclaration valide.")
+        return redirect("objets_trouves_attente")
+
+    # 🔹 Vérification de l'état initial
+    if declaration.etat_initial not in [EtatObjet.PERDU, EtatObjet.TROUVE]:
+        messages.error(request, "L'état initial de la déclaration est invalide.")
+        return redirect("objets_trouves_attente")
+
+    # 🔹 Options pour le formulaire
+    trouveurs_options = declaration.trouve_par.all() or []
+    reclamants_options = declaration.reclame_par.all() or []
     commissariats = Commissariat.objects.all()
 
     if request.method == "POST":
-        # Récupérer date, heure et commissariat
+        # 🔹 Récupérer date, heure et commissariat
         date_restitution = request.POST.get('date_restitution')
         heure_restitution = request.POST.get('heure_restitution')
         commissariat_id = request.POST.get('commissariat')
 
-        # Déterminer qui est le trouveur et le réclamant selon l'état initial
+        if not (date_restitution and heure_restitution and commissariat_id):
+            messages.error(request, "Veuillez remplir la date, l'heure et le commissariat.")
+            return redirect(request.path)
+
+        # 🔹 Déterminer qui est le trouveur et le réclamant
         if declaration.etat_initial == EtatObjet.PERDU:
             trouveur_id = request.POST.get('trouveur')
-            reclamant_id = declaration.citoyen.id  # le déclarant
+            reclamant_id = declaration.citoyen.id
         else:  # Etat initial TROUVE
-            trouveur_id = declaration.citoyen.id  # le déclarant
+            trouveur_id = declaration.citoyen.id
             reclamant_id = request.POST.get('reclamant')
 
         if not (trouveur_id and reclamant_id):
             messages.error(request, "Veuillez sélectionner le trouveur et le réclamant.")
             return redirect(request.path)
 
-        # Récupérer le commissariat
+        # 🔹 Récupérer le commissariat
         commissariat = get_object_or_404(Commissariat, id=commissariat_id)
 
-        # Création ou récupération de la restitution
+        # 🔹 Création ou récupération de la restitution
         restitution, created = Restitution.objects.get_or_create(
             objet=declaration.objet,
             citoyen_id=reclamant_id,
@@ -656,9 +679,10 @@ def planifier_restitution(request, objet_id, type_objet="declaration"):
             },
         )
 
-        # Mettre l'objet en attente
-        declaration.objet.etat = EtatObjet.EN_ATTENTE
-        declaration.objet.save()
+        # 🔹 Mettre l'objet en attente uniquement si il est actuellement RECLAME
+        if declaration.objet.etat == EtatObjet.RECLAME:
+            declaration.objet.etat = EtatObjet.EN_ATTENTE
+            declaration.objet.save()
 
         # 🔹 Préparer les destinataires pour notification
         recipients = []
@@ -668,14 +692,17 @@ def planifier_restitution(request, objet_id, type_objet="declaration"):
 
         if trouveur and trouveur.email:
             recipients.append(trouveur.email)
-        if reclamant and reclamant.email and reclamant.email not in recipients:
+        if reclamant and reclamant.email:
             recipients.append(reclamant.email)
+
+        recipients = list(set(recipients))  # Supprimer les doublons
 
         # 🔹 Envoyer le mail de notification
         if recipients:
-            send_mail(
-                subject=f"[Restitution planifiée] {declaration.objet.nom}",
-                message=f"""
+            try:
+                send_mail(
+                    subject=f"[Restitution planifiée] {declaration.objet.nom}",
+                    message=f"""
 Bonjour,
 
 La restitution de l'objet '{declaration.objet.nom}' a été planifiée.
@@ -685,32 +712,27 @@ Date : {date_restitution}
 Heure : {heure_restitution}
 
 Merci de vous présenter avec vos pièces justificatives.
-                """,
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=recipients,
-                fail_silently=True,
-            )
+                    """,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=recipients,
+                    fail_silently=False,
+                )
+            except Exception as e:
+                print(f"Erreur lors de l'envoi du mail: {e}")
 
         messages.success(request, f"Restitution de '{declaration.objet.nom}' planifiée avec succès ✅")
-        return redirect("objets_trouves_attente")  # ✅ redirection corrigée
+        return redirect("objets_trouves_attente")
 
-    # Contexte pour le template
+    # 🔹 Contexte pour le template
     context = {
         "declaration": declaration,
         "trouveurs_options": trouveurs_options,
         "reclamants_options": reclamants_options,
         "commissariats": commissariats,
+        "today": timezone.now(),
+        "now": timezone.now(),
     }
     return render(request, "frontend/policier/planifier_restitution.html", context)
-
-from django.shortcuts import get_object_or_404, redirect
-from django.core.mail import EmailMessage
-from django.template.loader import render_to_string
-from weasyprint import HTML
-from django.conf import settings
-import logging
-
-logger = logging.getLogger(__name__)
 
 def marquer_restitue(request, restitution_id):
     # 🔹 Récupérer la restitution
