@@ -4,8 +4,10 @@ from django.utils import timezone
 from django.conf import settings
 
 
+
+
 # =========================
-# 👤 Utilisateur
+# 👤 UTILISATEUR
 # =========================
 class Utilisateur(AbstractUser):
     email = models.EmailField(unique=True)
@@ -16,7 +18,7 @@ class Utilisateur(AbstractUser):
         ('policier', 'Policier'),
         ('citoyen', 'Citoyen'),
     )
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='admin')
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='citoyen')
     est_banni = models.BooleanField(default=False)
 
     commissariat = models.ForeignKey(
@@ -37,23 +39,21 @@ class Utilisateur(AbstractUser):
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["username"]
 
-    def __str__(self):
-        return f"{self.username} ({self.email}) - {self.role}"
-
+    def _str_(self):
+        return f"{self.username} ({self.role})"
 
 # =========================
-# 🏢 Commissariat
+# 🏢 COMMISSARIAT
 # =========================
 class Commissariat(models.Model):
     nom = models.CharField(max_length=100)
     adresse = models.CharField(max_length=200)
 
-    def __str__(self):
+    def _str_(self):
         return self.nom
 
-
 # =========================
-# 🔔 Notification
+# 🔔 NOTIFICATION
 # =========================
 class Notification(models.Model):
     user = models.ForeignKey(
@@ -65,34 +65,34 @@ class Notification(models.Model):
     date = models.DateTimeField(auto_now_add=True)
     lu = models.BooleanField(default=False)
 
-    def __str__(self):
-        return f"Notification pour {self.user.username} : {self.message[:30]}"
-
+    def _str_(self):
+        return f"Notif → {self.user.username}"
 
 # =========================
-# 💬 Message citoyen (Contact)
+# 💬 MESSAGE (Contact citoyen)
 # =========================
 class Message(models.Model):
     expediteur = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name="messages_citoyens",
+        on_delete=models.SET_NULL,
         null=True,
-        blank=True
+        blank=True,
+        related_name="messages_citoyens"
     )
     nom = models.CharField(max_length=100)
     email = models.EmailField()
     contenu = models.TextField(verbose_name="Message")
     date_envoi = models.DateTimeField(default=timezone.now)
-    reponse = models.TextField(blank=True, null=True, verbose_name="Réponse de l'administrateur")
+    reponse = models.TextField(blank=True, null=True)
     date_reponse = models.DateTimeField(blank=True, null=True)
     lu = models.BooleanField(default=False)
     traite = models.BooleanField(default=False)
-
-    def __str__(self):
-        return f"{self.nom} ({self.email})"
 
     class Meta:
         ordering = ['-date_envoi']
         verbose_name = "Message citoyen"
         verbose_name_plural = "Messages citoyens"
+
+    def _str_(self):
+        return f"{self.nom} ({self.email})"
+

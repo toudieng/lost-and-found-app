@@ -510,18 +510,24 @@ def objets_trouves_reclames(request):
 
 def objets_perdus_trouves(request):
     """
-    Affiche les objets dont :
-    - l'état initial est 'perdu'
-    - l'état actuel de l'objet est 'reclamé'
-    - et qui ont été réclamés par le citoyen qui les a déclarés
+    Affiche les objets perdus dont :
+    - l'état initial est 'PERDU'
+    - l'état actuel de l'objet est 'RECLAME'
+    - le réclamant principal est le citoyen qui les a déclarés
     """
     query = request.GET.get('q', '')
 
-    # Objets perdus réclamés par leur déclarant et avec objet actuellement réclamé
+    # Récupération des déclarations
     declarations = Declaration.objects.filter(
         etat_initial=EtatObjet.PERDU,
         objet__etat=EtatObjet.RECLAME,
-        reclame_par__id__in=Declaration.objects.values_list('citoyen_id', flat=True)
+        reclame_par=request.user  # si tu veux filtrer sur le user connecté
+    ).distinct()
+
+    # Si tu veux tous les réclamants sans filtrer sur l'utilisateur connecté :
+    declarations = Declaration.objects.filter(
+        etat_initial=EtatObjet.PERDU,
+        objet__etat=EtatObjet.RECLAME
     ).distinct()
 
     # Filtrage par recherche
@@ -532,43 +538,41 @@ def objets_perdus_trouves(request):
             Q(citoyen__username__icontains=query)
         )
 
-    # Préfetch pour optimiser le template
+    # Préfetch pour optimiser l'accès aux relations
     declarations = declarations.prefetch_related('trouve_par', 'reclame_par', 'citoyen', 'objet')
 
     # Ajouter attributs pour le template
     for dec in declarations:
         dec.reclamant_principal = dec.citoyen  # le déclarant est le réclamant
+        dec.trouveurs = dec.trouve_par.all()   # tous les trouveurs associés
 
     context = {
         'declarations': declarations,
         'query': query
     }
+
     return render(request, 'frontend/objets/objets_perdus_trouves.html', context)
-
-
-
 
 
 @policier_required
 def objets_trouves_attente(request):
     """
-    Restitutions en attente (statut planifié) et préchargement des déclarations/trouveurs.
+    Liste des objets en attente de restitution (planifiés).
+    Chaque objet a un réclamant et un seul trouveur.
     """
-    restitutions = Restitution.objects.select_related(
-        'objet', 'citoyen', 'policier', 'commissariat', 'restitue_par'
-    ).filter(
-        statut='planifiee',
-        objet__etat=EtatObjet.EN_ATTENTE
-    )
-
-    # Précharger les déclarations de type "trouve" et leurs utilisateurs
+    # Précharger la déclaration de type 'trouve' si existante
     declarations_prefetch = Prefetch(
-        'objet__declarations_trouvees',  # <-- ici on utilise le related_name
-        queryset=Declaration.objects.filter(type_declaration='trouve').prefetch_related('trouve_par'),
-        to_attr='trouvees_prefetch'  # attribut temporaire pour le template
+        'objet__declarations',
+        queryset=Declaration.objects.all(),
+        to_attr='declarations_prefetch'
     )
 
-    restitutions = restitutions.prefetch_related(declarations_prefetch)
+    restitutions = Restitution.objects.select_related(
+        'objet', 'citoyen', 'commissariat'
+    ).filter(
+        statut=StatutRestitution.PLANIFIEE,
+        objet__etat=EtatObjet.EN_ATTENTE
+    ).prefetch_related(declarations_prefetch)
 
     return render(request, "frontend/objets/objets_trouves_attente.html", {
         "restitutions": restitutions
@@ -576,71 +580,99 @@ def objets_trouves_attente(request):
 
 
 
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib import messages
-from django.core.mail import send_mail
-from django.conf import settings
-from django.utils import timezone
-from backend.objets.models import Declaration, Restitution, EtatObjet, StatutRestitution
-from backend.users.models import Commissariat
 
 def planifier_restitution(request, objet_id, type_objet="declaration"):
-    """Planifie la restitution d’un objet et le met en attente."""
+    """
+    Planifie la restitution d’un objet et notifie le réclamant et le trouveur.
+    """
+    # Récupération de la déclaration
     declaration = get_object_or_404(Declaration, id=objet_id)
 
-    # --- Création de la restitution ---
-    commissariat = Commissariat.objects.first()  # par défaut, le premier
-    citoyen = declaration.premier_reclamant()
+    # Options pour le formulaire
+    trouveurs_options = declaration.trouve_par.all()
+    reclamants_options = declaration.reclame_par.all()
+    commissariats = Commissariat.objects.all()
 
-    if not citoyen:
-        messages.error(request, "Aucun réclamant associé à cet objet.")
-        return redirect("objets_reclames")
+    if request.method == "POST":
+        # Récupérer date, heure et commissariat
+        date_restitution = request.POST.get('date_restitution')
+        heure_restitution = request.POST.get('heure_restitution')
+        commissariat_id = request.POST.get('commissariat')
 
-    # Création ou mise à jour de la restitution
-    restitution, created = Restitution.objects.get_or_create(
-        objet=declaration.objet,
-        citoyen=citoyen,
-        defaults={
-            "policier": request.user,
-            "commissariat": commissariat,
-            "date_restitution": timezone.now().date(),
-            "heure_restitution": timezone.now().time(),
-            "statut": StatutRestitution.PLANIFIEE,
-        },
-    )
+        # Déterminer qui est le trouveur et le réclamant selon l'état initial
+        if declaration.etat_initial == EtatObjet.PERDU:
+            trouveur_id = request.POST.get('trouveur')
+            reclamant_id = declaration.citoyen.id  # le déclarant
+        else:  # Etat initial TROUVE
+            trouveur_id = declaration.citoyen.id  # le déclarant
+            reclamant_id = request.POST.get('reclamant')
 
-    # Mise à jour du statut de l’objet
-    declaration.objet.etat = EtatObjet.EN_ATTENTE
-    declaration.objet.save()
+        if not (trouveur_id and reclamant_id):
+            messages.error(request, "Veuillez sélectionner le trouveur et le réclamant.")
+            return redirect(request.path)
 
-    # Envoi d’un email
-    destinataires = [
-        citoyen.email,
-        request.user.email,
-    ]
-    if declaration.trouve_par.exists():
-        destinataires += [u.email for u in declaration.trouve_par.all() if u.email]
+        # Récupérer le commissariat
+        commissariat = get_object_or_404(Commissariat, id=commissariat_id)
 
-    send_mail(
-        subject=f"[Restitution planifiée] {declaration.objet.nom}",
-        message=f"""
-        Bonjour,
-        La restitution de l'objet '{declaration.objet.nom}' a été planifiée.
-        Commissariat : {commissariat.nom if commissariat else 'Non défini'}
-        Date : {timezone.now().date().strftime('%d/%m/%Y')}
-        Heure : {timezone.now().time().strftime('%H:%M')}
-        Merci de vous présenter avec vos pièces justificatives.
-        """,
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        recipient_list=list(set(destinataires)),
-        fail_silently=True,
-    )
+        # Création ou récupération de la restitution
+        restitution, created = Restitution.objects.get_or_create(
+            objet=declaration.objet,
+            citoyen_id=reclamant_id,
+            defaults={
+                "policier": request.user,
+                "commissariat": commissariat,
+                "date_restitution": date_restitution,
+                "heure_restitution": heure_restitution,
+                "statut": StatutRestitution.PLANIFIEE,
+            },
+        )
 
-    messages.success(request, f"La restitution de '{declaration.objet.nom}' a été planifiée ✅")
-    return redirect("objets_en_attente")
+        # Mettre l'objet en attente
+        declaration.objet.etat = EtatObjet.EN_ATTENTE
+        declaration.objet.save()
 
+        # 🔹 Préparer les destinataires pour notification
+        recipients = []
+        trouveur = declaration.trouve_par.filter(id=trouveur_id).first()
+        reclamant = declaration.citoyen if declaration.etat_initial == EtatObjet.PERDU else \
+                    declaration.reclame_par.filter(id=reclamant_id).first()
 
+        if trouveur and trouveur.email:
+            recipients.append(trouveur.email)
+        if reclamant and reclamant.email and reclamant.email not in recipients:
+            recipients.append(reclamant.email)
 
+        # 🔹 Envoyer le mail de notification
+        if recipients:
+            send_mail(
+                subject=f"[Restitution planifiée] {declaration.objet.nom}",
+                message=f"""
+Bonjour,
+
+La restitution de l'objet '{declaration.objet.nom}' a été planifiée.
+
+Commissariat : {commissariat.nom if commissariat else 'Non défini'}
+Date : {date_restitution}
+Heure : {heure_restitution}
+
+Merci de vous présenter avec vos pièces justificatives.
+                """,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=recipients,
+                fail_silently=True,
+            )
+
+        messages.success(request, f"Restitution de '{declaration.objet.nom}' planifiée avec succès ✅")
+        return redirect("objets_trouves_attente")  # ✅ redirection corrigée
+
+    # Contexte pour le template
+    context = {
+        "declaration": declaration,
+        "trouveurs_options": trouveurs_options,
+        "reclamants_options": reclamants_options,
+        "commissariats": commissariats,
+    }
+    return render(request, "frontend/policier/planifier_restitution.html", context)
 
 def marquer_restitue(request, restitution_id):
     restitution = Restitution.objects.select_related('objet', 'citoyen').get(id=restitution_id)
