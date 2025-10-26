@@ -69,17 +69,20 @@
                         <button class="btn btn-sm btn-toggle mb-2 w-100 text-center" type="button" data-target="#details-{{ r.id }}">
                             ℹ️ Voir les détails
                         </button>
+
                         <div class="details-card" id="details-{{ r.id }}">
                             <p><b>👤 Citoyen (propriétaire) :</b> {{ r.proprietaire.username }} <br>
                             <small class="text-muted">{{ r.proprietaire.email|default:"-" }}</small></p>
 
+                            <p><b>🔍 Restitué par :</b>
                             {% if r.trouveurs %}
-                                <p><b>🔍 Restitué par :</b>
                                 {% for user in r.trouveurs %}
                                     {{ user.username }} — <span class="text-muted">{{ user.email|default:"-" }}</span>{% if not forloop.last %}, {% endif %}
                                 {% endfor %}
-                                </p>
+                            {% else %}
+                                <span class="text-muted">N/A</span>
                             {% endif %}
+                            </p>
 
                             <p><b>👮 Policier :</b>
                             {% if r.restitue_par %}
@@ -92,6 +95,10 @@
                             </p>
 
                             <p><b>🏢 Commissariat :</b> {{ r.commissariat.nom|default:"-" }}</p>
+
+                            <!-- ✅ État initial de la déclaration -->
+                            <p><b>📌 État initial :</b> {{ r.get_etat_initial_display }}</p>
+
                             <p><b>🕒 Date :</b> {{ r.date_restitution|date:"d/m/Y" }} à {{ r.heure_restitution|time:"H:i" }}</p>
                         </div>
                     </div>

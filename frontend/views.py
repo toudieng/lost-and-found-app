@@ -389,31 +389,6 @@ def policier_ou_admin_required(view_func):
         return redirect('login')  # ou page d'erreur "accès interdit"
     return _wrapped_view
 
-@login_required
-@policier_ou_admin_required
-def historique_restitutions(request):
-    restitutions = Restitution.objects.select_related(
-        'objet', 'citoyen', 'policier', 'restitue_par', 'commissariat'
-    ).filter(
-        objet__etat=EtatObjet.RESTITUE
-    ).order_by('-date_restitution', '-heure_restitution')
-
-    for r in restitutions:
-        r.proprietaire = r.citoyen
-        declarations_trouvees = Declaration.objects.filter(
-            objet=r.objet,
-            trouve_par__isnull=False
-        ).prefetch_related('trouve_par')
-
-        trouveurs = set()
-        for d in declarations_trouvees:
-            for u in d.trouve_par.all():
-                trouveurs.add(u)
-        r.trouveurs = list(trouveurs)
-
-    return render(request, "frontend/policier/historique_restitutions.html", {
-        "restitutions": restitutions
-    })
 
 
 @policier_required
@@ -458,6 +433,40 @@ def objets_reclames(request):
             dec.restitution_planifiee = None
 
     return render(request, "frontend/objets/objets_reclames.html", {"declarations": declarations})
+
+@login_required
+@policier_ou_admin_required
+def historique_restitutions(request):
+    # 🔹 Récupérer toutes les restitutions avec les objets, citoyens, policiers et commissariats
+    restitutions = Restitution.objects.select_related(
+        'objet', 'citoyen', 'policier', 'restitue_par', 'commissariat'
+    ).filter(
+        objet__etat=EtatObjet.RESTITUE
+    ).order_by('-date_restitution', '-heure_restitution')
+
+    for r in restitutions:
+        # 🔹 Définir le propriétaire
+        r.proprietaire = r.citoyen
+
+        # 🔹 Récupérer la déclaration associée (un seul déclarant)
+        declaration = r.objet.declarations.first()
+        r.etat_initial = declaration.etat_initial if declaration else None
+
+        # 🔹 Déterminer le ou les trouveurs selon l'état initial
+        trouveurs = []
+        if declaration:
+            if declaration.etat_initial == EtatObjet.TROUVE and declaration.citoyen:
+                # Objet trouvé → le déclarant est le trouveur
+                trouveurs.append(declaration.citoyen)
+            elif declaration.etat_initial == EtatObjet.PERDU:
+                # Objet perdu → tous ceux dans trouve_par
+                trouveurs.extend(declaration.trouve_par.all())
+
+        r.trouveurs = trouveurs
+
+    return render(request, "frontend/policier/historique_restitutions.html", {
+        "restitutions": restitutions
+    })
 
 from django.shortcuts import render
 from backend.objets.models import Declaration, Restitution, EtatObjet
@@ -690,56 +699,66 @@ Merci de vous présenter avec vos pièces justificatives.
     }
     return render(request, "frontend/policier/planifier_restitution.html", context)
 
+from django.shortcuts import get_object_or_404, redirect
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
+from weasyprint import HTML
+from django.conf import settings
+import logging
 
+logger = logging.getLogger(__name__)
 
 def marquer_restitue(request, restitution_id):
     # 🔹 Récupérer la restitution
     restitution = get_object_or_404(
-        Restitution.objects.select_related('objet', 'citoyen'),
+        Restitution.objects.select_related('objet', 'citoyen', 'policier'),
         id=restitution_id
     )
 
     # 🔹 Marquer comme effectuée
     restitution.statut = 'effectuee'
-    restitution.save()  # met aussi l'objet à RESTITUE grâce au save()
+    restitution.save()  # met aussi l'objet à RESTITUE si save() est surchargé
 
-    # 🔹 Génération PDF
-    html_string = render_to_string(
-        'frontend/policier/preuve_restitution_pdf.html',
-        {'restitution': restitution}
-    )
-    pdf_file = HTML(string=html_string).write_pdf()
+    # 🔹 Génération du PDF
+    try:
+        html_string = render_to_string(
+            'frontend/policier/preuve_restitution_pdf.html',
+            {'restitution': restitution}
+        )
+        pdf_file = HTML(string=html_string).write_pdf()
+    except Exception as e:
+        logger.error(f"Erreur génération PDF pour restitution {restitution.id}: {e}")
+        pdf_file = None
 
     # 🔹 Préparer les destinataires
-    recipients = []
-
-    # Citoyen concerné
+    recipients = set()
     if restitution.citoyen and restitution.citoyen.email:
-        recipients.append(restitution.citoyen.email)
+        recipients.add(restitution.citoyen.email)
 
-    # Trouveurs liés aux déclarations de l'objet
-    for declaration in restitution.objet.declarations.all():  # related_name='declarations' dans Objet
+    for declaration in restitution.objet.declarations.all():
         for user in declaration.trouve_par.all():
             if user.email:
-                recipients.append(user.email)
-
-    # Supprimer doublons
-    recipients = list(set(recipients))
+                recipients.add(user.email)
 
     # 🔹 Envoyer le mail avec pièce jointe PDF
     if recipients:
-        email = EmailMessage(
-            subject=f"Restitution de l'objet '{restitution.objet.nom}' effectuée ✅",
-            body=(
-                f"Bonjour,\n\n"
-                f"La restitution de l'objet '{restitution.objet.nom}' a été effectuée avec succès.\n"
-                f"Veuillez trouver la preuve en pièce jointe."
-            ),
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            to=recipients,
-        )
-        email.attach(f"preuve_{restitution.objet.nom}.pdf", pdf_file, 'application/pdf')
-        email.send(fail_silently=True)
+        try:
+            email_body_html = render_to_string(
+                'frontend/policier/email_restitution.html',  # template HTML facultatif
+                {'restitution': restitution}
+            )
+            email = EmailMessage(
+                subject=f"Restitution de l'objet '{restitution.objet.nom}' effectuée ✅",
+                body=f"Bonjour,\n\nLa restitution de l'objet '{restitution.objet.nom}' a été effectuée avec succès.\nVeuillez trouver la preuve en pièce jointe.",
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=list(recipients),
+            )
+            if pdf_file:
+                email.attach(f"preuve_{restitution.objet.nom}.pdf", pdf_file, 'application/pdf')
+            email.send(fail_silently=False)
+            logger.info(f"Mail de restitution envoyé à {recipients}")
+        except Exception as e:
+            logger.error(f"Erreur envoi mail restitution {restitution.id}: {e}")
 
     # 🔹 Redirection vers la page des objets en attente
     return redirect('objets_trouves_attente')

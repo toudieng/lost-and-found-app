@@ -16,12 +16,13 @@
 
 /* Card */
 .card { border-radius: 1rem; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-.card-header { background: var(--main-color); color: var(--accent-color); font-weight: 600; border-radius: 1rem 1rem 0 0; text-align: center; }
+.card-header { background: var(--main-color); color: var(--accent-color); font-weight: 600; border-radius: 1rem 1rem 0 0; display: flex; justify-content: space-between; align-items: center; }
 .form-label { color: var(--main-color); font-weight: 500; }
 .form-control, .form-select { border-radius: 0.5rem; border: 1px solid #ced4da; }
 .form-control:focus, .form-select:focus { border-color: var(--accent-color); box-shadow: 0 0 0 0.2rem rgba(200,160,72,0.25); }
 .btn-success { background: var(--main-color); border: none; color: var(--light-color); font-weight: 600; }
 .btn-success:hover { background: #2e3a38; }
+.btn-light { font-weight: 500; }
 </style>
 {% endblock %}
 
@@ -30,9 +31,13 @@
     <div class="row justify-content-center">
         <div class="col-12">
             <div class="card shadow-sm">
+                <!-- Header -->
                 <div class="card-header">
                     <h3 class="mb-0">📍 Planifier une restitution</h3>
+                    <a href="{% url 'dashboard_policier' %}" class="btn btn-light btn-sm">← Dashboard</a>
                 </div>
+
+                <!-- Body -->
                 <div class="card-body">
                     <form method="post">
                         {% csrf_token %}
@@ -46,7 +51,6 @@
 
                         <!-- Selon l'état initial -->
                         {% if declaration.etat_initial == "perdu" %}
-                            <!-- PERDU : choisir le trouveur -->
                             <div class="mb-3">
                                 <label class="form-label fw-semibold">Trouvé par</label>
                                 <select class="form-select" name="trouveur" required>
@@ -57,15 +61,12 @@
                                 </select>
                             </div>
 
-                            <!-- Réclamant = déclarant -->
                             <div class="mb-3">
                                 <label class="form-label fw-semibold">Réclamé par (déclarant)</label>
                                 <input type="text" class="form-control" value="{{ declaration.citoyen.username }}" disabled>
                                 <input type="hidden" name="reclamant" value="{{ declaration.citoyen.id }}">
                             </div>
-
                         {% else %}
-                            <!-- TROUVE : choisir le réclamant -->
                             <div class="mb-3">
                                 <label class="form-label fw-semibold">Réclamant</label>
                                 <select class="form-select" name="reclamant" required>
@@ -76,7 +77,6 @@
                                 </select>
                             </div>
 
-                            <!-- Trouveur = déclarant -->
                             <div class="mb-3">
                                 <label class="form-label fw-semibold">Trouvé par (déclarant)</label>
                                 <input type="text" class="form-control" value="{{ declaration.citoyen.username }}" disabled>
@@ -84,13 +84,11 @@
                             </div>
                         {% endif %}
 
-                        <!-- Date -->
+                        <!-- Date et Heure -->
                         <div class="mb-3">
                             <label class="form-label fw-semibold" for="date">Date de restitution</label>
                             <input type="date" class="form-control" id="date" name="date_restitution" required>
                         </div>
-
-                        <!-- Heure -->
                         <div class="mb-3">
                             <label class="form-label fw-semibold" for="heure">Heure</label>
                             <input type="time" class="form-control" id="heure" name="heure_restitution" required>
@@ -106,15 +104,12 @@
                                 {% endfor %}
                             </select>
                         </div>
-   <div class="card-header">
-    <h3 class="mb-0">📍 Planifier une restitution</h3>
-    <!-- Bouton retour vers le dashboard -->
-    <a href="{% url 'dashboard_policier' %}" class="btn btn-light btn-sm mt-2">
-        ← Retour au Dashboard
-    </a>
-</div>
 
-                        
+                        <!-- Footer : bouton de validation -->
+                        <div class="d-flex justify-content-end mt-3">
+                            <button type="submit" class="btn btn-success"> Planifier la restitution</button>
+                        </div>
+
                     </form>
                 </div>
             </div>

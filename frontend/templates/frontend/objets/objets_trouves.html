@@ -7,20 +7,17 @@
 <link rel="stylesheet" href="{% static 'css/objets.css' %}">
 <style>
 :root {
-    --main-color: #3E4C49;          /* vert-gris foncé */
-    --accent-color: #C8A048;        /* doré pour textes et accents */
-    --accent-color-dark: #b88f38;   /* doré foncé pour hover */
-    --light-color: #FFFFFF;          /* blanc */
+    --main-color: #3E4C49;
+    --accent-color: #C8A048;
+    --accent-color-dark: #b88f38;
+    --light-color: #FFFFFF;
     --main-color-light: rgba(62,76,73,0.1);
     --text-muted: #555;
 }
-
-/* CARD OBJET */
 .objet-card {
     border-radius: 1rem;
     overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease, filter 0.3s ease, opacity 0.3s ease;
-    border: none;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
     box-shadow: 0 4px 12px rgba(0,0,0,0.08);
     background-color: var(--light-color);
 }
@@ -28,72 +25,18 @@
     transform: translateY(-5px);
     box-shadow: 0 10px 25px rgba(0,0,0,0.15);
 }
-
-.card-title { 
-    color: var(--accent-color) !important; 
-    font-size: 1.2rem; 
-}
-.card-text { 
-    color: var(--text-muted); 
-    font-size: 0.9rem; 
-}
-
-/* BADGES */
-.badge-etat {
-    font-size: 0.85rem;
-    padding: 0.35em 0.6em;
-    border-radius: 0.5rem;
-    margin-right: 0.3rem;
-    font-weight:500;
-    transition: transform 0.2s ease;
-}
-.badge-etat:hover { transform: scale(1.05); }
-
-.badge-trouve { 
-    background-color: var(--main-color); 
-    color: var(--light-color); 
-}
-.badge-reclame { 
-    background-color: var(--accent-color); 
-    color: var(--main-color); 
-}
-
-/* BOUTONS */
-.btn-outline-success {
-    color: var(--accent-color);
-    border-color: var(--accent-color);
-    font-weight: 600;
-}
-.btn-outline-success:hover {
-    background-color: var(--accent-color);
-    color: var(--light-color);
-}
-
-.btn-primary {
-    background-color: var(--accent-color);
-    border-color: var(--accent-color);
-    font-weight: 600;
-}
-.btn-primary:hover {
-    background-color: var(--accent-color-dark);
-    border-color: var(--accent-color-dark);
-}
-.btn-primary.disabled,
-.btn-primary[disabled] {
-    background-color: #ccc;
-    border-color: #ccc;
-    color: #666;
-    cursor: not-allowed;
-}
-
-/* CARD FOOTER */
+.card-title { color: var(--accent-color); font-size:1.2rem; }
+.card-text { color: var(--text-muted); font-size:0.9rem; }
+.badge-etat { font-size:0.85rem; padding:0.35em 0.6em; border-radius:0.5rem; margin-right:0.3rem; font-weight:500; }
+.badge-trouve { background-color: var(--main-color); color: var(--light-color); }
+.badge-reclame { background-color: var(--accent-color); color: var(--main-color); }
+.btn-outline-success { color: var(--accent-color); border-color: var(--accent-color); font-weight:600; }
+.btn-outline-success:hover { background-color: var(--accent-color); color: var(--light-color); }
+.btn-primary { background-color: var(--accent-color); border-color: var(--accent-color); font-weight:600; }
+.btn-primary:hover { background-color: var(--accent-color-dark); border-color: var(--accent-color-dark); }
 .card-footer { background-color: var(--main-color-light); border-top: none; }
-
-/* OBJETS DÉJÀ RÉCLAMÉS */
-.objet-card.reclame { filter: grayscale(60%); opacity: 0.7; }
-
-/* IMAGE OBJET */
-.card-img-top { height: 200px; object-fit: cover; border-bottom: 1px solid var(--main-color-light); }
+.objet-card.reclame { filter: grayscale(60%); opacity:0.7; }
+.card-img-top { height:200px; object-fit:cover; border-bottom:1px solid var(--main-color-light); }
 </style>
 {% endblock %}
 
@@ -107,10 +50,8 @@
 
     <div class="row g-4">
         {% for declaration in declarations %}
-            {% if declaration.etat_initial == 'trouvé' or declaration.etat == 'reclamé' %}
             <div class="col-md-4">
                 <div class="card objet-card shadow-sm h-100 {% if user in declaration.reclame_par.all %}reclame{% endif %}">
-
                     {% if declaration.objet.image %}
                         <img src="{{ declaration.objet.image.url }}" class="card-img-top" alt="{{ declaration.objet.nom }}">
                     {% else %}
@@ -118,16 +59,25 @@
                     {% endif %}
 
                     <div class="card-body">
-                        <h5 class="card-title fw-bold">{{ declaration.objet.nom }}</h5>
+                        <h5 class="card-title">{{ declaration.objet.nom }}</h5>
                         <p class="card-text small text-muted">{{ declaration.description|truncatewords:20 }}</p>
 
                         <p class="card-text small text-muted">
-                            Trouvé par : <b style="color: var(--accent-color)">{{ declaration.citoyen.username }}</b>
+                            Trouvé par : <b>{{ declaration.citoyen.username }}</b>
+                            <small class="text-muted">{{ declaration.citoyen.email }}</small>
                         </p>
 
+                        {% if declaration.trouveurs %}
+                            <p class="card-text small text-muted">Autres trouveurs :
+                                {% for u in declaration.trouveurs %}
+                                    {{ u.username }} <small>{{ u.email }}</small>{% if not forloop.last %}, {% endif %}
+                                {% endfor %}
+                            </p>
+                        {% endif %}
+
                         <div class="mb-2">
-                            <span class="badge badge-etat badge-trouve">État initial : {{ declaration.etat_initial|title }}</span>
-                            {% if declaration.etat == 'reclamé' %}
+                            <span class="badge badge-etat badge-trouve">État : {{ declaration.etat_initial|title }}</span>
+                            {% if declaration.etat == EtatObjet.RECLAME %}
                                 <span class="badge badge-etat badge-reclame">Réclamé</span>
                             {% endif %}
                         </div>
@@ -135,11 +85,12 @@
 
                     <div class="card-footer text-end">
                         <a href="{% url 'objet_detail' declaration.objet.id %}" class="btn btn-sm btn-outline-success me-1">🔍 Voir détails</a>
+
                         {% if user.is_authenticated %}
                             {% if user == declaration.citoyen %}
-                                <button type="button" class="btn btn-sm btn-primary" disabled> Vous avez trouvé cet objet</button>
+                                <button type="button" class="btn btn-sm btn-primary" disabled>Vous avez trouvé cet objet</button>
                             {% elif user in declaration.reclame_par.all %}
-                                <button type="button" class="btn btn-sm btn-primary" disabled> Déjà réclamé</button>
+                                <button type="button" class="btn btn-sm btn-primary" disabled>Déjà réclamé</button>
                             {% else %}
                                 <form method="POST" action="{% url 'ca_m_appartient' declaration.id %}" class="d-inline">
                                     {% csrf_token %}
@@ -148,10 +99,8 @@
                             {% endif %}
                         {% endif %}
                     </div>
-
                 </div>
             </div>
-            {% endif %}
         {% empty %}
             <div class="col-12">
                 <div class="alert alert-info text-center">Aucun objet trouvé.</div>

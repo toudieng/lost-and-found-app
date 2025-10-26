@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Restitution de l'objet</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #3E4C49;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            background-color: #FFFFFF;
+            margin: 20px auto;
+            padding: 20px;
+            border-radius: 1rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        h2 {
+            color: #C8A048;
+            font-weight: 700;
+            text-align: center;
+        }
+        p {
+            line-height: 1.5;
+            font-size: 0.95rem;
+        }
+        .details {
+            background-color: #f0f0f0;
+            padding: 15px;
+            border-radius: 0.5rem;
+            margin: 15px 0;
+        }
+        .details p {
+            margin: 5px 0;
+        }
+        .btn {
+            display: inline-block;
+            text-decoration: none;
+            padding: 10px 20px;
+            background-color: #3E4C49;
+            color: #FFFFFF;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+        .btn:hover {
+            background-color: #2d3836;
+        }
+        @media (max-width: 480px) {
+            .container { padding: 15px; }
+            h2 { font-size: 1.4rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>📦 Restitution effectuée</h2>
+        <p>Bonjour,</p>
+        <p>La restitution de l'objet <strong>{{ restitution.objet.nom }}</strong> a été effectuée avec succès.</p>
+
+        <div class="details">
+            <p><b>Objet :</b> {{ restitution.objet.nom }}</p>
+            <p><b>Propriétaire :</b> {{ restitution.citoyen.username }} ({{ restitution.citoyen.email }})</p>
+            <p><b>Policier :</b> {{ restitution.policier.username }} ({{ restitution.policier.email }})</p>
+            <p><b>Date :</b> {{ restitution.date_restitution|date:"d/m/Y" }}</p>
+            <p><b>Heure :</b> {{ restitution.heure_restitution|time:"H:i" }}</p>
+        </div>
+
+        <p>Vous trouverez la preuve de restitution en pièce jointe à ce mail.</p>
+        <p>Merci de votre attention.</p>
+
+        <a href="#" class="btn">Consulter sur la plateforme</a>
+    </div>
+</body>
+</html>
