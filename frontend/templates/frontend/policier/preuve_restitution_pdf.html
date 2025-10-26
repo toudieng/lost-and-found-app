@@ -6,21 +6,10 @@
     <meta charset="UTF-8">
     <title>Preuve de restitution - {{ restitution.id }}</title>
     <style>
-        body {
-            font-family: 'DejaVu Sans', sans-serif;
-            margin: 2cm;
-            color: #333;
-        }
+        body { font-family: 'DejaVu Sans', sans-serif; margin: 2cm; color: #333; }
 
         /* Header */
-        .header-table {
-            width: 100%;
-            border-bottom: 2px solid #003366;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-collapse: collapse;
-        }
-
+        .header-table { width: 100%; border-bottom: 2px solid #003366; margin-bottom: 20px; padding-bottom: 10px; border-collapse: collapse; }
         .header-table td { vertical-align: middle; }
         .header-table td.left { text-align: left; width: 20%; }
         .header-table td.center { text-align: center; width: 60%; }
@@ -28,54 +17,26 @@
         .header-table img { height: 80px; width: auto; }
 
         /* Title */
-        .title {
-            text-align: center;
-            color: #003366;
-            margin-bottom: 25px;
-        }
+        .title { text-align: center; color: #003366; margin-bottom: 25px; }
 
         /* Sections */
-        .section {
-            margin-bottom: 20px;
-        }
-        .section h4 {
-            color: #003366;
-            margin-bottom: 8px;
-            border-bottom: 2px solid #C8A048;
-            display: inline-block;
-            padding-bottom: 2px;
-        }
-        .section p {
-            margin: 0.2rem 0;
-            font-size: 0.95rem;
-        }
+        .section { margin-bottom: 20px; }
+        .section h4 { color: #003366; margin-bottom: 8px; border-bottom: 2px solid #C8A048; display: inline-block; padding-bottom: 2px; }
+        .section p { margin: 0.2rem 0; font-size: 0.95rem; }
         .section strong { color: #C8A048; }
 
         /* Trouveurs */
-        .trouveurs {
-            padding-left: 1rem;
-        }
+        .trouveurs { padding-left: 1rem; }
 
         /* QR code */
         .qr { text-align: right; margin-top: 30px; }
         .qr img { height: 100px; }
 
         /* Signature */
-        .signature {
-            margin-top: 40px;
-            text-align: right;
-            font-style: italic;
-        }
+        .signature { margin-top: 40px; text-align: right; font-style: italic; }
 
         /* Footer */
-        .footer {
-            position: fixed;
-            bottom: 1cm;
-            text-align: center;
-            font-size: 10px;
-            color: #888;
-            width: 100%;
-        }
+        .footer { position: fixed; bottom: 1cm; text-align: center; font-size: 10px; color: #888; width: 100%; }
 
         /* Highlight objet important */
         .highlight { color: #C8A048; font-weight: 600; }
@@ -86,16 +47,12 @@
     <!-- Header -->
     <table class="header-table">
         <tr>
-            <td class="left">
-                <img src="{% static 'frontend/images/logo_senegal.png' %}" alt="Logo Sénégal">
-            </td>
+            <td class="left"><img src="{% static 'frontend/images/logo_senegal.png' %}" alt="Logo Sénégal"></td>
             <td class="center">
                 <h2>République du Sénégal</h2>
                 <p><strong>Police Nationale</strong> — Preuve de restitution d’objet</p>
             </td>
-            <td class="right">
-                <img src="{% static 'frontend/images/logo_police.png' %}" alt="Logo Police">
-            </td>
+            <td class="right"><img src="{% static 'frontend/images/logo_police.png' %}" alt="Logo Police"></td>
         </tr>
     </table>
 
@@ -114,11 +71,11 @@
 
     <!-- Réclamant -->
     <div class="section">
-        <h4>Réclamant</h4>
-        {% if restitution.reclamant_principal %}
-            <p>Nom : <strong>{{ restitution.reclamant_principal.username }}</strong></p>
-            <p>Email : {{ restitution.reclamant_principal.email|default:"Non renseigné" }}</p>
-            <p>Téléphone : {{ restitution.reclamant_principal.telephone|default:"Non renseigné" }}</p>
+        <h4>TROUVEUR</h4>
+        {% if reclamant_principal %}
+            <p>Nom : <strong>{{ reclamant_principal.username }}</strong></p>
+            <p>Email : {{ reclamant_principal.email|default:"Non renseigné" }}</p>
+            <p>Téléphone : {{ reclamant_principal.telephone|default:"Non renseigné" }}</p>
         {% else %}
             <p>Nom : <strong>Non renseigné</strong></p>
             <p>Email : Non renseigné</p>
@@ -128,7 +85,7 @@
 
     <!-- Citoyen (destinataire) -->
     <div class="section">
-        <h4>Citoyen</h4>
+        <h4>RECLAMANT</h4>
         <p>Nom : <strong>{{ restitution.citoyen.username|default:"Non renseigné" }}</strong></p>
         <p>Email : {{ restitution.citoyen.email|default:"Non renseigné" }}</p>
     </div>
@@ -136,7 +93,7 @@
     <!-- Trouveurs -->
     <div class="section">
         <h4>Trouveurs</h4>
-        {% if restitution.objet.declaration_set.all %}
+        {% if restitution.objet.declaration_set.exists %}
             <ul class="trouveurs">
                 {% for declaration in restitution.objet.declaration_set.all %}
                     {% for user in declaration.trouve_par.all %}

@@ -585,18 +585,23 @@ def objets_perdus_trouves(request):
     return render(request, 'frontend/objets/objets_perdus_trouves.html', context)
 
 
+
+@login_required
 @policier_required
 def objets_trouves_attente(request):
-    from django.db.models import Prefetch
-    from backend.objets.models import Restitution, Declaration, EtatObjet, StatutRestitution
+    """
+    Affiche les objets trouvés planifiés pour restitution,
+    dont l'état actuel est EN_ATTENTE.
+    """
 
-    # Précharger déclarations si elles existent
+    # Précharger les déclarations liées à chaque objet
     declarations_prefetch = Prefetch(
         'objet__declarations',
         queryset=Declaration.objects.prefetch_related('trouve_par', 'reclame_par'),
         to_attr='declarations_prefetch'
     )
 
+    # Récupérer les restitutions planifiées avec objet en attente
     restitutions = Restitution.objects.select_related(
         'objet', 'citoyen', 'commissariat'
     ).filter(
@@ -835,40 +840,44 @@ import qrcode
 
 
 def preuve_restitution_pdf(request, pk):
-    # Récupérer la restitution
     restitution = get_object_or_404(Restitution, pk=pk)
 
-    # Générer QR Code (par exemple : url de vérification)
+    # 🔹 Déclaration de l'objet trouvé (pour le trouveur)
+    declaration_trouve = restitution.objet.declarations.filter(
+        etat_initial=EtatObjet.TROUVE
+    ).first()
+    trouveur_principal = declaration_trouve.trouve_par.first() if declaration_trouve else None
+
+    # 🔹 Déclaration de l'objet perdu (pour le réclamant)
+    declaration_perdu = restitution.objet.declarations.filter(
+        etat_initial=EtatObjet.PERDU
+    ).first()
+    reclamant_principal = declaration_perdu.reclame_par.first() if declaration_perdu else None
+
+    # 🔹 Policier ayant planifié
+    policier_planificateur = restitution.restitue_par or restitution.policier
+
+    # 🔹 QR Code
     qr_data = f"http://ton-site.com/verifier-restitution/{restitution.id}/"
-    qr = qrcode.QRCode(
-        version=1,
-        error_correction=qrcode.constants.ERROR_CORRECT_L,
-        box_size=5,
-        border=2,
-    )
+    qr = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_L, box_size=5, border=2)
     qr.add_data(qr_data)
     qr.make(fit=True)
     img = qr.make_image(fill_color="black", back_color="white")
-
-    # Convertir l'image en base64
     buffered = BytesIO()
     img.save(buffered, format="PNG")
     qr_code_base64 = base64.b64encode(buffered.getvalue()).decode()
 
-    # Préparer le contexte pour le template
     context = {
         'restitution': restitution,
+        'reclamant_principal': reclamant_principal,
+        'trouveur_principal': trouveur_principal,
+        'policier_planificateur': policier_planificateur,
         'now': timezone.now(),
         'qr_code': qr_code_base64,
     }
 
-    # Générer le HTML du PDF
     html_string = render_to_string('frontend/policier/preuve_restitution_pdf.html', context)
-
-    # Générer le PDF
     pdf_file = HTML(string=html_string, base_url=request.build_absolute_uri('/')).write_pdf()
-
-    # Retourner le PDF dans la réponse HTTP
     response = HttpResponse(pdf_file, content_type='application/pdf')
     response['Content-Disposition'] = f'filename="preuve_restitution_{restitution.id}.pdf"'
     return response
