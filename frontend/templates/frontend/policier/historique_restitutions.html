@@ -97,7 +97,7 @@
                             <p><b>🏢 Commissariat :</b> {{ r.commissariat.nom|default:"-" }}</p>
 
                             <!-- ✅ État initial de la déclaration -->
-                            <p><b>📌 État initial :</b> {{ r.get_etat_initial_display }}</p>
+                            <p><b>📌 État initial :</b> {{ r.etat_initial|default:"N/A" }}</p>
 
                             <p><b>🕒 Date :</b> {{ r.date_restitution|date:"d/m/Y" }} à {{ r.heure_restitution|time:"H:i" }}</p>
                         </div>

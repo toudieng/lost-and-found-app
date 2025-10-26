@@ -277,8 +277,11 @@ def supprimer_objet(request, objet_id):
 # =============================
 
 
-@policier_required
+from django.shortcuts import render
+from django.utils import timezone
+from backend.objets.models import Declaration, EtatObjet
 
+@policier_required
 def dashboard_policier(request):
     current_year = timezone.now().year
     months_labels = ["Jan", "Fév", "Mar", "Avr", "Mai", "Juin",
@@ -332,23 +335,28 @@ def dashboard_policier(request):
     ]
 
     # --- Graphiques mois par mois ---
-    data_perdus_trouves = [0] * 12
-    for decl in Declaration.objects.filter(
-        etat_initial=EtatObjet.PERDU,
-        trouve_par__isnull=False,
-        date_declaration__year=current_year
-    ).distinct():
-        month = decl.date_declaration.month - 1
-        data_perdus_trouves[month] += 1
+    def data_by_month(queryset):
+        data = [0] * 12
+        for decl in queryset:
+            month_index = decl.date_declaration.month - 1
+            data[month_index] += 1
+        return data
 
-    data_trouves_reclames = [0] * 12
-    for decl in Declaration.objects.filter(
-        etat_initial=EtatObjet.TROUVE,
-        objet__etat=EtatObjet.RECLAME,
-        date_declaration__year=current_year
-    ).distinct():
-        month = decl.date_declaration.month - 1
-        data_trouves_reclames[month] += 1
+    data_perdus_trouves = data_by_month(
+        Declaration.objects.filter(
+            etat_initial=EtatObjet.PERDU,
+            trouve_par__isnull=False,
+            date_declaration__year=current_year
+        ).distinct()
+    )
+
+    data_trouves_reclames = data_by_month(
+        Declaration.objects.filter(
+            etat_initial=EtatObjet.TROUVE,
+            objet__etat=EtatObjet.RECLAME,
+            date_declaration__year=current_year
+        ).distinct()
+    )
 
     context = {
         'stats_cards': stats_cards,
@@ -360,7 +368,6 @@ def dashboard_policier(request):
     }
 
     return render(request, 'frontend/policier/dashboard_policier.html', context)
-
 
 @policier_required
 def liste_objets_declares(request):
@@ -437,7 +444,7 @@ def objets_reclames(request):
 @login_required
 @policier_ou_admin_required
 def historique_restitutions(request):
-    # 🔹 Récupérer toutes les restitutions avec les objets, citoyens, policiers et commissariats
+    # Récupère toutes les restitutions d'objets restitués
     restitutions = Restitution.objects.select_related(
         'objet', 'citoyen', 'policier', 'restitue_par', 'commissariat'
     ).filter(
@@ -445,34 +452,31 @@ def historique_restitutions(request):
     ).order_by('-date_restitution', '-heure_restitution')
 
     for r in restitutions:
-        # 🔹 Définir le propriétaire
         r.proprietaire = r.citoyen
 
-        # 🔹 Récupérer la déclaration associée (un seul déclarant)
-        declaration = r.objet.declarations.first()
-        r.etat_initial = declaration.etat_initial if declaration else None
+        # Récupère la déclaration correspondant à l'état initial
+        declaration_initiale = r.objet.declarations.order_by('date_declaration').first()
+        if declaration_initiale:
+            r.etat_initial = declaration_initiale.etat_initial
 
-        # 🔹 Déterminer le ou les trouveurs selon l'état initial
-        trouveurs = []
-        if declaration:
-            if declaration.etat_initial == EtatObjet.TROUVE and declaration.citoyen:
-                # Objet trouvé → le déclarant est le trouveur
-                trouveurs.append(declaration.citoyen)
-            elif declaration.etat_initial == EtatObjet.PERDU:
-                # Objet perdu → tous ceux dans trouve_par
-                trouveurs.extend(declaration.trouve_par.all())
-
-        r.trouveurs = trouveurs
+            # Détermine le(s) citoyen(s) qui ont trouvé l'objet
+            trouveurs = set()
+            if declaration_initiale.etat_initial == EtatObjet.TROUVE:
+                # Si l'objet était trouvé initialement, le déclarant est le trouveur
+                if declaration_initiale.citoyen:
+                    trouveurs.add(declaration_initiale.citoyen)
+            else:
+                # Sinon, récupère tous ceux listés dans trouve_par
+                for user in declaration_initiale.trouve_par.all():
+                    trouveurs.add(user)
+            r.trouveurs = list(trouveurs)
+        else:
+            r.etat_initial = 'N/A'
+            r.trouveurs = []
 
     return render(request, "frontend/policier/historique_restitutions.html", {
         "restitutions": restitutions
     })
-
-from django.shortcuts import render
-from backend.objets.models import Declaration, Restitution, EtatObjet
-
-from django.shortcuts import render
-from backend.objets.models import Declaration
 
 def objets_reclames(request):
     """
