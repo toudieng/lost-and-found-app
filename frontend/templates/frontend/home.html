@@ -250,13 +250,26 @@ body {
 </section>
 
 <!-- RESTITUTION -->
+
+
+
+<!-- RESTITUTION -->
 <section id="restitution" class="py-5 fade-up">
   <div class="container">
-    <h2 class="text-center fw-bold mb-5" style="color: var(--accent-color);">Comment se passe la restitution</h2>
+    <h2 class="text-center fw-bold mb-5" style="color: var(--accent-color);">
+      Comment se passe la restitution
+    </h2>
     <div class="row align-items-center g-4">
-      <div class="col-md-6">
-        <img src="{% static 'frontend/images/preuve_restitution.png' %}" class="img-fluid rounded shadow-sm" alt="">
+      
+      <!-- Colonne Images -->
+      <div class="col-md-6 d-flex flex-wrap justify-content-center gap-3">
+        <img src="{% static 'frontend/images/preuve1.png' %}" 
+             class="img-fluid rounded shadow-sm" alt="Preuve restitution 1" style="max-width: 70%;">
+        <img src="{% static 'frontend/images/preuve2.png' %}" 
+             class="img-fluid rounded shadow-sm" alt="Preuve restitution 2" style="max-width: 70%;">
       </div>
+
+      <!-- Colonne Timeline -->
       <div class="col-md-6">
         <div class="timeline">
           {% for step in steps %}
@@ -267,9 +280,11 @@ body {
           {% endfor %}
         </div>
       </div>
+
     </div>
   </div>
 </section>
+
 
 <!-- PARTENAIRES -->
 <section class="partners py-5 text-center fade-up">
