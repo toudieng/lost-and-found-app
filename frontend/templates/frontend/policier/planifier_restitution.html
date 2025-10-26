@@ -106,10 +106,15 @@
                                 {% endfor %}
                             </select>
                         </div>
+   <div class="card-header">
+    <h3 class="mb-0">📍 Planifier une restitution</h3>
+    <!-- Bouton retour vers le dashboard -->
+    <a href="{% url 'dashboard_policier' %}" class="btn btn-light btn-sm mt-2">
+        ← Retour au Dashboard
+    </a>
+</div>
 
-                        <div class="text-center">
-                            <button type="submit" class="btn btn-success btn-lg w-100">Planifier</button>
-                        </div>
+                        
                     </form>
                 </div>
             </div>

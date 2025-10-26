@@ -379,16 +379,32 @@ def maj_objet(request, pk):
     return render(request, "frontend/policier/maj_objet.html", {"objet": objet})
 
 
-@policier_required
+
+
+def policier_ou_admin_required(view_func):
+    @wraps(view_func)
+    def _wrapped_view(request, *args, **kwargs):
+        if request.user.is_authenticated and request.user.role in ['policier', 'admin']:
+            return view_func(request, *args, **kwargs)
+        return redirect('login')  # ou page d'erreur "accès interdit"
+    return _wrapped_view
+
+@login_required
+@policier_ou_admin_required
 def historique_restitutions(request):
     restitutions = Restitution.objects.select_related(
-        'objet', 'citoyen', 'policier', 'commissariat', 'restitue_par'
-    ).filter(objet__etat=EtatObjet.RESTITUE).order_by('-date_restitution', '-heure_restitution')
+        'objet', 'citoyen', 'policier', 'restitue_par', 'commissariat'
+    ).filter(
+        objet__etat=EtatObjet.RESTITUE
+    ).order_by('-date_restitution', '-heure_restitution')
 
-    # Préparer attributs pour template : propriétaire & liste de trouveurs
     for r in restitutions:
         r.proprietaire = r.citoyen
-        declarations_trouvees = Declaration.objects.filter(objet=r.objet, trouve_par__isnull=False).prefetch_related('trouve_par')
+        declarations_trouvees = Declaration.objects.filter(
+            objet=r.objet,
+            trouve_par__isnull=False
+        ).prefetch_related('trouve_par')
+
         trouveurs = set()
         for d in declarations_trouvees:
             for u in d.trouve_par.all():
@@ -674,97 +690,60 @@ Merci de vous présenter avec vos pièces justificatives.
     }
     return render(request, "frontend/policier/planifier_restitution.html", context)
 
-def marquer_restitue(request, restitution_id):
-    restitution = Restitution.objects.select_related('objet', 'citoyen').get(id=restitution_id)
-    restitution.statut = 'effectuee'
-    restitution.save()
 
-    # Génération du PDF de preuve
+
+def marquer_restitue(request, restitution_id):
+    # 🔹 Récupérer la restitution
+    restitution = get_object_or_404(
+        Restitution.objects.select_related('objet', 'citoyen'),
+        id=restitution_id
+    )
+
+    # 🔹 Marquer comme effectuée
+    restitution.statut = 'effectuee'
+    restitution.save()  # met aussi l'objet à RESTITUE grâce au save()
+
+    # 🔹 Génération PDF
     html_string = render_to_string(
         'frontend/policier/preuve_restitution_pdf.html',
         {'restitution': restitution}
     )
     pdf_file = HTML(string=html_string).write_pdf()
 
-    # Préparer le mail
-    subject = f"Restitution de l'objet '{restitution.objet.nom}' effectuée ✅"
-    message = (
-        f"Bonjour,\n\nLa restitution de l'objet '{restitution.objet.nom}' "
-        f"a été effectuée avec succès.\nVeuillez trouver la preuve en pièce jointe."
-    )
-
+    # 🔹 Préparer les destinataires
     recipients = []
+
+    # Citoyen concerné
     if restitution.citoyen and restitution.citoyen.email:
         recipients.append(restitution.citoyen.email)
 
-    # ✅ Parcours correct des déclarations liées à l'objet
-    for dec in restitution.objet.declarations_trouvees.all():
-        for user in dec.trouve_par.all():
-            if user.email and user.email not in recipients:
-                recipients.append(user.email)
-
-    # Envoi du mail
-    email = EmailMessage(
-        subject=subject,
-        body=message,
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        to=recipients,
-    )
-    email.attach(f"preuve_{restitution.objet.nom}.pdf", pdf_file, 'application/pdf')
-    email.send(fail_silently=True)
-
-    return redirect('objets_trouves_attente')
-
-
-def marquer_restitue(request, restitution_id):
-    restitution = get_object_or_404(
-        Restitution.objects.select_related('objet', 'citoyen'),
-        id=restitution_id
-    )
-
-    # 🔹 Marquer la restitution comme effectuée
-    restitution.statut = 'effectuee'
-    restitution.save()  # 🔸 Ceci met aussi l'objet à "restitue" automatiquement
-
-    # 🔹 Génération du PDF de preuve
-    html_string = render_to_string('frontend/policier/preuve_restitution_pdf.html', {'restitution': restitution})
-    pdf_file = HTML(string=html_string).write_pdf()
-
-    # 🔹 Préparer le mail
-    subject = f"Restitution de l'objet '{restitution.objet.nom}' effectuée ✅"
-    message = (
-        f"Bonjour,\n\n"
-        f"La restitution de l'objet '{restitution.objet.nom}' a été effectuée avec succès.\n"
-        f"Veuillez trouver la preuve en pièce jointe."
-    )
-
-    recipients = []
-
-    # Ajouter le citoyen concerné
-    if restitution.citoyen and restitution.citoyen.email:
-        recipients.append(restitution.citoyen.email)
-
-    # Ajouter les trouveurs de l'objet (via les déclarations liées)
-    for dec in restitution.objet.declaration_set.all():  # ✅ ici la correction
-        for user in dec.trouve_par.all():
+    # Trouveurs liés aux déclarations de l'objet
+    for declaration in restitution.objet.declarations.all():  # related_name='declarations' dans Objet
+        for user in declaration.trouve_par.all():
             if user.email:
                 recipients.append(user.email)
 
-    # Supprimer les doublons
+    # Supprimer doublons
     recipients = list(set(recipients))
 
-    # 🔹 Envoyer l’e-mail avec le PDF
-    email = EmailMessage(
-        subject=subject,
-        body=message,
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        to=recipients,
-    )
-    email.attach(f"preuve_{restitution.objet.nom}.pdf", pdf_file, 'application/pdf')
-    email.send(fail_silently=True)
+    # 🔹 Envoyer le mail avec pièce jointe PDF
+    if recipients:
+        email = EmailMessage(
+            subject=f"Restitution de l'objet '{restitution.objet.nom}' effectuée ✅",
+            body=(
+                f"Bonjour,\n\n"
+                f"La restitution de l'objet '{restitution.objet.nom}' a été effectuée avec succès.\n"
+                f"Veuillez trouver la preuve en pièce jointe."
+            ),
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            to=recipients,
+        )
+        email.attach(f"preuve_{restitution.objet.nom}.pdf", pdf_file, 'application/pdf')
+        email.send(fail_silently=True)
 
-    # 🔹 Redirection
+    # 🔹 Redirection vers la page des objets en attente
     return redirect('objets_trouves_attente')
+
 
 
 @policier_required
