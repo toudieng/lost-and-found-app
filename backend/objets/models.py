@@ -4,14 +4,6 @@ from django.utils import timezone
 import uuid
 from backend.users.models import Commissariat
 
-
-
-from django.db import models
-from django.contrib.auth.models import AbstractUser
-from django.utils import timezone
-from django.conf import settings
-import uuid
-
 # =========================#
 # ⚙ ENUMS
 # =========================
@@ -21,6 +13,7 @@ class EtatObjet(models.TextChoices):
     RECLAME = "reclame", "Réclamé"
     EN_ATTENTE = "en_attente", "En attente"
     RESTITUE = "restitue", "Restitué"
+
 
 class StatutRestitution(models.TextChoices):
     PLANIFIEE = "planifiee", "Planifiée"
@@ -43,11 +36,13 @@ class Objet(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.code_unique:
+            # Génère un identifiant unique court
             self.code_unique = str(uuid.uuid4())[:8].upper()
         super().save(*args, **kwargs)
 
-    def _str_(self):
+    def __str__(self):
         return f"{self.nom} ({self.get_etat_display()})"
+
 
 # =========================
 # 📄 DECLARATION
@@ -94,8 +89,9 @@ class Declaration(models.Model):
     etat_initial = models.CharField(max_length=20, choices=EtatObjet.choices)
     type_declaration = models.CharField(max_length=10, choices=TYPE_CHOICES)
 
-    def _str_(self):
-        return f"{self.objet.nom if self.objet else 'Objet inconnu'} ({self.type_declaration})"
+    def __str__(self):
+        return f"{self.objet.nom if self.objet else 'Objet inconnu'} ({self.get_type_declaration_display()})"
+
 
 # =========================
 # 🔁 RESTITUTION
@@ -149,11 +145,10 @@ class Restitution(models.Model):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
+        # Met à jour l'état de l'objet si la restitution est effectuée
         if self.objet and self.statut == StatutRestitution.EFFECTUEE:
             self.objet.etat = EtatObjet.RESTITUE
             self.objet.save()
 
-    def _str_(self):
+    def __str__(self):
         return f"Restitution de {self.objet.nom if self.objet else 'Objet'}"
-
-

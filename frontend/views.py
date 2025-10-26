@@ -1195,32 +1195,31 @@ def ca_m_appartient(request, declaration_id):
 # =============================
 #       DASHBOARD CITOYEN
 # =============================
-
 @login_required
 def dashboard_citoyen(request):
     user = request.user
 
     nb_objets_perdus = Declaration.objects.filter(
         citoyen=user,
-        objet__etat=EtatObjet.PERDU
+        etat_initial=EtatObjet.PERDU
     ).count()
 
     nb_objets_trouves = Declaration.objects.filter(
-        trouve_par=user,
-        objet__etat=EtatObjet.TROUVE
+        citoyen=user,
+        etat_initial=EtatObjet.TROUVE
     ).count()
 
     nb_objets_restitues = Restitution.objects.filter(
-        Q(citoyen=user) | Q(objet__declaration__citoyen=user),
-        statut=''
+        citoyen=user,
+        statut=StatutRestitution.EFFECTUEE
     ).count()
 
     notifications = Declaration.objects.filter(
-        Q(citoyen=user) | Q(trouve_par=user)
+        citoyen=user
     ).order_by('-date_declaration')[:5]
 
     context = {
-        'user': user,  # ✅ Ajouter explicitement l'utilisateur
+        'user': user,
         'nb_objets_perdus': nb_objets_perdus,
         'nb_objets_trouves': nb_objets_trouves,
         'nb_objets_restitues': nb_objets_restitues,
@@ -1228,33 +1227,46 @@ def dashboard_citoyen(request):
     }
     return render(request, "frontend/citoyen/dashboard_citoyen.html", context)
 
+
+from django.shortcuts import render, get_object_or_404, redirect
+from backend.objets.models import Declaration, Objet, EtatObjet
+from django.contrib.auth.decorators import login_required
+from django.db.models import Q
+
 @login_required
 def mes_objets_perdus(request):
+    query = request.GET.get('q', '')
     objets = Declaration.objects.filter(
         citoyen=request.user,
-        objet__etat=EtatObjet.PERDU
-    ).select_related('objet').order_by('-date_declaration')
+        type_declaration='perdu'
+    )
 
-    return render(request, "frontend/citoyen/mes_objets_perdus.html", {"objets": objets})
+    if query:
+        objets = objets.filter(
+            Q(objet__nom__icontains=query) |
+            Q(objet__description__icontains=query)
+        )
+
+    objets = objets.select_related('objet')
+    return render(request, 'frontend/citoyen/mes_objets_perdus.html', {'objets': objets, 'query': query})
 
 
 @login_required
 def mes_objets_trouves(request):
-    q = request.GET.get('q', '').strip()
-    objets_trouves = Declaration.objects.filter(
+    query = request.GET.get('q', '')
+    objets = Declaration.objects.filter(
         citoyen=request.user,
-        objet__etat=EtatObjet.TROUVE
-    ).select_related('objet').order_by('-date_declaration')
+        type_declaration='trouve'
+    )
 
-    if q:
-        objets_trouves = objets_trouves.filter(
-            models.Q(objet__nom__icontains=q) |
-            models.Q(objet__description__icontains=q)
+    if query:
+        objets = objets.filter(
+            Q(objet__nom__icontains=query) |
+            Q(objet__description__icontains=query)
         )
 
-    return render(request, "frontend/citoyen/mes_objets_trouves.html", {
-        "objets": objets_trouves
-    })
+    objets = objets.select_related('objet')
+    return render(request, 'frontend/citoyen/mes_objets_trouves.html', {'objets': objets, 'query': query})
 
 
 @login_required

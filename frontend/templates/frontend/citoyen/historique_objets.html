@@ -1,31 +1,39 @@
-{% extends "frontend/citoyen/base_citoyen.html" %}
+{% extends "frontend/base.html" %}
 {% load static %}
 
 {% block title %}Historique des Objets Restitués{% endblock %}
 
 {% block extra_css %}
 <style>
+:root {
+    --main-color: #3E4C49;   /* vert gris foncé */
+    --accent-color: #C8A048; /* doré */
+    --light-color: #FFFFFF;  /* blanc */
+}
+
 /* Section principale */
 .welcome-title {
     font-weight: 700;
     text-align: center;
+    color: var(--main-color);
     margin-bottom: 0.5rem;
 }
 .text-muted {
     text-align: center;
+    color: #555;
 }
 
 /* Cartes des objets restitués */
 .objet-restitue-card {
     border-radius: 1rem;
-    background: #fff;
+    background: var(--light-color);
     box-shadow: 0 4px 10px rgba(0,0,0,0.05);
     transition: transform 0.25s ease-in-out, box-shadow 0.25s ease-in-out;
     overflow: hidden;
 }
 .objet-restitue-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 18px rgba(0,0,0,0.1);
+    box-shadow: 0 8px 18px rgba(0,0,0,0.15);
 }
 
 /* Image objet */
@@ -40,7 +48,7 @@
     padding: 1rem 1.2rem;
 }
 .objet-restitue-body h5 {
-    color: #343a40;
+    color: var(--main-color);
     font-weight: 600;
     font-size: 1.05rem;
     margin-bottom: 0.5rem;
@@ -54,8 +62,8 @@
 /* Badge Restitué */
 .badge-restitue {
     display: inline-block;
-    background-color: #28a745;
-    color: #fff;
+    background-color: var(--accent-color);
+    color: var(--light-color);
     font-weight: 600;
     padding: 0.4em 0.75em;
     border-radius: 0.5rem;

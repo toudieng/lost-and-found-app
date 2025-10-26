@@ -1,14 +1,20 @@
-{% extends "frontend/citoyen/base_citoyen.html" %}
+{% extends "frontend/base.html" %}
 {% load static %}
 
 {% block title %}Mes Objets Perdus{% endblock %}
 
 {% block extra_css %}
 <style>
-/* Cartes des objets perdus */
+:root {
+    --main-color: #3E4C49;   /* vert gris foncé */
+    --accent-color: #C8A048; /* doré */
+    --light-color: #FFFFFF;  /* blanc */
+}
+
+/* ===== CARTES OBJETS PERDUS ===== */
 .objet-perdu-card {
     border-radius: 1rem;
-    background: #fff;
+    background: var(--light-color);
     box-shadow: 0 6px 20px rgba(0,0,0,0.08);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     cursor: pointer;
@@ -21,27 +27,30 @@
 
 .objet-perdu-img { width: 100%; height: 200px; object-fit: cover; }
 .objet-perdu-body { padding: 1rem 1.2rem; }
-.objet-perdu-body h5 { color: #dc3545; font-weight: 700; font-size: 1.2rem; margin-bottom: 0.5rem; }
+.objet-perdu-body h5 { color: var(--main-color); font-weight: 700; font-size: 1.2rem; margin-bottom: 0.5rem; }
 .objet-perdu-body p { font-size: 0.95rem; color: #555; margin-bottom: 0.35rem; }
 
-.badge-etat { padding: 0.4em 0.65em; border-radius: 0.5rem; font-size: 0.8rem; font-weight: 600; color: #fff; }
-.badge-perdu { background-color: #dc3545; }
-.badge-reclame { background-color: #ffc107; color: #343a40; }
-.badge-restitue { background-color: #17a2b8; }
-.badge-en_attente { background-color: #6c757d; }
+.badge-etat { padding: 0.4em 0.65em; border-radius: 0.5rem; font-size: 0.8rem; font-weight: 600; color: var(--light-color); }
+.badge-perdu { background-color: #dc3545; }      /* rouge pour perdu */
+.badge-reclame { background-color: #ffc107; color: #343a40; } /* doré */
+.badge-restitue { background-color: #17a2b8; }   /* bleu */
+.badge-en_attente { background-color: #6c757d; } /* gris */
 
 .objet-meta { font-size: 0.85rem; color: #6c757d; display: flex; justify-content: space-between; align-items: center; }
 
 .btn-action { display: inline-block; padding: 0.4rem 0.8rem; border-radius: 0.5rem; font-size: 0.85rem; color: #fff; text-decoration: none; margin-right: 0.4rem; transition: background 0.3s; }
-.btn-action-edit { background-color: #dc3545; } .btn-action-edit:hover { background-color: #b02a37; }
-.btn-action-delete { background-color: #6c1e3d; } .btn-action-delete:hover { background-color: #8a2c55; }
+.btn-action-edit { background-color: var(--accent-color); color: var(--main-color); } 
+.btn-action-edit:hover { background-color: #bfa13c; color: var(--main-color); }
+.btn-action-delete { background-color: #6c1e3d; } 
+.btn-action-delete:hover { background-color: #8a2c55; }
 
 @media (max-width: 768px) { .objet-perdu-img { height: 180px; } }
 </style>
 {% endblock %}
 
 {% block content %}
-<h2 class="welcome-title" style="color:#343a40;">🔍 Mes objets perdus</h2>
+<!-- Titre -->
+<h2 class="welcome-title">🔍 Mes objets perdus</h2>
 <p class="text-muted">Tous les objets que vous avez déclarés comme perdus.</p>
 
 <!-- Barre de recherche -->
