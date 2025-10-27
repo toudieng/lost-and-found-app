@@ -1,104 +1,185 @@
 {% extends "frontend/base.html" %}
 {% load static %}
 
-{% block title %}Mes Objets Trouvés{% endblock %}
+{% block title %}Mes Objets{% endblock %}
 
 {% block extra_css %}
 <style>
 :root {
-    --main-color: #3E4C49;   /* vert gris foncé */
-    --accent-color: #C8A048; /* doré */
-    --light-color: #FFFFFF;  /* blanc */
+    --main-color: #3E4C49;
+    --accent-color: #C8A048;
+    --light-color: #FFFFFF;
+    --main-color-light: rgba(62,76,73,0.08);
+    --text-muted: #555;
 }
 
-/* ===== CARTES OBJETS TROUVÉS ===== */
-.objet-trouve-card {
+/* === CARTES === */
+.card.objet {
     border-radius: 1rem;
-    background: var(--light-color);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    border: 1px solid rgba(62, 76, 73, 0.2);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    cursor: pointer;
+}
+.card.objet:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+.card-body { padding: 1rem; background: var(--light-color); }
+.card-title { color: var(--main-color); font-weight: bold; }
+
+/* === BADGES === */
+.badge-etat {
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.3em 0.6em;
+    border-radius: 0.4rem;
+    margin-right: 0.3rem;
+}
+.badge-initial { background-color: var(--main-color); color: var(--light-color); }
+.badge-actuel { background-color: var(--accent-color); color: var(--main-color); }
+
+/* === DETAILS === */
+.details-card {
+    background: rgba(62,76,73,0.05);
+    border-left: 4px solid var(--accent-color);
+    padding: 0 1rem;
+    margin-top: 0.5rem;
+    border-radius: 0.5rem;
+    max-height: 0;
     overflow: hidden;
+    transition: all 0.4s ease;
 }
-.objet-trouve-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+.details-card.open {
+    max-height: 600px;
+    padding: 0.75rem 1rem;
+}
+.details-card p {
+    margin: 0.2rem 0;
+    font-size: 0.9rem;
+    color: var(--main-color);
 }
 
-.objet-trouve-img { width: 100%; height: 200px; object-fit: cover; }
-.objet-trouve-body { padding: 1rem 1.2rem; }
-.objet-trouve-body h5 { color: var(--main-color); font-weight: 700; font-size: 1.2rem; margin-bottom: 0.5rem; }
-.objet-trouve-body p { font-size: 0.95rem; color: #555; margin-bottom: 0.35rem; }
+/* === BOUTONS === */
+.btn-toggle {
+    background-color: var(--main-color);
+    color: var(--light-color);
+    border: none;
+    padding: 0.5rem 0.8rem;
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+    width: 100%;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.btn-toggle:hover {
+    background-color: var(--accent-color);
+    color: var(--main-color);
+}
+.btn-primary {
+    background-color: var(--accent-color);
+    color: var(--main-color);
+    border: none;
+    padding: 0.5rem 0.8rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    transition: 0.3s;
+}
+.btn-primary:hover { background-color: #b48a3d; }
+.btn-outline-danger {
+    border-color: var(--main-color);
+    color: var(--main-color);
+    padding: 0.5rem 0.8rem;
+    border-radius: 0.5rem;
+}
+.btn-outline-danger:hover {
+    background-color: var(--main-color);
+    color: var(--light-color);
+}
 
-.badge-etat { padding: 0.4em 0.65em; border-radius: 0.5rem; font-size: 0.8rem; font-weight: 600; color: var(--light-color); }
-.badge-perdu { background-color: #dc3545; }
-.badge-trouve { background-color: var(--accent-color); color: var(--main-color); }
-.badge-reclame { background-color: #ffc107; color: #343a40; }
-.badge-restitue { background-color: #17a2b8; }
-.badge-en_attente { background-color: #6c757d; }
-
-.objet-meta { font-size: 0.85rem; color: #6c757d; display: flex; justify-content: space-between; align-items: center; }
-.search-bar { margin-bottom: 1.5rem; }
-.search-bar input { width: 100%; padding: 0.6rem 1rem; border-radius: 0.5rem; border: 1px solid #ccc; transition: border-color 0.3s; }
-.search-bar input:focus { border-color: var(--main-color); outline: none; }
-
-.btn-action { display: inline-block; padding: 0.4rem 0.8rem; border-radius: 0.5rem; font-size: 0.85rem; color: #fff; text-decoration: none; margin-right: 0.4rem; transition: background 0.3s; }
-.btn-action-edit { background-color: var(--accent-color); color: var(--main-color); } 
-.btn-action-edit:hover { background-color: #bfa13c; color: var(--main-color); }
-.btn-action-delete { background-color: #dc3545; } 
-.btn-action-delete:hover { background-color: #b02a37; }
-
-@media (max-width: 768px) { .objet-trouve-img { height: 180px; } }
+/* IMAGE OBJET */
+.card-img-top {
+    height: 200px;
+    object-fit: cover;
+    border-radius: 0.8rem 0.8rem 0 0;
+}
 </style>
 {% endblock %}
 
 {% block content %}
-<h2 class="welcome-title">🔍 Mes objets trouvés</h2>
-<p class="text-muted">Tous les objets que vous avez signalés comme trouvés.</p>
+<div class="container mt-5 mb-5">
+    <h2 class="fw-bold mb-4 text-center" style="color: var(--accent-color);">🎒 Mes Objets Trouves</h2>
 
-<!-- Barre de recherche -->
-<form method="get" class="search-bar">
-    <input type="text" name="q" placeholder="Rechercher un objet..." value="{{ request.GET.q|default:'' }}">
-</form>
+    <form method="get" class="mb-4">
+        <input type="text" name="q" class="form-control" placeholder="Rechercher un objet..." value="{{ query }}">
+    </form>
 
-{% if objets %}
-    <div class="row g-4">
-        {% for declaration in objets %}
-            {% with objet=declaration.objet %}
-            <div class="col-md-4">
-                <div class="objet-trouve-card">
-                    {% if objet.image %}
-                        <img src="{{ objet.image.url }}" class="objet-trouve-img" alt="{{ objet.nom }}">
-                    {% else %}
-                        <img src="{% static 'images/default-object.png' %}" class="objet-trouve-img" alt="Objet">
-                    {% endif %}
+    {% if declarations %}
+    <div class="row g-3">
+        {% for declaration in declarations %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card objet">
+                {% if declaration.objet.image %}
+                    <img src="{{ declaration.objet.image.url }}" class="card-img-top" alt="{{ declaration.objet.nom }}">
+                {% else %}
+                    <img src="{% static 'img/default_objet.png' %}" class="card-img-top" alt="Image par défaut">
+                {% endif %}
 
-                    <div class="objet-trouve-body">
-                        <h5>{{ objet.nom|default:"Objet inconnu" }}</h5>
-                        <p>{{ objet.description|default:"Aucune description" }}</p>
+                <div class="card-body">
+                    <h5 class="card-title">{{ declaration.objet.nom }}</h5>
+                    <p class="text-muted small mb-2">👤 Déclaré par {{ declaration.citoyen.username }}</p>
 
-                        <div class="objet-meta mb-2">
-                            <span><i class="fa-regular fa-calendar"></i> {{ declaration.date_declaration|date:"d/m/Y H:i" }}</span>
-                            <span class="badge-etat badge-trouve">Trouvé</span>
-                        </div>
+                    <div class="mb-2">
+                        <span class="badge badge-etat badge-initial">État initial : {{ declaration.etat_initial|title }}</span>
+                    </div>
 
-                        <!-- Boutons Modifier / Supprimer -->
-                        <div class="text-end">
-                            <a href="{% url 'modifier_objet_trouve' objet.id %}" class="btn-action btn-action-edit">
-                                ✏️ Modifier
-                            </a>
-                            <a href="{% url 'supprimer_objet_trouve' objet.id %}" class="btn-action btn-action-delete" 
-                               onclick="return confirm('Voulez-vous vraiment supprimer cet objet ?');">
-                                🗑️ Supprimer
-                            </a>
-                        </div>
+                    <button class="btn btn-toggle" type="button" data-target="#details-{{ declaration.id }}">
+                        ℹ️ Voir les détails
+                    </button>
+
+                    <div class="details-card" id="details-{{ declaration.id }}">
+                        <p><b>📜 Description :</b> {{ declaration.objet.description|default:"Aucune description" }}</p>
+                        <p><b>📍 Lieu présumé :</b> {{ declaration.lieu|default:"Non précisé" }}</p>
+                        <p><b>🕒 Date de déclaration :</b> {{ declaration.date_declaration|date:"d/m/Y H:i" }}</p>
+                        <p><b>📌 État actuel :</b> {{ declaration.objet.get_etat_display }}</p>
                     </div>
                 </div>
+
+                <div class="card-footer text-end bg-transparent border-0">
+                    <a href="{% url 'modifier_declaration' declaration.id %}" class="btn btn-primary me-1">✏️ Modifier</a>
+                    <a href="{% url 'supprimer_declaration' declaration.id %}" class="btn btn-outline-danger"
+                       onclick="return confirm('Voulez-vous vraiment supprimer cet objet ?');">🗑️ Supprimer</a>
+                </div>
             </div>
-            {% endwith %}
+        </div>
         {% endfor %}
     </div>
-{% else %}
-    <p class="text-muted">Vous n'avez trouvé aucun objet pour le moment.</p>
-{% endif %}
+    {% else %}
+        <div class="alert alert-secondary text-center mt-4 border" style="border-color: var(--accent-color); color: var(--main-color);">
+            Aucun objet déclaré par vous.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.btn-toggle').forEach(btn => {
+        const target = document.querySelector(btn.dataset.target);
+        btn.addEventListener('click', () => {
+            target.classList.toggle('open');
+            if (target.classList.contains('open')) {
+                btn.innerHTML = '⬆️ Réduire les détails';
+                btn.style.backgroundColor = 'var(--accent-color)';
+                btn.style.color = 'var(--main-color)';
+            } else {
+                btn.innerHTML = 'ℹ️ Voir les détails';
+                btn.style.backgroundColor = 'var(--main-color)';
+                btn.style.color = 'var(--light-color)';
+            }
+        });
+    });
+});
+</script>
 {% endblock %}

@@ -203,50 +203,63 @@ def repondre_message(request, message_id):
 
 
 @login_required
+
+
+
 def objets_perdus(request):
-    """Liste publique d'objets déclarés perdus ou réclamés, avec recherche simple."""
+    """
+    Liste publique des objets déclarés perdus ou réclamés,
+    affichant le déclarant et les détails de l'objet.
+    """
     query = request.GET.get('q', '').strip()
 
-    # Objets perdus ou réclamés
-    declarations = Declaration.objects.filter(
-        objet__etat__in=[EtatObjet.PERDU, EtatObjet.RECLAME]
-    ).order_by('-date_declaration')
+    # Récupération des déclarations d'objets perdus ou réclamés
+    declarations = (
+        Declaration.objects
+        .select_related('objet', 'citoyen')
+        .prefetch_related('reclame_par')
+        .filter(objet__etat__in=[EtatObjet.PERDU, EtatObjet.RECLAME])
+        .order_by('-date_declaration')
+    )
 
-    # Filtre par nom si recherche
+    # Recherche
     if query:
         declarations = declarations.filter(objet__nom__icontains=query)
 
-    # Préparer les attributs pour le template
+    # Préparation de données pour le template
     for dec in declarations:
-        dec.reclamant_principal = dec.citoyen  # le déclarant est le réclamant
-        dec.trouveurs = dec.trouve_par.all()   # tous les citoyens ayant trouvé
+        dec.declarant = dec.citoyen              # celui qui a déclaré
+        dec.details_objet = dec.objet            # les infos de l’objet
+        dec.est_reclame_par_user = (
+            request.user.is_authenticated and request.user in dec.reclame_par.all()
+        )
 
     return render(request, "frontend/objets/objets_perdus.html", {
         "declarations": declarations,
-        "query": query
+        "query": query,
     })
-
 
 
 
 @login_required
 def objets_trouves(request):
     query = request.GET.get("q", "").strip()
-    # Inclure les objets trouvés et réclamés
+    
+    # On récupère les objets trouvés ou réclamés
     declarations = Declaration.objects.filter(
         objet__etat__in=[EtatObjet.TROUVE, EtatObjet.RECLAME]
-    ).order_by('-date_declaration')
-
+    ).select_related('citoyen', 'objet').order_by('-date_declaration')
+    
     if query:
         declarations = declarations.filter(objet__nom__icontains=query)
-
+    
     context = {
         "declarations": declarations,
         "query": query,
-        "EtatObjet": EtatObjet,  # pour pouvoir utiliser l'enum dans le template
+        "EtatObjet": EtatObjet,  # pour utiliser l'enum dans le template
     }
+    
     return render(request, "frontend/objets/objets_trouves.html", context)
-
 
 
 def objet_detail(request, pk):
@@ -1259,45 +1272,61 @@ def dashboard_citoyen(request):
     return render(request, "frontend/citoyen/dashboard_citoyen.html", context)
 
 
-from django.shortcuts import render, get_object_or_404, redirect
-from backend.objets.models import Declaration, Objet, EtatObjet
+
+# views.py
+from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q
-
-@login_required
-def mes_objets_perdus(request):
-    query = request.GET.get('q', '')
-    objets = Declaration.objects.filter(
-        citoyen=request.user,
-        type_declaration='perdu'
-    )
-
-    if query:
-        objets = objets.filter(
-            Q(objet__nom__icontains=query) |
-            Q(objet__description__icontains=query)
-        )
-
-    objets = objets.select_related('objet')
-    return render(request, 'frontend/citoyen/mes_objets_perdus.html', {'objets': objets, 'query': query})
-
+from backend.objets.models import Declaration, EtatObjet
 
 @login_required
 def mes_objets_trouves(request):
+    """
+    Affiche tous les objets que le citoyen a déclarés comme trouvés,
+    avec état initial et état actuel égaux à TROUVE.
+    """
     query = request.GET.get('q', '')
-    objets = Declaration.objects.filter(
+
+    # Filtrer les déclarations du citoyen où l'objet est trouvé
+    declarations = Declaration.objects.filter(
         citoyen=request.user,
-        type_declaration='trouve'
-    )
+        etat_initial=EtatObjet.TROUVE,
+        objet__etat=EtatObjet.TROUVE
+    ).order_by('-date_declaration')
 
     if query:
-        objets = objets.filter(
-            Q(objet__nom__icontains=query) |
-            Q(objet__description__icontains=query)
-        )
+        declarations = declarations.filter(objet__nom__icontains=query)
 
-    objets = objets.select_related('objet')
-    return render(request, 'frontend/citoyen/mes_objets_trouves.html', {'objets': objets, 'query': query})
+    context = {
+        'declarations': declarations,
+        'query': query,
+    }
+    return render(request, 'frontend/citoyen/mes_objets_trouves.html', context)
+
+
+@login_required
+def mes_objets_perdus(request):
+    """
+    Affiche tous les objets que le citoyen a déclarés comme perdus,
+    avec état initial et état actuel égaux à PERDU.
+    Possibilité de recherche via paramètre 'q'.
+    """
+    query = request.GET.get('q', '')
+
+    # Filtrer les déclarations du citoyen où l'objet est perdu
+    declarations = Declaration.objects.filter(
+        citoyen=request.user,
+        etat_initial=EtatObjet.PERDU,
+        objet__etat=EtatObjet.PERDU
+    ).order_by('-date_declaration')
+
+    if query:
+        declarations = declarations.filter(objet__nom__icontains=query)
+
+    context = {
+        'declarations': declarations,
+        'query': query,
+    }
+    return render(request, 'frontend/citoyen/mes_objets_perdus.html', context)
 
 
 @login_required
