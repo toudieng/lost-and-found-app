@@ -8,7 +8,9 @@
 :root {
   --main-color: #3E4C49;       /* vert-gris profond */
   --accent-color: #C8A048;     /* doré */
-  --light-color: #FFFFFF;      /* blanc */
+  --light-color: #F8F9FA;      /* blanc cassé plus doux */
+  --card-bg: #FFFFFF;           /* fond cartes et steps */
+  --partners-bg: #F0F0F0;      /* fond section partenaires */
   --shadow: 0 6px 18px rgba(0,0,0,0.15);
   --radius: 1rem;
 }
@@ -22,7 +24,6 @@ body {
   color: var(--main-color);
   scroll-behavior: smooth;
 }
-
 .fade-up { opacity: 0; transform: translateY(40px); transition: all 0.8s ease-out; }
 .fade-up.show { opacity: 1; transform: translateY(0); }
 
@@ -35,13 +36,16 @@ body {
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   padding: 4rem 1rem;
+  text-align: center;
 }
 .hero-intro h1 {
   color: var(--accent-color);
   font-weight: 700;
+  font-size: 2.2rem;
 }
 .hero-intro p {
   font-size: 1.1rem;
+  line-height: 1.6;
 }
 
 /* ======================
@@ -61,13 +65,10 @@ body {
   font-weight: 600;
   text-decoration: none;
   border: none;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s ease;
   display: inline-block;
 }
-.btn-action:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow);
-}
+.btn-action:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
 .btn-lost { background-color: var(--accent-color); color: var(--light-color); }
 .btn-found { background-color: var(--main-color); color: var(--light-color); }
 .btn-dashboard { background-color: #2E3836; color: var(--accent-color); }
@@ -81,57 +82,59 @@ body {
   object-fit: cover;
   border-radius: var(--radius);
   filter: brightness(0.95);
+  transition: transform 0.4s ease;
 }
+.carousel-inner img:hover { transform: scale(1.02); }
 .carousel-caption {
-  background: rgba(62, 76, 73, 0.8);
+  background: rgba(62,76,73,0.8);
   border-radius: 0.6rem;
   padding: 1rem 1.2rem;
 }
-.carousel-caption h5 {
-  color: var(--accent-color);
-}
+.carousel-caption h5 { color: var(--accent-color); }
 
 /* ======================
    FEATURES / AVANTAGES
 ====================== */
 .features-section .card {
+  background-color: var(--card-bg);
   border: none;
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 .features-section .card:hover {
   transform: translateY(-6px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
 }
-.features-section i {
-  color: var(--accent-color);
-}
+.features-section i { color: var(--accent-color); font-size: 2.5rem; margin-bottom: 0.8rem; }
 
 /* ======================
-   RESTITUTION
+   RESTITUTION / TIMELINE
 ====================== */
 #restitution .step {
-  background-color: var(--light-color);
+  background-color: var(--card-bg);
   border-left: 4px solid var(--accent-color);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   padding: 1rem 1.2rem;
-  transition: transform 0.3s ease;
+  margin-bottom: 1rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
-#restitution .step:hover { transform: translateY(-5px); }
+#restitution .step:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.15); }
 
 /* ======================
    PARTENAIRES
 ====================== */
+.partners {
+  background-color: var(--partners-bg);
+  padding: 3rem 0;
+}
 .partners img {
   filter: grayscale(30%);
   opacity: 0.9;
   transition: transform 0.3s ease, opacity 0.3s ease;
 }
-.partners img:hover {
-  transform: scale(1.05);
-  opacity: 1;
-}
+.partners img:hover { transform: scale(1.05); opacity: 1; }
 
 /* ======================
    CTA FINALE
@@ -153,24 +156,31 @@ body {
   font-weight: 700;
   transition: transform 0.2s ease, background 0.3s ease;
 }
-.btn-cta:hover {
-  transform: scale(1.05);
-  background-color: #A88433;
-}
+.btn-cta:hover { transform: scale(1.05); background-color: #A88433; }
 
-/* Responsive */
+/* ======================
+   Responsive
+====================== */
+@media (max-width: 992px) {
+  .carousel-inner img { max-height: 380px; }
+}
 @media (max-width: 768px) {
   .carousel-inner img { max-height: 320px; }
   .carousel-caption { font-size: 0.95rem; }
+  .hero-intro h1 { font-size: 1.8rem; }
+}
+@media (max-width: 576px) {
+  .hero-intro h1 { font-size: 1.6rem; }
+  .features-section i { font-size: 2rem; }
 }
 </style>
 {% endblock %}
 
 {% block content %}
 <!-- HERO INTRO -->
-<section class="hero-intro text-center fade-up">
+<section class="hero-intro fade-up">
   <div class="container">
-    <h1 class="display-5 mb-4">Bienvenue sur la plateforme Lost & Found</h1>
+    <h1 class="display-5 mb-4">Bienvenue sur Lost & Found</h1>
     <p>Déclarez un objet perdu, consultez les objets retrouvés et suivez vos démarches en toute sécurité.</p>
   </div>
 </section>
@@ -178,36 +188,33 @@ body {
 <!-- CAROUSEL -->
 <section class="py-5 fade-up">
   <div id="carouselAll" class="carousel slide carousel-fade" data-bs-ride="carousel">
-  <div class="carousel-inner">
-    {% for slide in all_slides %}
-    <div class="carousel-item {% if forloop.first %}active{% endif %}">
-      <img src="{{ slide.url }}" alt="{{ slide.titre }}" class="d-block w-100" style="max-height: 500px; object-fit: cover;">
-      <div class="carousel-caption text-center p-3" style="background: rgba(0,0,0,0.4); border-radius: 1rem;">
-        <h5>{{ slide.titre }}</h5>
-        <p>{{ slide.description }}</p>
-        {% if slide.etat_type == 'perdu' %}
-          <span class="badge bg-danger">Perdu</span>
-        {% elif slide.etat_type == 'reclame' %}
-          <span class="badge bg-warning text-dark">Réclamé</span>
-        {% elif slide.etat_type == 'trouve' %}
-          <span class="badge bg-success">Trouvé</span>
-        {% endif %}
+    <div class="carousel-inner">
+      {% for slide in all_slides %}
+      <div class="carousel-item {% if forloop.first %}active{% endif %}">
+        <img src="{{ slide.url }}" alt="{{ slide.titre }}">
+        <div class="carousel-caption">
+          <h5>{{ slide.titre }}</h5>
+          <p>{{ slide.description }}</p>
+          {% if slide.etat_type == 'perdu' %}
+            <span class="badge bg-danger">Perdu</span>
+          {% elif slide.etat_type == 'reclame' %}
+            <span class="badge bg-warning text-dark">Réclamé</span>
+          {% elif slide.etat_type == 'trouve' %}
+            <span class="badge bg-success">Trouvé</span>
+          {% endif %}
+        </div>
       </div>
+      {% endfor %}
     </div>
-    {% endfor %}
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselAll" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon"></span>
+      <span class="visually-hidden">Précédent</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselAll" data-bs-slide="next">
+      <span class="carousel-control-next-icon"></span>
+      <span class="visually-hidden">Suivant</span>
+    </button>
   </div>
-
-  <!-- Contrôles du carrousel -->
-  <button class="carousel-control-prev" type="button" data-bs-target="#carouselAll" data-bs-slide="prev">
-    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-    <span class="visually-hidden">Précédent</span>
-  </button>
-  <button class="carousel-control-next" type="button" data-bs-target="#carouselAll" data-bs-slide="next">
-    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-    <span class="visually-hidden">Suivant</span>
-  </button>
-</div>
-
 </section>
 
 <!-- HERO ACTIONS -->
@@ -226,21 +233,21 @@ body {
     <div class="row text-center g-4">
       <div class="col-md-4">
         <div class="card p-4 h-100">
-          <i class="bi bi-box-seam fa-3x mb-3"></i>
+          <i class="bi bi-box-seam mb-3"></i>
           <h4>Déclarer un objet perdu</h4>
           <p>Signalez un objet perdu grâce à un formulaire simple et intuitif.</p>
         </div>
       </div>
       <div class="col-md-4">
         <div class="card p-4 h-100">
-          <i class="bi bi-search fa-3x mb-3"></i>
+          <i class="bi bi-search mb-3"></i>
           <h4>Consulter les objets retrouvés</h4>
           <p>Vérifiez si votre objet figure parmi les objets retrouvés.</p>
         </div>
       </div>
       <div class="col-md-4">
         <div class="card p-4 h-100">
-          <i class="bi bi-clock-history fa-3x mb-3"></i>
+          <i class="bi bi-clock-history mb-3"></i>
           <h4>Suivre vos démarches</h4>
           <p>Gardez un œil sur vos déclarations et notifications en temps réel.</p>
         </div>
@@ -250,26 +257,14 @@ body {
 </section>
 
 <!-- RESTITUTION -->
-
-
-
-<!-- RESTITUTION -->
 <section id="restitution" class="py-5 fade-up">
   <div class="container">
-    <h2 class="text-center fw-bold mb-5" style="color: var(--accent-color);">
-      Comment se passe la restitution
-    </h2>
+    <h2 class="text-center fw-bold mb-5" style="color: var(--accent-color);">Comment se passe la restitution</h2>
     <div class="row align-items-center g-4">
-      
-      <!-- Colonne Images -->
       <div class="col-md-6 d-flex flex-wrap justify-content-center gap-3">
-        <img src="{% static 'frontend/images/preuve1.png' %}" 
-             class="img-fluid rounded shadow-sm" alt="Preuve restitution 1" style="max-width: 70%;">
-        <img src="{% static 'frontend/images/preuve2.png' %}" 
-             class="img-fluid rounded shadow-sm" alt="Preuve restitution 2" style="max-width: 70%;">
+        <img src="{% static 'frontend/images/preuve1.png' %}" class="img-fluid rounded shadow-sm" alt="Preuve 1" style="max-width: 70%;">
+        <img src="{% static 'frontend/images/preuve2.png' %}" class="img-fluid rounded shadow-sm" alt="Preuve 2" style="max-width: 70%;">
       </div>
-
-      <!-- Colonne Timeline -->
       <div class="col-md-6">
         <div class="timeline">
           {% for step in steps %}
@@ -280,23 +275,28 @@ body {
           {% endfor %}
         </div>
       </div>
-
     </div>
   </div>
 </section>
-
 
 <!-- PARTENAIRES -->
 <section class="partners py-5 text-center fade-up">
   <div class="container">
     <h2 class="fw-bold mb-4" style="color: var(--accent-color);">Nos Partenaires</h2>
     <div class="row justify-content-center align-items-center g-4">
-      <div class="col-4 col-md-2"><img src="{% static 'frontend/img/partenaire1.png' %}" class="img-fluid" alt=""></div>
-      <div class="col-4 col-md-2"><img src="{% static 'frontend/img/partenaire2.jpg' %}" class="img-fluid" alt=""></div>
-      <div class="col-4 col-md-2"><img src="{% static 'frontend/img/partenaire3.jpg' %}" class="img-fluid" alt=""></div>
+      <div class="col-4 col-md-2">
+        <img src="{% static 'frontend/img/partenaire1.png' %}" class="img-fluid" alt="Partenaire 1">
+      </div>
+      <div class="col-4 col-md-2">
+        <img src="{% static 'frontend/img/partenaire2.jpg' %}" class="img-fluid" alt="Partenaire 2">
+      </div>
+      <div class="col-4 col-md-2">
+        <img src="{% static 'frontend/img/partenaire3.jpg' %}" class="img-fluid" alt="Partenaire 3">
+      </div>
     </div>
   </div>
 </section>
+
 
 <!-- CTA -->
 <section class="cta fade-up">

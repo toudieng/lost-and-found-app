@@ -10,6 +10,25 @@
     --light-color: #FFFFFF;
 }
 
+/* === BARRE DE RECHERCHE === */
+.search-bar {
+    margin-bottom: 1.5rem;
+}
+.search-input {
+    width: 100%;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid rgba(62,76,73,0.2);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+.search-input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 5px rgba(200,160,72,0.5);
+}
+
 /* === CARTES === */
 .card.objet-historique {
     border-radius: 1rem;
@@ -51,15 +70,19 @@
 <div class="container mt-4 mb-5">
     <h2 class="fw-bold mb-4" style="color: var(--accent-color);">📜 Historique des restitutions</h2>
 
+    <!-- Barre de recherche -->
+    <div class="search-bar">
+        <input type="text" id="searchInput" class="search-input" placeholder="🔍 Rechercher par objet ou citoyen...">
+    </div>
+
     {% if restitutions %}
-        <div class="row g-3">
+        <div class="row g-3" id="restitutionsContainer">
             {% for r in restitutions %}
-            <div class="col-md-6 col-lg-4">
+            <div class="col-md-6 col-lg-4 restitution-card">
                 <div class="card objet-historique h-100">
                     {% if r.objet.image %}
                         <img src="{{ r.objet.image.url }}" class="card-img-top" alt="{{ r.objet.nom }}" style="height:200px; object-fit:cover; border-radius:0.8rem 0.8rem 0 0;">
                     {% endif %}
-
                     <div class="card-body">
                         <h5 class="card-title fw-bold">
                             {{ r.objet.nom }}
@@ -95,10 +118,7 @@
                             </p>
 
                             <p><b>🏢 Commissariat :</b> {{ r.commissariat.nom|default:"-" }}</p>
-
-                            <!-- ✅ État initial de la déclaration -->
                             <p><b>📌 État initial :</b> {{ r.etat_initial|default:"N/A" }}</p>
-
                             <p><b>🕒 Date :</b> {{ r.date_restitution|date:"d/m/Y" }} à {{ r.heure_restitution|time:"H:i" }}</p>
                         </div>
                     </div>
@@ -117,6 +137,7 @@
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Toggle détails
     document.querySelectorAll('.btn-toggle').forEach(btn => {
         const target = document.querySelector(btn.dataset.target);
         btn.addEventListener('click', () => {
@@ -130,6 +151,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 btn.style.backgroundColor = 'var(--main-color)';
                 btn.style.color = 'var(--light-color)';
             }
+        });
+    });
+
+    // Recherche instantanée
+    const searchInput = document.getElementById('searchInput');
+    const cards = document.querySelectorAll('.restitution-card');
+
+    searchInput.addEventListener('input', function() {
+        const filter = searchInput.value.toLowerCase();
+        cards.forEach(card => {
+            const text = card.textContent.toLowerCase();
+            card.style.display = text.includes(filter) ? '' : 'none';
         });
     });
 });
