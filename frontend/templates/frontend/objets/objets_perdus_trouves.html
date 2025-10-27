@@ -10,111 +10,91 @@
     --light-color: #FFFFFF;      
 }
 
-.card {
-    border-radius: 1rem;
-    border: none;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-}
+/* === CARTES === */
+.card.objet-reclame { border-radius: 1rem; border: 1px solid rgba(200, 160, 72, 0.2); box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: transform 0.3s ease, box-shadow 0.3s ease; }
+.card.objet-reclame:hover { transform: translateY(-4px); box-shadow: 0 10px 25px rgba(0,0,0,0.15); }
+.card-body { padding: 1rem; background: var(--light-color); }
+.card-title { color: var(--main-color); }
 
-.card-body {
-    padding: 1rem;
-    background: var(--light-color);
-    color: var(--main-color);
-}
+/* === BADGES === */
+.badge-etat { font-size: 0.8rem; font-weight: 600; padding: 0.3em 0.6em; border-radius: 0.4rem; }
+.badge-perdu { background-color: #dc3545; color: var(--light-color); }
+.badge-reclame { background-color: var(--accent-color); color: var(--main-color); }
 
-.card-title {
-    color: var(--main-color);
-}
+/* === DETAILS DÉROULANTS === */
+.details-card { background: rgba(62, 76, 73, 0.05); border-left: 4px solid var(--accent-color); padding: 0 1rem; margin-top: 0.5rem; border-radius: 0.5rem; max-height: 0; overflow: hidden; transition: all 0.4s ease; }
+.details-card.open { max-height: 600px; padding: 0.75rem 1rem; }
+.details-card p { margin: 0.2rem 0; font-size: 0.9rem; color: var(--main-color); }
 
-.btn-toggle {
-    background: var(--main-color);
-    color: var(--light-color);
-    border: none;
-    font-weight: 500;
-    transition: background 0.3s;
-    cursor: pointer;
-}
-.btn-toggle:hover {
-    background: #2e3a38;
-}
+/* === BOUTONS === */
+.btn-action { font-weight: 500; border: none; transition: all 0.3s ease; }
+.btn-primary { background-color: var(--main-color); color: var(--light-color); }
+.btn-primary:hover { background-color: #2d3836; }
 
-.details-card {
-    background: rgba(62,76,73,0.05);
-    border-left: 4px solid var(--accent-color);
-    padding: 0.75rem 1rem;
-    margin-top: 0.5rem;
-    border-radius: 0.5rem;
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.5s ease, padding 0.5s ease;
-}
-.details-card.open {
-    max-height: 1000px;
-    padding: 0.75rem 1rem;
-}
-.details-card p {
-    margin: 0.2rem 0;
-    font-size: 0.9rem;
-    color: var(--main-color);
-}
+/* === BOUTON TOGGLE === */
+.btn-toggle { background-color: var(--main-color); color: var(--light-color); border: none; padding: 0.4rem 0.7rem; border-radius: 0.4rem; font-size: 0.85rem; transition: all 0.3s ease; }
+.btn-toggle:hover { background-color: var(--accent-color); color: var(--main-color); }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h2 class="fw-bold mb-4">📌 Objets déclarés perdus et réclamés</h2>
+<div class="container mt-4 mb-5">
+    <h2 class="fw-bold mb-4" style="color: var(--accent-color);">📌 Objets perdus et réclamés</h2>
 
     {% if declarations %}
-        {% for dec in declarations %}
-        <div class="card my-3">
-            <div class="card-body">
-                <h5 class="card-title fw-bold mb-2">
-                    {% if dec.objet %}{{ dec.objet.nom }}{% else %}Objet inconnu{% endif %}
-                </h5>
-
-                <p><b>État initial :</b> {{ dec.get_etat_initial_display }}</p>
-
-                <!-- Bouton Infos -->
-                <button class="btn btn-sm btn-toggle mb-2" type="button" 
-                        data-target="#details-{{ dec.id }}">
-                    ℹ️ Infos Complètes
-                </button>
-
-                <!-- Détails déroulants -->
-                <div class="details-card" id="details-{{ dec.id }}">
-                    <!-- Réclamant principal -->
-                    <p><b>Réclamant (déclarant) :</b> {{ dec.reclamant_principal.username }}</p>
-                    <p>Email : {{ dec.reclamant_principal.email|default:"-" }}</p>
-                    <p>Téléphone : {{ dec.reclamant_principal.telephone|default:"-" }}</p>
-                    <hr>
-
-                    <!-- Trouveurs -->
-                    <p><b>Trouveurs :</b></p>
-                    {% if dec.trouve_par.all %}
-                        <ul class="list-unstyled">
-                            {% for user in dec.trouve_par.all %}
-                                <li>{{ user.username }} | Email: {{ user.email|default:"-" }} | Téléphone: {{ user.telephone|default:"-" }}</li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        <p class="text-muted">Aucun trouveur enregistré</p>
+        <div class="row g-3">
+            {% for dec in declarations %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card objet-reclame h-100">
+                    {% if dec.objet.image %}
+                        <img src="{{ dec.objet.image.url }}" class="card-img-top" alt="{{ dec.objet.nom }}" style="height:200px; object-fit:cover; border-radius:0.8rem 0.8rem 0 0;">
                     {% endif %}
-                    <hr>
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold">
+                            {{ dec.objet.nom }}
+                            {% if dec.etat_initial == "PERDU" %}
+                                <span class="badge badge-etat badge-perdu ms-1">PERDU</span>
+                            {% else %}
+                                <span class="badge badge-etat badge-reclame ms-1">RECLAME</span>
+                            {% endif %}
+                        </h5>
 
-                    <p class="text-muted mb-0">
-                        <small>📅 Date déclaration : {{ dec.date_declaration|date:"d/m/Y H:i" }}</small>
-                    </p>
+                        <button class="btn btn-sm btn-toggle mb-2 w-100 text-center" type="button" data-target="#details-{{ dec.id }}">
+                            ℹ️ Voir les détails
+                        </button>
+                        <div class="details-card" id="details-{{ dec.id }}">
+                            <p><b>👤 Réclamant :</b> {{ dec.reclamant_principal.username }}</p>
+                            <p><b>Email :</b> {{ dec.reclamant_principal.email|default:"-" }}</p>
+                            <p><b>Téléphone :</b> {{ dec.reclamant_principal.telephone|default:"-" }}</p>
+                            <hr>
+
+                            <p><b>Trouveurs :</b></p>
+                            {% if dec.trouve_par.all %}
+                                <ul class="list-unstyled">
+                                    {% for user in dec.trouve_par.all %}
+                                        <li>{{ user.username }} | Email: {{ user.email|default:"-" }} | Téléphone: {{ user.telephone|default:"-" }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <p class="text-muted">Aucun trouveur enregistré</p>
+                            {% endif %}
+                            <hr>
+
+                            <p class="text-muted mb-0">
+                                <small>📅 Date déclaration : {{ dec.date_declaration|date:"d/m/Y H:i" }}</small>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="card-footer bg-light text-end">
+                        <a href="{% url 'planifier_restitution' dec.id 'declaration' %}" class="btn btn-sm btn-primary btn-action">📅 Planifier restitution</a>
+                    </div>
                 </div>
-
-                <a href="{% url 'planifier_restitution' dec.id 'declaration' %}" 
-                   class="btn btn-primary btn-sm mt-2">
-                    📅 Planifier restitution
-                </a>
             </div>
+            {% endfor %}
         </div>
-        {% endfor %}
     {% else %}
-        <div class="alert alert-info text-center mt-2">
+        <div class="alert alert-secondary text-center mt-4 border" style="border-color: var(--accent-color); color: var(--main-color);">
             Aucun objet perdu et réclamé.
         </div>
     {% endif %}
@@ -124,19 +104,17 @@
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const toggleButtons = document.querySelectorAll('.btn-toggle');
-
-    toggleButtons.forEach(btn => {
+    document.querySelectorAll('.btn-toggle').forEach(btn => {
         const target = document.querySelector(btn.dataset.target);
         btn.addEventListener('click', () => {
             target.classList.toggle('open');
             if (target.classList.contains('open')) {
-                btn.innerHTML = '⬆️ Réduire';
-                btn.style.background = '#C8A048';
-                btn.style.color = '#3E4C49';
+                btn.innerHTML = '⬆️ Réduire les détails';
+                btn.style.backgroundColor = 'var(--accent-color)';
+                btn.style.color = 'var(--main-color)';
             } else {
-                btn.innerHTML = 'ℹ️ Infos Complètes';
-                btn.style.background = 'var(--main-color)';
+                btn.innerHTML = 'ℹ️ Voir les détails';
+                btn.style.backgroundColor = 'var(--main-color)';
                 btn.style.color = 'var(--light-color)';
             }
         });

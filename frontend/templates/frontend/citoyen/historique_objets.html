@@ -1,113 +1,145 @@
-{% extends "frontend/base.html" %}
+{% extends 'frontend/base.html' %}
 {% load static %}
 
-{% block title %}Historique des Objets Restitués{% endblock %}
+{% block title %}Historique de mes objets restitués{% endblock %}
 
 {% block extra_css %}
 <style>
 :root {
-    --main-color: #3E4C49;   /* vert gris foncé */
-    --accent-color: #C8A048; /* doré */
-    --light-color: #FFFFFF;  /* blanc */
+    --main-color: #3E4C49;
+    --accent-color: #C8A048;
+    --light-color: #FFFFFF;
 }
 
-/* Section principale */
-.welcome-title {
-    font-weight: 700;
-    text-align: center;
-    color: var(--main-color);
-    margin-bottom: 0.5rem;
-}
-.text-muted {
-    text-align: center;
-    color: #555;
-}
-
-/* Cartes des objets restitués */
-.objet-restitue-card {
+/* === CARTES === */
+.card.objet-historique {
     border-radius: 1rem;
-    background: var(--light-color);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-    transition: transform 0.25s ease-in-out, box-shadow 0.25s ease-in-out;
-    overflow: hidden;
+    border: 1px solid rgba(62, 76, 73, 0.2);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
-.objet-restitue-card:hover {
+.card.objet-historique:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 18px rgba(0,0,0,0.15);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+.card-body { padding: 1rem; background: var(--light-color); }
+.card-title { color: var(--main-color); font-weight: bold; }
+
+/* === BADGES === */
+.badge-restaure {
+    font-size: 0.8rem; font-weight: 600; padding: 0.3em 0.6em;
+    border-radius: 0.4rem; background-color: var(--accent-color); color: var(--main-color);
 }
 
-/* Image objet */
-.objet-restitue-img {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
+/* === DETAILS DÉROULANTS === */
+.details-card {
+    background: rgba(62,76,73,0.05); border-left: 4px solid var(--accent-color);
+    padding: 0 1rem; margin-top: 0.5rem; border-radius: 0.5rem;
+    max-height: 0; overflow: hidden; transition: all 0.4s ease;
 }
+.details-card.open { max-height: 600px; padding: 0.75rem 1rem; }
+.details-card p { margin: 0.2rem 0; font-size: 0.9rem; color: var(--main-color); }
 
-/* Contenu */
-.objet-restitue-body {
-    padding: 1rem 1.2rem;
+/* === BOUTONS === */
+.btn-toggle {
+    background-color: var(--main-color); color: var(--light-color);
+    border: none; padding: 0.4rem 0.7rem; border-radius: 0.4rem; font-size: 0.85rem;
+    transition: all 0.3s ease; width: 100%; margin-bottom: 0.5rem;
 }
-.objet-restitue-body h5 {
-    color: var(--main-color);
-    font-weight: 600;
-    font-size: 1.05rem;
-    margin-bottom: 0.5rem;
-}
-.objet-restitue-body p {
-    font-size: 0.9rem;
-    color: #555;
-    margin-bottom: 0.4rem;
-}
-
-/* Badge Restitué */
-.badge-restitue {
-    display: inline-block;
-    background-color: var(--accent-color);
-    color: var(--light-color);
-    font-weight: 600;
-    padding: 0.4em 0.75em;
-    border-radius: 0.5rem;
-    font-size: 0.85rem;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .objet-restitue-img {
-        height: 180px;
-    }
-}
+.btn-toggle:hover { background-color: var(--accent-color); color: var(--main-color); }
 </style>
 {% endblock %}
 
 {% block content %}
-<h2 class="welcome-title">📜 Historique des Objets Restitués</h2>
-<p class="text-muted mb-4">Tous les objets qui vous ont été restitués par les forces de l’ordre.</p>
+<div class="container mt-4 mb-5">
+    <h2 class="fw-bold mb-4" style="color: var(--accent-color);">📜 Historique de mes objets restitués</h2>
 
-{% if restitutions %}
-    <div class="row">
-        {% for rest in restitutions %}
-        <div class="col-md-4 mb-4">
-            <div class="objet-restitue-card">
-                {% if rest.objet.image %}
-                    <img src="{{ rest.objet.image.url }}" class="objet-restitue-img" alt="{{ rest.objet.nom }}">
-                {% else %}
-                    <img src="{% static 'images/default-object.png' %}" class="objet-restitue-img" alt="Objet">
-                {% endif %}
-                <div class="objet-restitue-body">
-                    <h5>{{ rest.objet.nom|default:"Objet inconnu" }}</h5>
-                    <p>{{ rest.objet.description|default:"Aucune description disponible." }}</p>
-                    <p><small class="text-muted">📅 Restitué le {{ rest.date_restitution|date:"d/m/Y" }} à {{ rest.heure_restitution|time:"H:i" }}</small></p>
-                    
-                    <p><small class="text-muted">👤 Citoyen : {{ rest.citoyen.username|default:"Inconnu" }}</small></p>
-                    <p><small class="text-muted">👮 Policier : {{ rest.restitue_par.username|default:"Inconnu" }}</small></p>
+    {% if restitutions %}
+        <div class="row g-3">
+            {% for r in restitutions %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card objet-historique h-100">
+                    {% if r.objet.image %}
+                        <img src="{{ r.objet.image.url }}" class="card-img-top" alt="{{ r.objet.nom }}" style="height:200px; object-fit:cover; border-radius:0.8rem 0.8rem 0 0;">
+                    {% endif %}
 
-                    <span class="badge badge-restitue">✅ Restitué</span>
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold">
+                            {{ r.objet.nom }}
+                            <span class="badge-restaure ms-1">✅ Restitué</span>
+                        </h5>
+
+                        <button class="btn btn-sm btn-toggle mb-2" type="button" data-target="#details-{{ r.id }}">
+                            ℹ️ Voir les détails
+                        </button>
+
+                        <div class="details-card" id="details-{{ r.id }}">
+                            <p><b>👤 Propriétaire :</b> {{ r.citoyen.username }} <br>
+                            <small class="text-muted">{{ r.citoyen.email|default:"-" }}</small></p>
+
+                            <p><b>🔍 Déclaré par :</b>
+                            {% if r.objet.declarations.all %}
+                                {% for decl in r.objet.declarations.all %}
+                                    {{ decl.citoyen.username }}{% if not forloop.last %}, {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                <span class="text-muted">N/A</span>
+                            {% endif %}
+                            </p>
+
+                            <p><b>👮 Policier :</b>
+                            {% if r.restitue_par %}
+                                {{ r.restitue_par.username }} — <span class="text-muted">{{ r.restitue_par.email|default:"-" }}</span>
+                            {% elif r.policier %}
+                                {{ r.policier.username }} — <span class="text-muted">{{ r.policier.email|default:"-" }}</span>
+                            {% else %}
+                                <span class="text-muted">N/A</span>
+                            {% endif %}
+                            </p>
+
+                            <p><b>🏢 Commissariat :</b> {{ r.commissariat.nom|default:"-" }}</p>
+
+                            <p><b>📌 État initial :</b>
+                                {% if r.objet.declarations.first %}
+                                    {{ r.objet.declarations.first.etat_initial|title }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </p>
+
+                            <p><b>🕒 Date :</b> {{ r.date_restitution|date:"d/m/Y" }} à {{ r.heure_restitution|time:"H:i" }}</p>
+                        </div>
+                    </div>
                 </div>
             </div>
+            {% endfor %}
         </div>
-        {% endfor %}
-    </div>
-{% else %}
-    <p class="text-muted text-center mt-5">Aucun objet n’a encore été restitué.</p>
-{% endif %}
+    {% else %}
+        <div class="alert alert-secondary text-center mt-4 border" style="border-color: var(--accent-color); color: var(--main-color);">
+            Aucun historique d’objets restitués trouvé.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.btn-toggle').forEach(btn => {
+        const target = document.querySelector(btn.dataset.target);
+        btn.addEventListener('click', () => {
+            target.classList.toggle('open');
+            if (target.classList.contains('open')) {
+                btn.innerHTML = '⬆️ Réduire les détails';
+                btn.style.backgroundColor = 'var(--accent-color)';
+                btn.style.color = 'var(--main-color)';
+            } else {
+                btn.innerHTML = 'ℹ️ Voir les détails';
+                btn.style.backgroundColor = 'var(--main-color)';
+                btn.style.color = 'var(--light-color)';
+            }
+        });
+    });
+});
+</script>
 {% endblock %}

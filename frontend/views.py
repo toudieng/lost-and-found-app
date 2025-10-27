@@ -1239,10 +1239,15 @@ def ca_m_appartient(request, declaration_id):
 # =============================
 #       DASHBOARD CITOYEN
 # =============================
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+from backend.objets.models import Declaration, Restitution, EtatObjet, StatutRestitution
+
 @login_required
 def dashboard_citoyen(request):
     user = request.user
 
+    # Comptage des objets perdus et trouvés par l'utilisateur
     nb_objets_perdus = Declaration.objects.filter(
         citoyen=user,
         etat_initial=EtatObjet.PERDU
@@ -1253,11 +1258,13 @@ def dashboard_citoyen(request):
         etat_initial=EtatObjet.TROUVE
     ).count()
 
+    # Objets restitués
     nb_objets_restitues = Restitution.objects.filter(
         citoyen=user,
         statut=StatutRestitution.EFFECTUEE
     ).count()
 
+    # 5 dernières notifications (déclarations)
     notifications = Declaration.objects.filter(
         citoyen=user
     ).order_by('-date_declaration')[:5]
@@ -1273,10 +1280,6 @@ def dashboard_citoyen(request):
 
 
 
-# views.py
-from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
-from backend.objets.models import Declaration, EtatObjet
 
 @login_required
 def mes_objets_trouves(request):
@@ -1355,13 +1358,36 @@ def supprimer_objet_trouve(request, objet_id):
     return redirect('mes_objets_trouves')
 
 
+
+
+@login_required
 def historique_objets_restitues(request):
+    """
+    Affiche l'historique des objets restitués pour le citoyen connecté.
+    """
+    # On récupère toutes les restitutions où l'objet est restitué et appartenant à l'utilisateur
     restitutions = Restitution.objects.filter(
         citoyen=request.user,
-        objet__etat=EtatObjet.RESTITUE  # si ton modèle de statut est EtatObjet
+        objet__etat=EtatObjet.RESTITUE
     ).order_by('-date_restitution', '-heure_restitution')
 
-    return render(request, 'frontend/citoyen/historique_objets.html', {'restitutions': restitutions})
+    # Préparer les données pour le template
+    # On peut ajouter des propriétés pour faciliter l'affichage
+    for r in restitutions:
+        # utilisateur(s) ayant trouvé l'objet
+        r.trouveurs = r.objet.declarations.filter(type_declaration='trouve').values_list('citoyen', flat=True)
+        # propriétaire
+        r.proprietaire = r.citoyen
+        # état initial
+        if r.objet.declarations.exists():
+            r.etat_initial = r.objet.declarations.first().etat_initial
+        else:
+            r.etat_initial = 'N/A'
+
+    context = {
+        'restitutions': restitutions
+    }
+    return render(request, 'frontend/citoyen/historique_objets.html', context)
 
 
 @login_required
