@@ -6,23 +6,27 @@ from backend.objets.models import Objet
 from .forms import UtilisateurCreationForm, ProfilForm
 from .models import Notification
 # -------------------- AUTHENTIFICATION --------------------
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
+from .forms import UtilisateurCreationForm  # ton formulaire personnalisé
+
 def login_view(request):
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
         user = authenticate(request, email=email, password=password)
-        if user:
+        
+        if user is not None:
             login(request, user)
             # Redirection selon le rôle
-            if hasattr(user, "role"):
-                if user.role == "admin":
-                    return redirect("dashboard_admin")
-                elif user.role == "policier":
-                    return redirect("dashboard_policier")
-                else:  # citoyen
-                    return redirect("home")
+            role = getattr(user, 'role', 'citoyen')  # rôle par défaut si non défini
+            if role == 'admin':
+                return redirect('dashboard_admin')
+            elif role == 'policier':
+                return redirect('dashboard_policier')
             else:
-                return redirect("home")
+                return redirect('home')
         else:
             messages.error(request, "Adresse e-mail ou mot de passe incorrect.")
     return render(request, 'users/login.html')
@@ -30,6 +34,7 @@ def login_view(request):
 
 def logout_view(request):
     logout(request)
+    messages.success(request, "Vous avez été déconnecté avec succès.")
     return redirect('home')
 
 
@@ -38,14 +43,18 @@ def register_view(request):
         form = UtilisateurCreationForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
-            user.role = "citoyen"  # rôle par défaut
+            user.role = 'citoyen'  # rôle par défaut
             user.save()
-            messages.success(request, "✅ Compte citoyen créé avec succès ! Vous pouvez vous connecter.")
+            messages.success(request, "✅ Compte citoyen créé avec succès ! Vous pouvez maintenant vous connecter.")
             return redirect('login')
         else:
-            messages.error(request, "❌ Erreurs dans le formulaire. Merci de corriger.")
+            # Affichage des erreurs du formulaire
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field.capitalize()}: {error}")
     else:
         form = UtilisateurCreationForm()
+    
     return render(request, 'users/register.html', {'form': form})
 
 # -------------------- DASHBOARDS --------------------
