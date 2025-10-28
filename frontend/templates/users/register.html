@@ -35,31 +35,26 @@ body {
     box-shadow: 0 12px 25px rgba(0,0,0,0.1);
     padding: 2.5rem 2rem;
     width: 100%;
-    max-width: 450px;
+    max-width: 400px;
     border: 1px solid rgba(62, 76, 73, 0.15);
     opacity: 0;
     transform: translateY(40px);
     animation: fadeInUp 0.8s forwards;
 }
 
-@keyframes fadeInUp {
-    to { opacity: 1; transform: translateY(0); }
-}
+@keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
 
 .form-title {
     color: var(--accent-color);
     font-weight: 700;
-    font-size: 2rem;
+    font-size: 1.9rem;
     text-align: center;
     margin-bottom: 1.8rem;
     opacity: 0;
     transform: translateY(-20px);
     animation: titleFade 0.8s forwards 0.3s;
 }
-
-@keyframes titleFade {
-    to { opacity: 1; transform: translateY(0); }
-}
+@keyframes titleFade { to { opacity: 1; transform: translateY(0); } }
 
 /* INPUTS */
 .input-group {
@@ -69,41 +64,33 @@ body {
     transform: translateX(-30px);
     animation: inputFade 0.6s forwards;
 }
-
 .input-group:nth-child(1) { animation-delay: 0.5s; }
 .input-group:nth-child(2) { animation-delay: 0.6s; }
-.input-group:nth-child(3) { animation-delay: 0.7s; }
-.input-group:nth-child(4) { animation-delay: 0.8s; }
-.input-group:nth-child(5) { animation-delay: 0.9s; }
+@keyframes inputFade { to { opacity: 1; transform: translateX(0); } }
 
-@keyframes inputFade {
-    to { opacity: 1; transform: translateX(0); }
-}
-
-.input-group input {
+.input-group input.form-control {
     width: 100%;
     height: 45px;
     border-radius: 0.6rem;
-    border: 1px solid rgba(62,76,73,0.3);
-    padding-left: 2.5rem;  /* espace pour icône gauche */
-    padding-right: 2.5rem; /* espace pour icône droite (mot de passe) */
+    border: 1px solid rgba(62, 76, 73, 0.3);
+    padding: 0.375rem 2.8rem 0.375rem 2.5rem; /* espace pour icône */
     background: var(--light-color);
     transition: 0.3s;
     color: var(--main-color);
 }
-
-.input-group input:focus {
+.input-group input.form-control:focus {
     border-color: var(--accent-color);
     box-shadow: 0 0 10px rgba(200,160,72,0.35);
     outline: none;
     transform: scale(1.02);
 }
 
-/* Icônes à l'intérieur */
+/* Icônes */
 .input-group i.fa-user,
 .input-group i.fa-envelope,
+.input-group i.fa-lock,
 .input-group i.fa-phone,
-.input-group i.fa-lock {
+.input-group i.fa-id-badge {
     position: absolute;
     top: 50%;
     left: 0.75rem;
@@ -112,7 +99,7 @@ body {
     color: var(--main-color);
 }
 
-/* Icône “œil” pour mot de passe */
+/* Icône œil */
 .toggle-password {
     position: absolute;
     top: 50%;
@@ -135,43 +122,22 @@ body {
     transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
     opacity: 0;
     transform: translateY(20px);
-    animation: buttonFade 0.6s forwards 1s;
+    animation: buttonFade 0.6s forwards 0.8s;
 }
-
 .btn-submit:hover {
     background-color: #A88433;
     transform: translateY(-2px);
     box-shadow: 0 6px 15px rgba(200,160,72,0.3);
 }
-
-@keyframes buttonFade {
-    to { opacity: 1; transform: translateY(0); }
-}
+@keyframes buttonFade { to { opacity: 1; transform: translateY(0); } }
 
 /* ALERTS */
-.alert {
-    border-radius: 0.6rem;
-    font-size: 0.9rem;
-    text-align: center;
-    margin-bottom: 1rem;
-    padding: 0.65rem 0.8rem;
-}
+.alert { border-radius: 0.6rem; font-size: 0.9rem; text-align: center; margin-bottom: 1rem; padding: 0.65rem 0.8rem; }
 
 /* REGISTER LINK */
-.register-link {
-    text-align: center;
-    margin-top: 1.2rem;
-    font-size: 0.9rem;
-}
-.register-link a {
-    color: var(--accent-color);
-    font-weight: 600;
-    text-decoration: none;
-    transition: color 0.3s ease;
-}
-.register-link a:hover {
-    color: var(--main-color);
-}
+.register-link { text-align: center; margin-top: 1.2rem; font-size: 0.9rem; }
+.register-link a { color: var(--accent-color); font-weight: 600; text-decoration: none; transition: color 0.3s ease; }
+.register-link a:hover { color: var(--main-color); }
 
 /* RESPONSIVE */
 @media (max-width: 576px) {
@@ -193,34 +159,54 @@ body {
 
     <form method="POST" novalidate>
         {% csrf_token %}
+
         <div class="input-group">
-            <i class="fa fa-user"></i>
-            <input type="text" name="username" placeholder="Nom d’utilisateur" required>
-        </div>
-        <div class="input-group">
-            <i class="fa fa-envelope"></i>
-            <input type="email" name="email" placeholder="Adresse e-mail" required>
-        </div>
-        <div class="input-group">
-            <i class="fa fa-phone"></i>
-            <input type="text" name="telephone" placeholder="Téléphone">
-        </div>
-        <div class="input-group">
-            <i class="fa fa-lock"></i>
-            <input type="password" id="password1" name="password1" placeholder="Mot de passe" required>
-            <i class="fa fa-eye-slash toggle-password" onclick="togglePassword('password1', this)"></i>
-        </div>
-        <div class="input-group">
-            <i class="fa fa-lock"></i>
-            <input type="password" id="password2" name="password2" placeholder="Confirmez le mot de passe" required>
-            <i class="fa fa-eye-slash toggle-password" onclick="togglePassword('password2', this)"></i>
+            <i class="fa fa-id-badge"></i>
+            {{ form.username }}
+            {% for error in form.username.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
         </div>
 
-        <button type="submit" class="btn-submit">S’inscrire</button>
+        <div class="input-group">
+            <i class="fa fa-envelope"></i>
+            {{ form.email }}
+            {% for error in form.email.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+
+        <div class="input-group">
+            <i class="fa fa-phone"></i>
+            {{ form.telephone }}
+            {% for error in form.telephone.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+
+        <div class="input-group">
+            <i class="fa fa-lock"></i>
+            {{ form.password1 }}
+            <i class="fa fa-eye-slash toggle-password" onclick="togglePassword('id_password1', this)"></i>
+            {% for error in form.password1.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+
+        <div class="input-group">
+            <i class="fa fa-lock"></i>
+            {{ form.password2 }}
+            <i class="fa fa-eye-slash toggle-password" onclick="togglePassword('id_password2', this)"></i>
+            {% for error in form.password2.errors %}
+                <span class="text-danger">{{ error }}</span>
+            {% endfor %}
+        </div>
+
+        <button type="submit" class="btn-submit">S'inscrire</button>
     </form>
 
     <p class="register-link">
-        Déjà un compte ? <a href="{% url 'login' %}">Connectez-vous ici</a>
+        Vous avez déjà un compte ? <a href="{% url 'login' %}">Connectez-vous ici</a>
     </p>
 </div>
 
