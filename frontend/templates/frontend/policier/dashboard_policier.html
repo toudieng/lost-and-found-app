@@ -6,94 +6,46 @@
 {% block extra_css %}
 <style>
 :root {
-    --main-color: #3E4C49;          
-    --accent-color: #C8A048;        
-    --accent-color-dark: #b88f38;   
-    --light-color: #FFFFFF;          
+    --main-color: #3E4C49;
+    --accent-color: #C8A048;
+    --accent-color-dark: #b88f38;
+    --light-color: #FFFFFF;
     --main-color-light: rgba(62,76,73,0.1);
 }
 
 /* Layout */
-body { 
-    font-family: 'Segoe UI', sans-serif; 
-    background: #f8f9fa; 
-}
-.main-content {
-    padding: 2rem;
-    background: var(--light-color);
-    min-height: 80vh;
-    border-radius: 1rem;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-}
+body { font-family: 'Segoe UI', sans-serif; background: #f8f9fa; }
+.main-content { padding: 2rem; background: var(--light-color); min-height: 80vh; border-radius: 1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
 
 /* Sidebar */
-.sidebar {
-    background: var(--main-color);
-    color: var(--light-color);
-    min-height: 100vh;
-    padding: 2rem 1rem;
-    position: sticky;
-    top: 0;
-}
-.sidebar h4 {
-    color: var(--accent-color);
-    text-align: center;
-    margin-bottom: 1.5rem;
-}
-.sidebar .nav-link {
-    color: #f0e5f0;
-    border-radius: 0.5rem;
-    padding: 0.6rem 1rem;
-    transition: all 0.2s;
-}
-.sidebar .nav-link:hover,
-.sidebar .nav-link.active {
-    background: var(--accent-color-dark);
-    color: var(--light-color);
-}
+.sidebar { background: var(--main-color); color: var(--light-color); min-height: 100vh; padding: 2rem 1rem; position: sticky; top: 0; }
+.sidebar h4 { color: var(--accent-color); text-align: center; margin-bottom: 1.5rem; }
+.sidebar .nav-link { color: #f0e5f0; border-radius: 0.5rem; padding: 0.6rem 1rem; transition: all 0.2s; }
+.sidebar .nav-link:hover, .sidebar .nav-link.active { background: var(--accent-color-dark); color: var(--light-color); }
 
 /* Welcome */
-.welcome-title { 
-    color: var(--main-color); 
-    font-weight: 700; 
-    margin-bottom: 0.5rem; 
-}
+.welcome-title { color: var(--main-color); font-weight: 700; margin-bottom: 0.5rem; }
 
-/* Stat cards */
-.stats-card {
-    border-radius: 1rem;
-    padding: 1.5rem;
-    background: var(--light-color);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    transition: transform 0.2s, box-shadow 0.2s;
-    cursor: pointer;
-}
-.stats-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 18px rgba(0,0,0,0.1);
-}
-.stats-icon {
-    font-size: 2.5rem;
-}
+/* Stats cards */
+.stats-card { border-radius: 1rem; padding: 1.5rem; background: var(--light-color); box-shadow: 0 4px 12px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 1rem; transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; }
+.stats-card:hover { transform: scale(1.03); box-shadow: 0 8px 25px rgba(62,76,73,0.15); }
+.stats-icon { font-size: 2.5rem; }
+.stats-badge { padding: 0.2rem 0.5rem; border-radius: 12px; font-size: 0.75rem; font-weight: 600; color: var(--light-color); margin-left: 0.5rem; }
 
-/* Badge */
-.stats-badge {
-    padding: 0.2rem 0.5rem;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--light-color);
-    margin-left: 0.5rem;
-}
-
-/* Couleurs badges */
+/* Badge colors */
 .badge-perdus-trouves { background: var(--main-color); }
 .badge-trouves-reclames { background: #6f42c1; }
 .badge-attente { background: #fd7e14; }
 .badge-historique { background: #20c997; }
+
+/* Last objects cards */
+.last-objects .card { border-radius: 1rem; transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; }
+.last-objects .card:hover { transform: translateY(-3px); box-shadow: 0 6px 18px rgba(0,0,0,0.1); }
+.card img { border-top-left-radius: 1rem; border-top-right-radius: 1rem; object-fit: cover; height: 150px; width: 100%; }
+.card-body { padding: 0.5rem 0.75rem; }
+.card-body h6 { font-size: 0.9rem; margin-bottom: 0.2rem; }
+.card-body small { font-size: 0.75rem; color: #6c757d; }
+.card-body .badge { font-size: 0.65rem; margin-top: 0.2rem; }
 
 /* Responsive */
 @media (max-width: 768px) {
@@ -110,30 +62,26 @@ body {
         <h4>👮 Policier</h4>
         <ul class="nav flex-column">
             <li class="nav-item mb-2">
-                <a class="nav-link {% if request.resolver_match.url_name == 'objets_perdus_trouves' %}active{% endif %}"
-                   href="{% url 'objets_perdus_trouves' %}">📌 Objets perdus & trouvés</a>
+                <a class="nav-link {% if request.resolver_match.url_name == 'objets_perdus_trouves' %}active{% endif %}" href="{% url 'objets_perdus_trouves' %}">📌 Objets perdus & trouvés</a>
             </li>
             <li class="nav-item mb-2">
-                <a class="nav-link {% if request.resolver_match.url_name == 'objets_trouves_reclames' %}active{% endif %}"
-                   href="{% url 'objets_trouves_reclames' %}">📌 Objets trouvés & réclamés</a>
+                <a class="nav-link {% if request.resolver_match.url_name == 'objets_trouves_reclames' %}active{% endif %}" href="{% url 'objets_trouves_reclames' %}">📌 Objets trouvés & réclamés</a>
             </li>
             <li class="nav-item mb-2">
-                <a class="nav-link {% if request.resolver_match.url_name == 'objets_trouves_attente' %}active{% endif %}"
-                   href="{% url 'objets_trouves_attente' %}">📦 Objets retrouvés (en attente)</a>
+                <a class="nav-link {% if request.resolver_match.url_name == 'objets_trouves_attente' %}active{% endif %}" href="{% url 'objets_trouves_attente' %}">📦 Objets retrouvés (en attente)</a>
             </li>
             <li class="nav-item mb-2">
-                <a class="nav-link {% if request.resolver_match.url_name == 'historique_restitutions' %}active{% endif %}"
-                   href="{% url 'historique_restitutions' %}">📂 Historique des restitutions</a>
+                <a class="nav-link {% if request.resolver_match.url_name == 'historique_restitutions' %}active{% endif %}" href="{% url 'historique_restitutions' %}">📂 Historique des restitutions</a>
             </li>
         </ul>
     </div>
 
-    <!-- Contenu principal -->
+    <!-- Main content -->
     <div class="col-md-9 col-lg-10 main-content">
         <h2 class="welcome-title">Bienvenue, Policier 👋</h2>
         <p class="text-muted mb-4">Gérez les objets et planifiez les restitutions depuis ce tableau de bord.</p>
 
-        <!-- Statistiques rapides -->
+        <!-- Stats cards -->
         <div class="row g-3 mb-4">
             {% for card in stats_cards %}
             <div class="col-md-3">
@@ -154,6 +102,62 @@ body {
             </div>
             {% endfor %}
         </div>
+
+        <!-- Derniers objets -->
+        <h4 class="mt-4">Derniers objets enregistrés</h4>
+        <div class="row g-3 last-objects">
+            {% for obj in derniers_objets %}
+            <div class="col-md-3">
+                <div class="card">
+                    <img src="{{ obj.photo.url }}" alt="{{ obj.nom }}">
+                    <div class="card-body">
+                        <h6>{{ obj.nom|truncatewords:4 }}</h6>
+                        <small>{{ obj.date_perte|date:"d/m/Y H:i" }}</small>
+                        <br>
+                        <span class="badge {% if obj.statut == 'reclame' %}badge-trouves-reclames{% elif obj.statut == 'attente' %}badge-attente{% endif %}">{{ obj.statut }}</span>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <p>Aucun objet récent</p>
+            {% endfor %}
+        </div>
+
+        <!-- Graphique -->
+        <h4 class="mt-4">Évolution des objets</h4>
+        <canvas id="chartObjets" height="100"></canvas>
     </div>
 </div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const ctx = document.getElementById('chartObjets').getContext('2d');
+new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: {{ chart_labels|safe }},
+        datasets: [{
+            label: 'Objets perdus',
+            data: {{ chart_perdus|safe }},
+            backgroundColor: 'rgba(62,76,73,0.7)'
+        },
+        {
+            label: 'Objets trouvés',
+            data: {{ chart_trouves|safe }},
+            backgroundColor: 'rgba(200,160,72,0.7)'
+        },
+        {
+            label: 'Restitutions',
+            data: {{ chart_restitutions|safe }},
+            backgroundColor: 'rgba(32,201,151,0.7)'
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: { legend: { position: 'top' } },
+        scales: { y: { beginAtZero: true } }
+    }
+});
+</script>
 {% endblock %}

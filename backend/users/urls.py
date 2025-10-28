@@ -13,7 +13,13 @@ urlpatterns = [
     path('dashboard/policier/', views.dashboard_policier, name='dashboard_policier'),
 
     # -------------------- Profils Admin --------------------
-    path('admin/profil/', views.profil_admin, name='profil_admin'),
+  
+
+    path('dashboard/admin/profil/', views.profil_admin, name='profil_admin'),
+      
+      path('dashboard/admin/profil/modifier/', views.modifier_profil_admin, name='modifier_profil_admin'),
+
+
     path('admin/profil/modifier/', views.modifier_profil_admin, name='modifier_profil_admin'),
 
     # -------------------- Profils Policier --------------------

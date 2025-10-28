@@ -11,6 +11,7 @@
     --accent-color-dark: #b88f38;   
     --light-color: #FFFFFF;          
     --main-color-light: rgba(62,76,73,0.1);
+    --shadow-color: rgba(0,0,0,0.12);
 }
 
 /* =========================
@@ -46,6 +47,9 @@
 .sidebar .nav-link.active {
     background: var(--main-color-light);
     color: var(--accent-color);
+}
+.sidebar .nav-link i {
+    font-size: 1.1rem;
 }
 
 /* =========================
@@ -84,7 +88,7 @@
     border-radius: 1rem;
     padding: 1rem 1.2rem;
     background: var(--light-color);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    box-shadow: 0 5px 15px var(--shadow-color);
     flex: 1 1 220px;
     display: flex;
     flex-direction: column;
@@ -92,10 +96,11 @@
     transition: all 0.3s ease-in-out;
     cursor: pointer;
     min-width: 220px;
+    animation: fadeInUp 0.5s ease forwards;
 }
 .stats-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(62,76,73,0.15);
+    box-shadow: 0 10px 30px rgba(62,76,73,0.18);
 }
 .stats-icon {
     font-size: 2rem;
@@ -109,21 +114,22 @@
     font-size: 1.6rem;
 }
 .stats-badge {
-    padding: 0.2rem 0.5rem;
+    padding: 0.25rem 0.6rem;
     border-radius: 12px;
     font-size: 0.75rem;
     font-weight: 600;
     color: var(--light-color);
+    background: linear-gradient(135deg, var(--accent-color), var(--accent-color-dark));
 }
 
-/* Couleurs badges */
-.badge-commissariat { background: var(--main-color); }
-.badge-policiers { background: #2a5d63; }
-.badge-citoyens { background: #17a2b8; }
-.badge-objets-perdus { background: var(--accent-color); color: var(--main-color); }
-.badge-objets-trouves { background: #6f42c1; }
-.badge-restitutions { background: #20c997; }
-.badge-messages { background: #fd7e14; }
+/* Couleurs badges spécifiques */
+.badge-commissariat { background: linear-gradient(135deg, #4a5c59, #2e3a36); }
+.badge-policiers { background: linear-gradient(135deg, #256d74, #1b4b52); }
+.badge-citoyens { background: linear-gradient(135deg, #17a2b8, #0e6c7a); }
+.badge-objets-perdus { background: linear-gradient(135deg, var(--accent-color), var(--accent-color-dark)); color: var(--main-color); }
+.badge-objets-trouves { background: linear-gradient(135deg, #7b5dc7, #5c3aa1); }
+.badge-restitutions { background: linear-gradient(135deg, #20c997, #159470); }
+.badge-messages { background: linear-gradient(135deg, #fd7e14, #e0690c); }
 
 /* =========================
    LISTES DANS CARTES
@@ -134,6 +140,15 @@
     max-height: 180px;
     overflow-y: auto;
     margin-top: 0.3rem;
+    scrollbar-width: thin;
+    scrollbar-color: var(--main-color-light) transparent;
+}
+.stats-card ul::-webkit-scrollbar {
+    width: 6px;
+}
+.stats-card ul::-webkit-scrollbar-thumb {
+    background-color: var(--main-color-light);
+    border-radius: 3px;
 }
 .stats-card ul li {
     font-size: 0.85rem;
@@ -144,6 +159,14 @@
 .stats-card ul li.new {
     font-weight: 600;
     background: var(--main-color-light);
+}
+
+/* =========================
+   ANIMATIONS
+========================= */
+@keyframes fadeInUp {
+    0% { opacity: 0; transform: translateY(20px); }
+    100% { opacity: 1; transform: translateY(0); }
 }
 
 /* =========================
@@ -190,8 +213,7 @@
                 <a class="nav-link {% if request.resolver_match.url_name == 'liste_messages' %}active{% endif %}" href="{% url 'liste_messages' %}">💬 Messages citoyens</a>
             </li>
              <li class="nav-item mb-2">
-                <a class="nav-link {% if request.resolver_match.url_name == 'historique_restitutions' %}active{% endif %}"
-                   href="{% url 'historique_restitutions' %}">📂 Historique des restitutions</a>
+                <a class="nav-link {% if request.resolver_match.url_name == 'historique_restitutions' %}active{% endif %}" href="{% url 'historique_restitutions' %}">📂 Historique des restitutions</a>
             </li>
         </ul>
     </div>

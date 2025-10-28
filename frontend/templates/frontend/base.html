@@ -14,13 +14,22 @@
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 
     <style>
-        :root {
-            --main-color: #3E4C49;
-            --accent-color: #C8A048;
-            --light-color: #FFFFFF;
-            --shadow-color: rgba(0,0,0,0.1);
-        }
-
+       
+:root {
+  --main-color: #3E4C49;            /* vert-gris foncé */
+  --accent-color: #C8A048;          /* doré */
+  --accent-color-dark: #b88f38;     /* doré foncé */
+  --white: #FFFFFF;                 /* blanc pur */
+  --white-soft: #FAFAFA;            /* blanc doux */
+  --white-warm: #F5F4F2;            /* blanc chaud */
+  --white-light: #F9FAFB;           /* blanc légèrement bleuté */
+  --hero-bg: #F4F5F7;
+  --card-bg: var(--white);
+  --partners-bg: var(--white-soft);
+  --cta-bg: var(--white-warm);
+  --shadow: 0 8px 24px rgba(0,0,0,0.12);
+  --radius: 1.2rem;
+}
         body {
             background-color: var(--light-color);
             color: var(--main-color);

@@ -1,94 +1,244 @@
 {% extends 'frontend/base.html' %}
 {% load static %}
 
-{% block title %}Accueil - Objets Perdus{% endblock %}
+{% block title %}Accueil - Lost & Found{% endblock %}
 
 {% block extra_css %}
 <style>
 :root {
-  --main-color: #3E4C49;
-  --accent-color: #C8A048;
-  --accent-color-dark: #b88f38;
-  --light-color: #F9FAFB;
+  --main-color: #3E4C49;            /* vert-gris foncé */
+  --accent-color: #C8A048;          /* doré */
+  --accent-color-dark: #b88f38;     /* doré foncé */
+  --white: #FFFFFF;                 /* blanc pur */
+  --white-soft: #FAFAFA;            /* blanc doux */
+  --white-warm: #F5F4F2;            /* blanc chaud */
+  --white-light: #F9FAFB;           /* blanc légèrement bleuté */
   --hero-bg: #F4F5F7;
-  --card-bg: #FFFFFF;
-  --partners-bg: #FAFAFA;
-  --cta-bg: #F4F5F7;
+  --card-bg: var(--white);
+  --partners-bg: var(--white-soft);
+  --cta-bg: var(--white-warm);
   --shadow: 0 8px 24px rgba(0,0,0,0.12);
   --radius: 1.2rem;
 }
 
-/* ======================
-   Fond et structure
-====================== */
-body { font-family: 'Poppins', sans-serif; scroll-behavior: smooth; background-color: var(--light-color); color: var(--main-color); }
+/* ========== GLOBAL ========== */
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: var(--white-light);
+  color: var(--main-color);
+  scroll-behavior: smooth;
+}
+section {
+  padding: 5rem 1rem;
+  margin-bottom: 3rem;
+  border-radius: var(--radius);
+}
+.fade-up {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: all 0.8s cubic-bezier(0.5,0,0,1);
+}
+.fade-up.show {
+  opacity: 1;
+  transform: translateY(0);
+}
 
-section { padding: 5rem 1rem; border-radius: var(--radius); margin-bottom: 3rem; }
+/* ========== HERO INTRO ========== */
+.hero-intro {
+  background-color: var(--hero-bg);
+  text-align: center;
+  padding: 6rem 1rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  background-image: linear-gradient(135deg, rgba(62,76,73,0.9), rgba(62,76,73,0.8)),
+    url("{% static 'frontend/img/bg-hero.jpg' %}");
+  background-size: cover;
+  background-position: center;
+  color: var(--white);
+}
+.hero-intro h1 {
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: var(--accent-color);
+  margin-bottom: 1rem;
+}
+.hero-intro p {
+  font-size: 1.2rem;
+  max-width: 700px;
+  margin: auto;
+  line-height: 1.7;
+}
 
-/* ======================
-   Fade-up animation
-====================== */
-.fade-up { opacity: 0; transform: translateY(40px); transition: all 0.8s cubic-bezier(0.5,0,0,1); }
-.fade-up.show { opacity: 1; transform: translateY(0); }
+/* ========== ACTION BUTTONS ========== */
+.hero-actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-top: -3rem;
+  background-color: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 2rem 1rem;
+}
+.btn-action {
+  font-weight: 600;
+  padding: 0.9rem 2rem;
+  border-radius: 0.7rem;
+  border: none;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.btn-action:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+}
+.btn-lost {
+  background-color: var(--accent-color);
+  color: var(--white);
+}
+.btn-found {
+  background-color: var(--main-color);
+  color: var(--white);
+}
+.btn-dashboard {
+  background-color: #2E3836;
+  color: var(--accent-color);
+}
 
-/* ======================
-   HERO INTRO
-====================== */
-.hero-intro { background-color: var(--hero-bg); text-align: center; padding: 6rem 1rem; border-radius: var(--radius); box-shadow: var(--shadow); }
-.hero-intro h1 { font-size: 2.8rem; font-weight: 700; color: var(--accent-color); margin-bottom: 1rem; }
-.hero-intro p { font-size: 1.2rem; max-width: 700px; margin: auto; line-height: 1.7; }
+/* ========== CAROUSEL ========== */
+.carousel-inner img {
+  width: 100%;
+  max-height: 480px;
+  object-fit: cover;
+  border-radius: var(--radius);
+  filter: brightness(0.9);
+  transition: transform 0.5s ease, filter 0.4s ease;
+}
+.carousel-inner img:hover {
+  transform: scale(1.03);
+  filter: brightness(1);
+}
+.carousel-caption {
+  background: rgba(62,76,73,0.85);
+  border-radius: 0.8rem;
+  padding: 1rem 1.3rem;
+  backdrop-filter: blur(6px);
+}
+.carousel-caption h5 {
+  color: var(--accent-color);
+  font-weight: 700;
+  font-size: 1.3rem;
+}
 
-/* ======================
-   HERO ACTIONS
-====================== */
-.hero-actions { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin-top: 2rem; background-color: var(--light-color); border-radius: var(--radius); box-shadow: var(--shadow); padding: 2.5rem 1rem; }
-.btn-action { font-weight: 600; padding: 0.85rem 2rem; border-radius: 0.7rem; border: none; text-decoration: none; cursor: pointer; transition: all 0.3s ease; }
-.btn-action:hover { transform: translateY(-4px); box-shadow: 0 10px 20px rgba(0,0,0,0.15); }
-.btn-lost { background-color: var(--accent-color); color: var(--light-color); }
-.btn-found { background-color: var(--main-color); color: var(--light-color); }
-.btn-dashboard { background-color: #2E3836; color: var(--accent-color); }
+/* ========== FEATURES ========== */
+.features-section .card {
+  padding: 2rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--white-soft);
+  background-color: var(--white);
+  box-shadow: var(--shadow);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.features-section .card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 14px 30px rgba(0,0,0,0.18);
+}
+.features-section i {
+  color: var(--accent-color);
+  font-size: 2.8rem;
+  margin-bottom: 0.8rem;
+}
 
-/* ======================
-   CAROUSEL
-====================== */
-.carousel-inner img { width: 100%; max-height: 450px; object-fit: cover; border-radius: var(--radius); filter: brightness(0.95); transition: transform 0.4s ease, filter 0.4s ease; }
-.carousel-inner img:hover { transform: scale(1.03); filter: brightness(1); }
-.carousel-caption { background: rgba(62,76,73,0.85); border-radius: 0.6rem; padding: 1rem 1.2rem; }
-.carousel-caption h5 { color: var(--accent-color); font-weight: 700; }
+/* ========== RESTITUTION ========== */
+#restitution {
+  background: var(--white-warm);
+  box-shadow: var(--shadow);
+}
+#restitution .step {
+  background: var(--white);
+  padding: 1.5rem;
+  border-left: 5px solid var(--accent-color);
+  margin-bottom: 1rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  transition: all 0.3s ease;
+}
+#restitution .step:hover {
+  transform: translateY(-5px);
+  background: var(--white-soft);
+}
 
-/* ======================
-   FEATURES / AVANTAGES
-====================== */
-.features-section .card { padding: 2rem; transition: all 0.3s ease; border-radius: var(--radius); box-shadow: var(--shadow); border: none; }
-.features-section .card:hover { transform: translateY(-8px); box-shadow: 0 12px 28px rgba(0,0,0,0.18); }
-.features-section i { color: var(--accent-color); font-size: 2.8rem; margin-bottom: 0.8rem; }
+/* ========== PARTNERS ========== */
+.partners {
+  background-color: var(--white-soft);
+  text-align: center;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 4rem 1rem;
+}
+.partners img {
+  filter: grayscale(40%);
+  opacity: 0.9;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border-radius: 10px;
+}
+.partners img:hover {
+  transform: scale(1.1);
+  filter: grayscale(0);
+  opacity: 1;
+}
 
-/* ======================
-   RESTITUTION / TIMELINE
-====================== */
-#restitution .step { background: var(--card-bg); padding: 1.5rem; border-left: 5px solid var(--accent-color); margin-bottom: 1rem; border-radius: var(--radius); box-shadow: var(--shadow); transition: all 0.3s ease; }
-#restitution .step:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.12); }
+/* ========== CTA (Blanc/Or Nuancé) ========== */
+.cta {
+  background: linear-gradient(145deg, var(--white-warm) 0%, var(--white) 70%, var(--accent-color) 300%);
+  text-align: center;
+  padding: 6rem 1rem;
+  border-radius: var(--radius);
+  color: var(--main-color);
+  box-shadow: var(--shadow);
+}
+.cta h2 {
+  color: var(--accent-color);
+  font-weight: 700;
+}
+.cta p {
+  max-width: 600px;
+  margin: 1rem auto 2rem;
+  color: var(--main-color);
+}
+.btn-cta {
+  padding: 1rem 2.5rem;
+  font-weight: 700;
+  border-radius: 0.7rem;
+  border: 2px solid var(--accent-color);
+  cursor: pointer;
+  background-color: var(--accent-color);
+  color: var(--white);
+  transition: all 0.3s ease;
+}
+.btn-cta:hover {
+  transform: scale(1.08);
+  background-color: var(--main-color);
+  color: var(--accent-color);
+  border-color: var(--main-color);
+}
 
-/* ======================
-   PARTENAIRES
-====================== */
-.partners { padding: 3rem 0; border-radius: var(--radius); box-shadow: var(--shadow); }
-.partners img { filter: grayscale(20%); opacity: 0.9; transition: all 0.3s ease; cursor: pointer; }
-.partners img:hover { transform: scale(1.1); filter: grayscale(0); }
-
-/* ======================
-   CTA FINALE
-====================== */
-.cta { background: var(--cta-bg); text-align: center; padding: 6rem 1rem; border-radius: var(--radius); box-shadow: var(--shadow); }
-.btn-cta { padding: 1rem 2.5rem; font-weight: 700; border-radius: 0.7rem; border: none; cursor: pointer; transition: all 0.3s ease; background-color: var(--accent-color); color: var(--light-color); }
-.btn-cta:hover { transform: scale(1.08); background-color: var(--accent-color-dark); }
-
-/* ======================
-   Responsive
-====================== */
-@media(max-width: 992px){ .carousel-inner img{ max-height: 380px; } }
-@media(max-width: 768px){ .carousel-inner img{ max-height: 320px; } .carousel-caption{ font-size: 0.95rem; } .hero-intro h1{ font-size:2rem; } }
-@media(max-width: 576px){ .hero-intro h1{ font-size:1.6rem; } .features-section i{ font-size:2rem; } }
+/* ========== Responsive ========== */
+@media(max-width: 992px) {
+  .carousel-inner img { max-height: 400px; }
+}
+@media(max-width: 768px) {
+  .carousel-inner img { max-height: 320px; }
+  .carousel-caption { font-size: 0.95rem; }
+  .hero-intro h1 { font-size:2rem; }
+}
+@media(max-width: 576px) {
+  .hero-intro h1 { font-size:1.6rem; }
+  .features-section i { font-size:2rem; }
+}
 </style>
 {% endblock %}
 
@@ -96,9 +246,18 @@ section { padding: 5rem 1rem; border-radius: var(--radius); margin-bottom: 3rem;
 <!-- HERO INTRO -->
 <section class="hero-intro fade-up">
   <div class="container">
-    <h1 class="display-5 mb-4">Bienvenue sur Lost & Found</h1>
-    <p>Déclarez un objet perdu, consultez les objets retrouvés et suivez vos démarches en toute sécurité.</p>
+    <h1>Bienvenue sur <span style="color: var(--white);">Lost & Found</span></h1>
+    <p>Déclarez un objet perdu, consultez les objets retrouvés et contribuez à reconnecter les citoyens à leurs biens.</p>
   </div>
+</section>
+
+<!-- HERO ACTIONS -->
+<section class="hero-actions fade-up">
+  <a href="{% url 'objets_perdus' %}" class="btn-action btn-lost">🔍 Voir objets perdus</a>
+  <a href="{% url 'objets_trouves' %}" class="btn-action btn-found">📦 Voir objets trouvés</a>
+  {% if user.is_authenticated and user.role == 'citoyen' %}
+    <a href="{% url 'dashboard_citoyen' %}" class="btn-action btn-dashboard">📊 Mon Dashboard</a>
+  {% endif %}
 </section>
 
 <!-- CAROUSEL -->
@@ -133,39 +292,30 @@ section { padding: 5rem 1rem; border-radius: var(--radius); margin-bottom: 3rem;
   </div>
 </section>
 
-<!-- HERO ACTIONS -->
-<section class="hero-actions fade-up">
-  <a href="{% url 'objets_perdus' %}" class="btn-action btn-lost">Voir Objets perdus</a>
-  <a href="{% url 'objets_trouves' %}" class="btn-action btn-found">Voir Objets trouvés</a>
-  {% if user.is_authenticated and user.role == 'citoyen' %}
-    <a href="{% url 'dashboard_citoyen' %}" class="btn-action btn-dashboard">Mon Dashboard</a>
-  {% endif %}
-</section>
-
 <!-- FEATURES -->
-<section id="about" class="features-section py-5 fade-up">
+<section id="about" class="features-section fade-up">
   <div class="container">
     <h2 class="text-center fw-bold mb-5" style="color: var(--accent-color);">Les avantages de notre plateforme</h2>
     <div class="row text-center g-4">
       <div class="col-md-4">
         <div class="card p-4 h-100">
-          <i class="bi bi-box-seam mb-3"></i>
+          <i class="bi bi-box-seam"></i>
           <h4>Déclarer un objet perdu</h4>
-          <p>Signalez un objet perdu grâce à un formulaire simple et intuitif.</p>
+          <p>Signalez un objet perdu avec un formulaire intuitif et rapide.</p>
         </div>
       </div>
       <div class="col-md-4">
         <div class="card p-4 h-100">
-          <i class="bi bi-search mb-3"></i>
+          <i class="bi bi-search"></i>
           <h4>Consulter les objets retrouvés</h4>
-          <p>Vérifiez si votre objet figure parmi les objets retrouvés.</p>
+          <p>Accédez facilement à la liste des objets retrouvés près de chez vous.</p>
         </div>
       </div>
       <div class="col-md-4">
         <div class="card p-4 h-100">
-          <i class="bi bi-clock-history mb-3"></i>
+          <i class="bi bi-clock-history"></i>
           <h4>Suivre vos démarches</h4>
-          <p>Gardez un œil sur vos déclarations et notifications en temps réel.</p>
+          <p>Restez informé sur l’état de vos déclarations et restitutions.</p>
         </div>
       </div>
     </div>
@@ -173,29 +323,27 @@ section { padding: 5rem 1rem; border-radius: var(--radius); margin-bottom: 3rem;
 </section>
 
 <!-- RESTITUTION -->
-<section id="restitution" class="py-5 fade-up">
+<section id="restitution" class="fade-up">
   <div class="container">
     <h2 class="text-center fw-bold mb-5" style="color: var(--accent-color);">Comment se passe la restitution</h2>
     <div class="row align-items-center g-4">
-      <div class="col-md-6 d-flex flex-wrap justify-content-center gap-3">
-        <img src="{% static 'frontend/images/preuve.png' %}" class="img-fluid rounded shadow-sm" alt="Preuve 1" style="max-width: 70%;">
+      <div class="col-md-6 text-center">
+        <img src="{% static 'frontend/images/preuve.png' %}" class="img-fluid rounded shadow-sm" alt="Preuve">
       </div>
       <div class="col-md-6">
-        <div class="timeline">
-          {% for step in steps %}
-          <div class="step mb-3">
-            <h5 class="fw-bold">{{ step.title }}</h5>
-            <p>{{ step.desc }}</p>
-          </div>
-          {% endfor %}
+        {% for step in steps %}
+        <div class="step">
+          <h5 class="fw-bold">{{ step.title }}</h5>
+          <p>{{ step.desc }}</p>
         </div>
+        {% endfor %}
       </div>
     </div>
   </div>
 </section>
 
 <!-- PARTENAIRES -->
-<section class="partners py-5 text-center fade-up">
+<section class="partners fade-up">
   <div class="container">
     <h2 class="fw-bold mb-4" style="color: var(--accent-color);">Nos Partenaires</h2>
     <div class="row justify-content-center align-items-center g-4">
@@ -206,12 +354,12 @@ section { padding: 5rem 1rem; border-radius: var(--radius); margin-bottom: 3rem;
   </div>
 </section>
 
-<!-- CTA -->
+<!-- CTA (blanc et or) -->
 <section class="cta fade-up">
   <div class="container">
     <h2>Vous avez perdu ou trouvé un objet ?</h2>
-    <p>Déclarez-le dès maintenant et aidez-nous à le restituer à son propriétaire.</p>
-    <a href="{% url 'declarer_objet' %}" class="btn btn-cta">Faire une déclaration</a>
+    <p>Faites une déclaration dès maintenant et contribuez à la restitution rapide des objets perdus.</p>
+    <a href="{% url 'declarer_objet' %}" class="btn btn-cta">📝 Faire une déclaration</a>
   </div>
 </section>
 

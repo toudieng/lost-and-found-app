@@ -3,12 +3,12 @@
 {% block extra_css %}
 <style>
 :root {
-    --main-color: #3E4C49;       
-    --accent-color: #C8A048;     
-    --accent-color-dark: #b88f38;    
-    --light-color: #FFFFFF;           
-    --border-color: #CED4DA;          
-    --shadow-color: rgba(0,0,0,0.1);  
+    --main-color: #3E4C49;
+    --accent-color: #C8A048;
+    --accent-color-dark: #b88f38;
+    --light-color: #FFFFFF;
+    --border-color: #CED4DA;
+    --shadow-color: rgba(0,0,0,0.1);
     --main-color-light: rgba(62,76,73,0.1);
 }
 
@@ -39,12 +39,15 @@ input, select, textarea {
     transition: border-color 0.3s, box-shadow 0.3s;
     font-size: 0.95rem;
 }
-textarea { min-height: 100px; resize: vertical; }
+textarea { min-height: 120px; resize: vertical; }
 
-input:focus, select:focus, textarea:focus { border-color: var(--accent-color); box-shadow: 0 0 8px rgba(200,160,72,0.4); outline: none; }
+input:focus, select:focus, textarea:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 8px rgba(200,160,72,0.4);
+    outline: none;
+}
 
 .form-check-input:checked { background-color: var(--accent-color); border-color: var(--accent-color); }
-
 .form-check-label { color: var(--main-color); font-weight: 500; }
 
 .btn-submit, .btn-back {
@@ -86,7 +89,17 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent-color); b
 
 .alert { background-color: rgba(62,76,73,0.08); color: var(--main-color); border: 1px solid var(--accent-color); border-radius: 0.5rem; padding: 0.5rem 0.75rem; font-size: 0.85rem; margin-bottom: 1rem; }
 
-#preview-image { max-height: 200px; width: 100%; margin-top: 0.5rem; border-radius: 0.5rem; border: 2px solid var(--main-color-light); box-shadow: 0 4px 12px rgba(0,0,0,0.1); object-fit: cover; transition: opacity 0.3s ease; }
+#preview-image {
+    display: none;
+    max-height: 220px;
+    width: 100%;
+    margin-top: 0.5rem;
+    border-radius: 0.5rem;
+    border: 2px solid var(--main-color-light);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    object-fit: cover;
+    transition: opacity 0.3s ease;
+}
 
 .btn-group { display: flex; justify-content: space-between; gap: 4%; }
 
@@ -143,7 +156,6 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent-color); b
                     <img id="preview-image" src="#" alt="Prévisualisation">
                 </div>
 
-                <!-- Bloc Type de déclaration -->
                 <div class="mb-4 text-center">
                     <p class="fw-bold mb-2" style="color: var(--accent-color);">📌 Type de déclaration</p>
                     {% for radio in form.etat_initial %}
@@ -157,7 +169,6 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent-color); b
                     {% endfor %}
                 </div>
 
-                <!-- Groupe de boutons côte à côte -->
                 <div class="btn-group">
                     <a href="{% url 'home' %}" class="btn btn-back fw-bold">🔙 Retour</a>
                     <button type="submit" class="btn btn-submit fw-bold">Soumettre</button>
