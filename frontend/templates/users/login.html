@@ -2,136 +2,185 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connexion</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Connexion</title>
 
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<!-- Bootstrap & FontAwesome -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
-    <style>
-        :root {
-            --main-color: #3E4C49;       /* vert gris foncé */
-            --accent-color: #C8A048;     /* doré */
-            --light-color: #FFFFFF;      /* blanc */
-        }
+<style>
+:root {
+    --main-color: #3E4C49;
+    --accent-color: #C8A048;
+    --light-color: #FFFFFF;
+}
 
-        /* =========================
-           BODY
-        ========================= */
-        body {
-            background: linear-gradient(135deg, var(--light-color), #f3f3f3);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: 'Poppins', sans-serif;
-            color: var(--main-color);
-        }
+/* =========================
+   BODY
+========================= */
+body {
+    background: linear-gradient(135deg, var(--light-color), #f3f3f3);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Poppins', sans-serif;
+    color: var(--main-color);
+}
 
-        /* =========================
-           FORM CONTAINER
-        ========================= */
-        .form-container {
-            background: var(--light-color);
-            border-radius: 1rem;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-            padding: 2.5rem 2rem;
-            width: 100%;
-            max-width: 400px;
-            border: 1px solid rgba(62, 76, 73, 0.15);
-        }
+/* =========================
+   FORM CONTAINER
+========================= */
+.form-container {
+    background: var(--light-color);
+    border-radius: 1rem;
+    box-shadow: 0 12px 25px rgba(0,0,0,0.1);
+    padding: 2.5rem 2rem;
+    width: 100%;
+    max-width: 400px;
+    border: 1px solid rgba(62, 76, 73, 0.15);
+    opacity: 0;
+    transform: translateY(40px);
+    animation: fadeInUp 0.8s forwards;
+}
 
-        .form-title {
-            color: var(--accent-color);
-            font-weight: 700;
-            font-size: 1.8rem;
-            text-align: center;
-            margin-bottom: 1.5rem;
-        }
+@keyframes fadeInUp {
+    to { opacity: 1; transform: translateY(0); }
+}
 
-        /* =========================
-           INPUTS
-        ========================= */
-        .input-group {
-            position: relative;
-            margin-bottom: 1.3rem;
-        }
+.form-title {
+    color: var(--accent-color);
+    font-weight: 700;
+    font-size: 1.9rem;
+    text-align: center;
+    margin-bottom: 1.8rem;
+    opacity: 0;
+    transform: translateY(-20px);
+    animation: titleFade 0.8s forwards 0.3s;
+}
 
-        .input-group input {
-            width: 100%;
-            height: 45px;
-            border-radius: 0.6rem;
-            border: 1px solid rgba(62, 76, 73, 0.3);
-            padding: 0.375rem 2.5rem 0.375rem 0.75rem;
-            background: var(--light-color);
-            transition: 0.3s;
-            color: var(--main-color);
-        }
+@keyframes titleFade {
+    to { opacity: 1; transform: translateY(0); }
+}
 
-        .input-group input:focus {
-            border-color: var(--accent-color);
-            box-shadow: 0 0 8px rgba(200,160,72,0.3);
-            outline: none;
-        }
+/* =========================
+   INPUTS
+========================= */
+.input-group {
+    position: relative;
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    transform: translateX(-30px);
+    animation: inputFade 0.6s forwards;
+}
 
-        .input-group i {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--main-color);
-            font-size: 1.2rem;
-        }
+.input-group:nth-child(1) { animation-delay: 0.5s; }
+.input-group:nth-child(2) { animation-delay: 0.6s; }
 
-        .input-group .fa-envelope { right: 0.8rem; }
-        .input-group .fa-lock { right: 2.4rem; }
-        .toggle-password { right: 0.8rem; cursor: pointer; }
+@keyframes inputFade {
+    to { opacity: 1; transform: translateX(0); }
+}
 
-        /* =========================
-           BUTTON
-        ========================= */
-        .btn-submit {
-            background-color: var(--accent-color);
-            color: var(--light-color);
-            border: none;
-            border-radius: 0.6rem;
-            height: 45px;
-            width: 100%;
-            font-weight: 700;
-            transition: background 0.3s ease, transform 0.2s ease;
-        }
+.input-group input {
+    width: 100%;
+    height: 45px;
+    border-radius: 0.6rem;
+    border: 1px solid rgba(62, 76, 73, 0.3);
+    padding: 0.375rem 2.8rem 0.375rem 2.5rem; /* padding-left pour l'icône */
+    background: var(--light-color);
+    transition: 0.3s;
+    color: var(--main-color);
+}
 
-        .btn-submit:hover {
-            background-color: #A88433;
-            transform: translateY(-2px);
-        }
+.input-group input:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 10px rgba(200,160,72,0.35);
+    outline: none;
+    transform: scale(1.02);
+}
 
-        /* =========================
-           LINKS & ALERTS
-        ========================= */
-        .register-link {
-            text-align: center;
-            margin-top: 1rem;
-        }
+/* Icônes à gauche */
+.input-group i.fa-envelope,
+.input-group i.fa-lock {
+    position: absolute;
+    top: 50%;
+    left: 0.75rem;
+    transform: translateY(-50%);
+    font-size: 1.2rem;
+    color: var(--main-color);
+}
 
-        .register-link a {
-            color: var(--accent-color);
-            font-weight: 600;
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
+/* Icône “oeil” pour mot de passe */
+.toggle-password {
+    position: absolute;
+    top: 50%;
+    right: 0.75rem;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 1.1rem;
+    color: var(--main-color);
+}
 
-        .register-link a:hover {
-            color: var(--main-color);
-        }
+/* =========================
+   BUTTON
+========================= */
+.btn-submit {
+    background-color: var(--accent-color);
+    color: var(--light-color);
+    border: none;
+    border-radius: 0.6rem;
+    height: 45px;
+    width: 100%;
+    font-weight: 700;
+    transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: buttonFade 0.6s forwards 0.8s;
+}
 
-        .alert {
-            border-radius: 0.6rem;
-            font-size: 0.9rem;
-            text-align: center;
-        }
-    </style>
+.btn-submit:hover {
+    background-color: #A88433;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(200,160,72,0.3);
+}
+
+@keyframes buttonFade {
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ALERTS */
+.alert {
+    border-radius: 0.6rem;
+    font-size: 0.9rem;
+    text-align: center;
+    margin-bottom: 1rem;
+    padding: 0.65rem 0.8rem;
+}
+
+/* REGISTER LINK */
+.register-link {
+    text-align: center;
+    margin-top: 1.2rem;
+    font-size: 0.9rem;
+}
+.register-link a {
+    color: var(--accent-color);
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+.register-link a:hover {
+    color: var(--main-color);
+}
+
+/* RESPONSIVE */
+@media (max-width: 576px) {
+    .form-container { padding: 2rem 1rem; }
+    .form-title { font-size: 1.6rem; }
+}
+</style>
 </head>
 <body>
 
@@ -140,25 +189,25 @@
 
     {% if messages %}
         {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} py-2 px-3">{{ message }}</div>
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
         {% endfor %}
     {% endif %}
 
     <form method="POST" novalidate>
         {% csrf_token %}
         <div class="input-group">
-            <input type="email" name="email" placeholder="Adresse e-mail" required>
             <i class="fa fa-envelope"></i>
+            <input type="email" name="email" placeholder="Adresse e-mail" required>
         </div>
         <div class="input-group">
-            <input type="password" id="password" name="password" placeholder="Mot de passe" required>
             <i class="fa fa-lock"></i>
+            <input type="password" id="password" name="password" placeholder="Mot de passe" required>
             <i class="fa fa-eye-slash toggle-password" onclick="togglePassword('password', this)"></i>
         </div>
         <button type="submit" class="btn-submit">Se connecter</button>
     </form>
 
-    <p class="register-link small mt-3">
+    <p class="register-link">
         Pas de compte ? <a href="{% url 'register' %}">Inscrivez-vous ici</a>
     </p>
 </div>

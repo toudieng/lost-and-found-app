@@ -6,69 +6,44 @@
 {% block extra_css %}
 <style>
 :root {
-  --main-color: #3E4C49;       /* vert-gris profond */
-  --accent-color: #C8A048;     /* doré */
-  --light-color: #F8F9FA;      /* blanc cassé plus doux */
-  --card-bg: #FFFFFF;           /* fond cartes et steps */
-  --partners-bg: #F0F0F0;      /* fond section partenaires */
-  --shadow: 0 6px 18px rgba(0,0,0,0.15);
-  --radius: 1rem;
+  --main-color: #3E4C49;
+  --accent-color: #C8A048;
+  --accent-color-dark: #b88f38;
+  --light-color: #F9FAFB;
+  --hero-bg: #F4F5F7;
+  --card-bg: #FFFFFF;
+  --partners-bg: #FAFAFA;
+  --cta-bg: #F4F5F7;
+  --shadow: 0 8px 24px rgba(0,0,0,0.12);
+  --radius: 1.2rem;
 }
 
 /* ======================
-   Structure générale
+   Fond et structure
 ====================== */
-body {
-  font-family: 'Poppins', sans-serif;
-  background-color: var(--light-color);
-  color: var(--main-color);
-  scroll-behavior: smooth;
-}
-.fade-up { opacity: 0; transform: translateY(40px); transition: all 0.8s ease-out; }
+body { font-family: 'Poppins', sans-serif; scroll-behavior: smooth; background-color: var(--light-color); color: var(--main-color); }
+
+section { padding: 5rem 1rem; border-radius: var(--radius); margin-bottom: 3rem; }
+
+/* ======================
+   Fade-up animation
+====================== */
+.fade-up { opacity: 0; transform: translateY(40px); transition: all 0.8s cubic-bezier(0.5,0,0,1); }
 .fade-up.show { opacity: 1; transform: translateY(0); }
 
 /* ======================
    HERO INTRO
 ====================== */
-.hero-intro {
-  background-color: var(--main-color);
-  color: var(--light-color);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding: 4rem 1rem;
-  text-align: center;
-}
-.hero-intro h1 {
-  color: var(--accent-color);
-  font-weight: 700;
-  font-size: 2.2rem;
-}
-.hero-intro p {
-  font-size: 1.1rem;
-  line-height: 1.6;
-}
+.hero-intro { background-color: var(--hero-bg); text-align: center; padding: 6rem 1rem; border-radius: var(--radius); box-shadow: var(--shadow); }
+.hero-intro h1 { font-size: 2.8rem; font-weight: 700; color: var(--accent-color); margin-bottom: 1rem; }
+.hero-intro p { font-size: 1.2rem; max-width: 700px; margin: auto; line-height: 1.7; }
 
 /* ======================
-   BOUTONS D’ACTION
+   HERO ACTIONS
 ====================== */
-.hero-actions {
-  background-color: var(--light-color);
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 1rem;
-  padding: 3rem 1rem;
-}
-.btn-action {
-  padding: 0.75rem 1.6rem;
-  border-radius: 0.6rem;
-  font-weight: 600;
-  text-decoration: none;
-  border: none;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s ease;
-  display: inline-block;
-}
-.btn-action:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+.hero-actions { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin-top: 2rem; background-color: var(--light-color); border-radius: var(--radius); box-shadow: var(--shadow); padding: 2.5rem 1rem; }
+.btn-action { font-weight: 600; padding: 0.85rem 2rem; border-radius: 0.7rem; border: none; text-decoration: none; cursor: pointer; transition: all 0.3s ease; }
+.btn-action:hover { transform: translateY(-4px); box-shadow: 0 10px 20px rgba(0,0,0,0.15); }
 .btn-lost { background-color: var(--accent-color); color: var(--light-color); }
 .btn-found { background-color: var(--main-color); color: var(--light-color); }
 .btn-dashboard { background-color: #2E3836; color: var(--accent-color); }
@@ -76,103 +51,44 @@ body {
 /* ======================
    CAROUSEL
 ====================== */
-.carousel-inner img {
-  width: 100%;
-  max-height: 450px;
-  object-fit: cover;
-  border-radius: var(--radius);
-  filter: brightness(0.95);
-  transition: transform 0.4s ease;
-}
-.carousel-inner img:hover { transform: scale(1.02); }
-.carousel-caption {
-  background: rgba(62,76,73,0.8);
-  border-radius: 0.6rem;
-  padding: 1rem 1.2rem;
-}
-.carousel-caption h5 { color: var(--accent-color); }
+.carousel-inner img { width: 100%; max-height: 450px; object-fit: cover; border-radius: var(--radius); filter: brightness(0.95); transition: transform 0.4s ease, filter 0.4s ease; }
+.carousel-inner img:hover { transform: scale(1.03); filter: brightness(1); }
+.carousel-caption { background: rgba(62,76,73,0.85); border-radius: 0.6rem; padding: 1rem 1.2rem; }
+.carousel-caption h5 { color: var(--accent-color); font-weight: 700; }
 
 /* ======================
    FEATURES / AVANTAGES
 ====================== */
-.features-section .card {
-  background-color: var(--card-bg);
-  border: none;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-.features-section .card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-}
-.features-section i { color: var(--accent-color); font-size: 2.5rem; margin-bottom: 0.8rem; }
+.features-section .card { padding: 2rem; transition: all 0.3s ease; border-radius: var(--radius); box-shadow: var(--shadow); border: none; }
+.features-section .card:hover { transform: translateY(-8px); box-shadow: 0 12px 28px rgba(0,0,0,0.18); }
+.features-section i { color: var(--accent-color); font-size: 2.8rem; margin-bottom: 0.8rem; }
 
 /* ======================
    RESTITUTION / TIMELINE
 ====================== */
-#restitution .step {
-  background-color: var(--card-bg);
-  border-left: 4px solid var(--accent-color);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding: 1rem 1.2rem;
-  margin-bottom: 1rem;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-#restitution .step:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.15); }
+#restitution .step { background: var(--card-bg); padding: 1.5rem; border-left: 5px solid var(--accent-color); margin-bottom: 1rem; border-radius: var(--radius); box-shadow: var(--shadow); transition: all 0.3s ease; }
+#restitution .step:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.12); }
 
 /* ======================
    PARTENAIRES
 ====================== */
-.partners {
-  background-color: var(--partners-bg);
-  padding: 3rem 0;
-}
-.partners img {
-  filter: grayscale(30%);
-  opacity: 0.9;
-  transition: transform 0.3s ease, opacity 0.3s ease;
-}
-.partners img:hover { transform: scale(1.05); opacity: 1; }
+.partners { padding: 3rem 0; border-radius: var(--radius); box-shadow: var(--shadow); }
+.partners img { filter: grayscale(20%); opacity: 0.9; transition: all 0.3s ease; cursor: pointer; }
+.partners img:hover { transform: scale(1.1); filter: grayscale(0); }
 
 /* ======================
    CTA FINALE
 ====================== */
-.cta {
-  padding: 4rem 1rem;
-  text-align: center;
-  background-color: var(--main-color);
-  color: var(--light-color);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-}
-.btn-cta {
-  background-color: var(--accent-color);
-  color: var(--light-color);
-  padding: 0.9rem 2rem;
-  border-radius: 0.6rem;
-  border: none;
-  font-weight: 700;
-  transition: transform 0.2s ease, background 0.3s ease;
-}
-.btn-cta:hover { transform: scale(1.05); background-color: #A88433; }
+.cta { background: var(--cta-bg); text-align: center; padding: 6rem 1rem; border-radius: var(--radius); box-shadow: var(--shadow); }
+.btn-cta { padding: 1rem 2.5rem; font-weight: 700; border-radius: 0.7rem; border: none; cursor: pointer; transition: all 0.3s ease; background-color: var(--accent-color); color: var(--light-color); }
+.btn-cta:hover { transform: scale(1.08); background-color: var(--accent-color-dark); }
 
 /* ======================
    Responsive
 ====================== */
-@media (max-width: 992px) {
-  .carousel-inner img { max-height: 380px; }
-}
-@media (max-width: 768px) {
-  .carousel-inner img { max-height: 320px; }
-  .carousel-caption { font-size: 0.95rem; }
-  .hero-intro h1 { font-size: 1.8rem; }
-}
-@media (max-width: 576px) {
-  .hero-intro h1 { font-size: 1.6rem; }
-  .features-section i { font-size: 2rem; }
-}
+@media(max-width: 992px){ .carousel-inner img{ max-height: 380px; } }
+@media(max-width: 768px){ .carousel-inner img{ max-height: 320px; } .carousel-caption{ font-size: 0.95rem; } .hero-intro h1{ font-size:2rem; } }
+@media(max-width: 576px){ .hero-intro h1{ font-size:1.6rem; } .features-section i{ font-size:2rem; } }
 </style>
 {% endblock %}
 
@@ -262,8 +178,7 @@ body {
     <h2 class="text-center fw-bold mb-5" style="color: var(--accent-color);">Comment se passe la restitution</h2>
     <div class="row align-items-center g-4">
       <div class="col-md-6 d-flex flex-wrap justify-content-center gap-3">
-        <img src="{% static 'frontend/images/preuve1.png' %}" class="img-fluid rounded shadow-sm" alt="Preuve 1" style="max-width: 70%;">
-        <img src="{% static 'frontend/images/preuve2.png' %}" class="img-fluid rounded shadow-sm" alt="Preuve 2" style="max-width: 70%;">
+        <img src="{% static 'frontend/images/preuve.png' %}" class="img-fluid rounded shadow-sm" alt="Preuve 1" style="max-width: 70%;">
       </div>
       <div class="col-md-6">
         <div class="timeline">
@@ -284,19 +199,12 @@ body {
   <div class="container">
     <h2 class="fw-bold mb-4" style="color: var(--accent-color);">Nos Partenaires</h2>
     <div class="row justify-content-center align-items-center g-4">
-      <div class="col-4 col-md-2">
-        <img src="{% static 'frontend/img/partenaire1.png' %}" class="img-fluid" alt="Partenaire 1">
-      </div>
-      <div class="col-4 col-md-2">
-        <img src="{% static 'frontend/img/partenaire2.jpg' %}" class="img-fluid" alt="Partenaire 2">
-      </div>
-      <div class="col-4 col-md-2">
-        <img src="{% static 'frontend/img/partenaire3.jpg' %}" class="img-fluid" alt="Partenaire 3">
-      </div>
+      <div class="col-4 col-md-2"><img src="{% static 'frontend/img/partenaire1.png' %}" class="img-fluid" alt="Partenaire 1"></div>
+      <div class="col-4 col-md-2"><img src="{% static 'frontend/img/partenaire2.jpg' %}" class="img-fluid" alt="Partenaire 2"></div>
+      <div class="col-4 col-md-2"><img src="{% static 'frontend/img/partenaire3.jpg' %}" class="img-fluid" alt="Partenaire 3"></div>
     </div>
   </div>
 </section>
-
 
 <!-- CTA -->
 <section class="cta fade-up">

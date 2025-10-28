@@ -1,51 +1,106 @@
-<footer class="footer-custom mt-auto py-5" style="background: var(--main-color); color: var(--light-color);">
-  <div class="container text-center">
-    <div class="row gy-3 align-items-center">
-      
-      <!-- Liens -->
+<footer class="footer-custom mt-auto py-5">
+  <div class="container">
+    <div class="row gy-4 align-items-center text-center text-md-start">
+
+      <!-- Logo & Infos -->
       <div class="col-md-4">
-        <ul class="list-unstyled mb-0 d-flex flex-wrap justify-content-center gap-3">
+        <h5 class="mb-3">Lost & Found</h5>
+        <p class="small mb-0">Un projet citoyen pour faciliter la restitution des objets perdus.</p>
+        <p class="small mt-1">&copy; 2025 <strong>Lost & Found</strong></p>
+      </div>
+
+      <!-- Liens rapides -->
+      <div class="col-md-4">
+        <h6 class="mb-3">Liens utiles</h6>
+        <ul class="list-unstyled d-flex flex-wrap justify-content-center justify-content-md-start gap-3 mb-0">
           <li><a href="#faq" class="footer-link">FAQ & Aide</a></li>
           <li><a href="#confidentialite" class="footer-link">Confidentialité</a></li>
-          <li><a href="#conditions" class="footer-link">Conditions d’utilisation</a></li>
+          <li><a href="#conditions" class="footer-link">Conditions</a></li>
           <li><a href="#mentions" class="footer-link">Mentions légales</a></li>
         </ul>
       </div>
 
       <!-- Réseaux sociaux -->
       <div class="col-md-4">
-        <div class="d-flex justify-content-center gap-4">
-          <a href="#" class="social-link"><i class="bi bi-facebook"></i></a>
-          <a href="#" class="social-link"><i class="bi bi-twitter-x"></i></a>
-          <a href="#" class="social-link"><i class="bi bi-linkedin"></i></a>
-          <a href="#" class="social-link"><i class="bi bi-instagram"></i></a>
+        <h6 class="mb-3">Suivez-nous</h6>
+        <div class="d-flex justify-content-center justify-content-md-start gap-3">
+          <a href="https://www.facebook.com/" target="_blank" class="social-link"><i class="bi bi-facebook fs-4"></i></a>
+          <a href="https://twitter.com/" target="_blank" class="social-link"><i class="bi bi-twitter fs-4"></i></a>
+          <a href="https://www.linkedin.com/" target="_blank" class="social-link"><i class="bi bi-linkedin fs-4"></i></a>
+          <a href="https://www.instagram.com/" target="_blank" class="social-link"><i class="bi bi-instagram fs-4"></i></a>
         </div>
       </div>
 
-      <!-- Infos -->
-      <div class="col-md-4">
-        <p class="mb-1 small">&copy; 2025 <strong style="color: var(--accent-color);">Lost & Found</strong></p>
-        <p class="small text-light">Un projet citoyen pour faciliter la restitution des objets perdus</p>
-      </div>
     </div>
   </div>
 </footer>
 
 <style>
+.footer-custom {
+  background: linear-gradient(135deg, #3E4C49, #2E3836);
+  color: #F8F9FA;
+  box-shadow: 0 -6px 20px rgba(0,0,0,0.3);
+  border-top-left-radius: 1.5rem;
+  border-top-right-radius: 1.5rem;
+  padding: 3rem 1rem;
+  transition: all 0.3s ease;
+}
+.footer-custom h5, .footer-custom h6 {
+  color: #C8A048;
+  font-weight: 700;
+}
 .footer-link {
-  color: var(--accent-color);
+  color: #C8A048;
   text-decoration: none;
-  transition: color 0.3s ease;
-}
-.footer-link:hover {
-  color: var(--light-color);
-}
-.social-link {
-  color: var(--light-color);
+  font-weight: 500;
+  position: relative;
   transition: color 0.3s, transform 0.3s;
 }
+.footer-link::after {
+  content: '';
+  display: block;
+  width: 0;
+  height: 2px;
+  background: #F8F9FA;
+  transition: width 0.3s;
+  margin-top: 2px;
+}
+.footer-link:hover {
+  color: #F8F9FA;
+  transform: translateY(-2px);
+}
+.footer-link:hover::after {
+  width: 100%;
+}
+
+.social-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #F8F9FA;
+  background: rgba(255,255,255,0.1);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  transition: all 0.3s;
+}
+.social-link i {
+  transition: transform 0.3s;
+}
 .social-link:hover {
-  color: var(--accent-color);
-  transform: scale(1.2);
+  background: #C8A048;
+  color: #3E4C49;
+  transform: translateY(-3px) scale(1.2) rotate(-5deg);
+}
+.social-link:hover i {
+  transform: rotate(10deg);
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+  .footer-custom .col-md-4 {
+    text-align: center !important;
+  }
+  .social-link { margin: 0 5px; }
 }
 </style>

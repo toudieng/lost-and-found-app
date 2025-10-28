@@ -3,119 +3,98 @@
 {% block extra_css %}
 <style>
 :root {
-    --main-color: #3E4C49;       /* vert-gris foncé */
-    --accent-color: #C8A048;     /* doré */
-    --light-color: #FFFFFF;       /* blanc */
-    --main-color-light: rgba(62,76,73,0.1); /* pour alertes et bordures */
-    --accent-color-dark: #b88f38; /* doré foncé pour hover */
+    --main-color: #3E4C49;       
+    --accent-color: #C8A048;     
+    --accent-color-dark: #b88f38;    
+    --light-color: #FFFFFF;           
+    --border-color: #CED4DA;          
+    --shadow-color: rgba(0,0,0,0.1);  
+    --main-color-light: rgba(62,76,73,0.1);
 }
+
+body { background: #f7f8fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
 .form-container {
     background: var(--light-color);
     padding: 2rem;
     border-radius: 1rem;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    box-shadow: 0 8px 25px var(--shadow-color);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
-.form-container:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 25px rgba(0,0,0,0.15);
-}
+.form-container:hover { transform: translateY(-5px); box-shadow: 0 12px 30px rgba(0,0,0,0.15); }
 
 .form-title {
     color: var(--accent-color);
     font-weight: 700;
-    font-size: 1.6rem;
+    font-size: 1.75rem;
     text-align: center;
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
 }
 
 input, select, textarea {
     width: 100%;
-    height: 42px;
-    padding: 0.5rem 0.75rem;
-    border: 1px solid #ced4da;
+    padding: 0.55rem 0.75rem;
+    border: 1px solid var(--border-color);
     border-radius: 0.5rem;
     transition: border-color 0.3s, box-shadow 0.3s;
+    font-size: 0.95rem;
 }
-textarea { height: auto; }
+textarea { min-height: 100px; resize: vertical; }
 
-input:focus, select:focus, textarea:focus {
-    border-color: var(--accent-color);
-    box-shadow: 0 0 6px rgba(200,160,72,0.4);
-    outline: none;
-}
+input:focus, select:focus, textarea:focus { border-color: var(--accent-color); box-shadow: 0 0 8px rgba(200,160,72,0.4); outline: none; }
 
-.form-check-input:checked {
-    background-color: var(--accent-color);
-    border-color: var(--accent-color);
-}
+.form-check-input:checked { background-color: var(--accent-color); border-color: var(--accent-color); }
 
-.form-check-label {
-    color: var(--main-color);
-    font-weight: 500;
+.form-check-label { color: var(--main-color); font-weight: 500; }
+
+.btn-submit, .btn-back {
+    position: relative;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 700;
+    padding: 0.65rem 1.3rem;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    width: 48%;
 }
 
 .btn-submit {
-    position: relative;
     background-color: var(--accent-color);
-    border: none;
     color: var(--main-color);
-    font-weight: 700;
-    transition: all 0.3s ease-in-out;
-    border-radius: 0.5rem;
     overflow: hidden;
 }
 .btn-submit::before {
     content: "";
     position: absolute;
     top: 0;
-    left: -75%;
-    width: 50%;
+    left: -80%;
+    width: 60%;
     height: 100%;
-    background: linear-gradient(
-        120deg,
-        rgba(255,255,255,0.2) 0%,
-        rgba(255,255,255,0.5) 50%,
-        rgba(255,255,255,0.2) 100%
-    );
+    background: linear-gradient(120deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0.2) 100%);
     transform: skewX(-20deg);
 }
-.btn-submit:hover::before {
-    left: 130%;
-    transition: left 0.8s ease-in-out;
-}
-.btn-submit:hover {
-    background-color: var(--accent-color-dark);
-    color: var(--light-color);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-}
+.btn-submit:hover::before { left: 130%; transition: left 0.8s ease-in-out; }
+.btn-submit:hover { background-color: var(--accent-color-dark); color: var(--light-color); transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.2); }
 
-.text-error {
-    color: #dc3545;
-    font-size: 0.85rem;
+.btn-back {
+    background-color: #6c757d;
+    color: #fff;
 }
+.btn-back:hover { background-color: #5a6268; }
 
-.alert {
-    background-color: var(--main-color-light);
-    color: var(--main-color);
-    border: 1px solid var(--accent-color);
-    border-radius: 0.5rem;
-}
+.text-error { color: #dc3545; font-size: 0.85rem; margin-top: 0.25rem; }
 
-@media (max-width: 576px) {
-    .form-container { padding: 1.5rem; }
-    .form-title { font-size: 1.3rem; }
-}
+.alert { background-color: rgba(62,76,73,0.08); color: var(--main-color); border: 1px solid var(--accent-color); border-radius: 0.5rem; padding: 0.5rem 0.75rem; font-size: 0.85rem; margin-bottom: 1rem; }
 
-#preview-image {
-    display: none;
-    max-height: 200px;
-    margin-top: 0.5rem;
-    border-radius: 0.5rem;
-    border: 2px solid var(--main-color-light);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+#preview-image { max-height: 200px; width: 100%; margin-top: 0.5rem; border-radius: 0.5rem; border: 2px solid var(--main-color-light); box-shadow: 0 4px 12px rgba(0,0,0,0.1); object-fit: cover; transition: opacity 0.3s ease; }
+
+.btn-group { display: flex; justify-content: space-between; gap: 4%; }
+
+@media (max-width: 576px) { 
+    .form-container { padding: 1.5rem; } 
+    .form-title { font-size: 1.5rem; } 
+    .btn-submit, .btn-back { width: 100%; } 
+    .btn-group { flex-direction: column; gap: 0.8rem; }
 }
 </style>
 {% endblock %}
@@ -128,7 +107,7 @@ input:focus, select:focus, textarea:focus {
 
             {% if messages %}
                 {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }} py-2 px-3 small">{{ message }}</div>
+                    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
                 {% endfor %}
             {% endif %}
 
@@ -170,9 +149,7 @@ input:focus, select:focus, textarea:focus {
                     {% for radio in form.etat_initial %}
                         <div class="form-check form-check-inline">
                             {{ radio.tag }}
-                            <label class="form-check-label" for="{{ radio.id_for_label }}">
-                                {{ radio.choice_label }}
-                            </label>
+                            <label class="form-check-label" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
                         </div>
                     {% endfor %}
                     {% for error in form.etat_initial.errors %}
@@ -180,7 +157,9 @@ input:focus, select:focus, textarea:focus {
                     {% endfor %}
                 </div>
 
-                <div class="d-grid">
+                <!-- Groupe de boutons côte à côte -->
+                <div class="btn-group">
+                    <a href="{% url 'home' %}" class="btn btn-back fw-bold">🔙 Retour</a>
                     <button type="submit" class="btn btn-submit fw-bold">Soumettre</button>
                 </div>
             </form>
@@ -200,10 +179,12 @@ document.addEventListener("DOMContentLoaded", function() {
             reader.onload = e => {
                 preview.src = e.target.result;
                 preview.style.display = "block";
+                preview.style.opacity = "1";
             }
             reader.readAsDataURL(file);
         } else {
-            preview.style.display = "none";
+            preview.style.opacity = "0";
+            setTimeout(() => preview.style.display = "none", 300);
         }
     });
 });
