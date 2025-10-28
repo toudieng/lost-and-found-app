@@ -1,182 +1,171 @@
 {% extends "frontend/admin/base_admin.html" %}
+{% load static %}
 
 {% block title %}Créer un policier{% endblock %}
-
-{% block content %}
-<div class="row justify-content-center mt-5">
-    <div class="col-md-6 col-lg-5 col-xl-4">
-        <div class="form-container">
-            <h4 class="form-title">👮 Créer un policier</h4>
-
-            {% if form.errors %}
-                <div class="alert alert-danger py-2 px-3 small">
-                    Veuillez corriger les erreurs ci-dessous.
-                </div>
-            {% endif %}
-
-            <form method="POST" novalidate>
-                {% csrf_token %}
-                {% for field in form %}
-                    <div class="mb-3 position-relative input-icon-wrapper">
-                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                        {{ field }}
-                        {% for error in field.errors %}
-                            <div class="text-error">{{ error }}</div>
-                        {% endfor %}
-                    </div>
-                {% endfor %}
-
-                <button type="submit" class="btn btn-submit w-100"> Créer</button>
-            </form>
-        </div>
-    </div>
-</div>
-{% endblock %}
-
 
 {% block extra_css %}
 <style>
 :root {
-    --main-color: #6c1e3d;      /* Couleur sombre principale */
-    --accent-color: #ffc107;    /* Couleur dorée pour détails et focus */
-    --light-color: #f8f9fa;     /* Fond clair */
+    --main-color: #3E4C49;
+    --accent-color: #C8A048;
+    --light-color: #FFFFFF;
 }
 
-/* ======================
-   CONTENEUR FORMULAIRE
-====================== */
+body {
+    font-family: 'Poppins', sans-serif;
+    color: var(--main-color);
+    background: linear-gradient(135deg, var(--light-color), #f3f3f3);
+}
+
 .form-container {
     background: var(--light-color);
-    padding: 2.5rem 2rem;
     border-radius: 1rem;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-    transition: transform 0.35s ease, box-shadow 0.35s ease;
-}
-.form-container:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+    box-shadow: 0 12px 25px rgba(0,0,0,0.1);
+    padding: 2.5rem 2rem;
+    max-width: 500px;
+    margin: 3rem auto;
 }
 
-/* ======================
-   TITRE FORMULAIRE
-====================== */
 .form-title {
-    color: var(--main-color);
+    color: var(--accent-color);
     font-weight: 700;
-    font-size: 1.6rem;
+    font-size: 2rem;
     text-align: center;
-    margin-bottom: 2rem;
-    position: relative;
-}
-.form-title::after {
-    content: '';
-    display: block;
-    width: 60px;
-    height: 3px;
-    background: var(--accent-color);
-    margin: 0.5rem auto 0;
-    border-radius: 2px;
+    margin-bottom: 1.8rem;
 }
 
-/* ======================
-   CHAMPS FORMULAIRE AVEC ICÔNES
-====================== */
-.input-icon-wrapper {
+.input-group {
     position: relative;
+    margin-bottom: 1.5rem;
 }
-.input-icon-wrapper input,
-.input-icon-wrapper select,
-.input-icon-wrapper textarea {
+
+.input-group input,
+.input-group select {
     width: 100%;
     height: 45px;
-    font-size: 0.95rem;
-    padding: 0.5rem 0.75rem 0.5rem 2.5rem; /* espace pour l’icône */
-    border: 1.5px solid var(--main-color);
     border-radius: 0.6rem;
-    transition: all 0.35s ease;
-    background: #fff;
-    box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
-}
-.input-icon-wrapper:hover input,
-.input-icon-wrapper:hover select,
-.input-icon-wrapper:hover textarea {
-    border-color: var(--accent-color);
-}
-.input-icon-wrapper input:focus,
-.input-icon-wrapper select:focus,
-.input-icon-wrapper textarea:focus {
-    border-color: var(--accent-color);
-    box-shadow: 0 0 8px rgba(255,193,7,0.4);
-    outline: none;
+    border: 1px solid rgba(62,76,73,0.3);
+    padding-left: 2.5rem;
+    background: var(--light-color);
+    color: var(--main-color);
+    transition: 0.3s;
 }
 
-/* icônes à gauche */
-.input-icon-wrapper::before {
-    content: "🔑"; /* icône par défaut, tu peux ajuster selon le champ */
+.input-group input:focus,
+.input-group select:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 10px rgba(200,160,72,0.35);
+    outline: none;
+    transform: scale(1.02);
+}
+
+.input-group i {
     position: absolute;
     top: 50%;
-    left: 12px;
+    left: 0.75rem;
     transform: translateY(-50%);
-    font-size: 1rem;
-    color: var(--main-color);
-    pointer-events: none;
-}
-
-/* ======================
-   LABEL
-====================== */
-.form-label {
-    font-weight: 600;
-    margin-bottom: 0.4rem;
-    display: block;
+    font-size: 1.2rem;
     color: var(--main-color);
 }
 
-/* ======================
-   BOUTON SUBMIT
-====================== */
 .btn-submit {
-    background-color: var(--main-color);
-    border-color: var(--main-color);
+    background-color: var(--accent-color);
     color: var(--light-color);
+    border: none;
+    border-radius: 0.6rem;
+    height: 45px;
+    width: 100%;
     font-weight: 700;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.btn-submit:hover {
+    background-color: #A88433;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(200,160,72,0.3);
+}
+
+.btn-back {
+    background-color: #6c757d;
+    color: #fff;
+    font-weight: 600;
     padding: 0.55rem 1rem;
     border-radius: 0.6rem;
-    font-size: 1rem;
-    transition: all 0.35s ease;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-}
-.btn-submit:hover {
-    background-color: #4d1530;
-    transform: translateY(-2px) scale(1.02);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    width: 100%;
+    margin-top: 10px;
 }
 
-/* ======================
-   MESSAGES D’ERREUR
-====================== */
-.text-error {
-    color: #dc3545;
-    font-size: 0.85rem;
-    margin-top: 0.25rem;
-    background-color: #ffe5e5;
-    padding: 2px 6px;
-    border-radius: 4px;
+.btn-back:hover {
+    background-color: #5a6268;
 }
 
-/* ======================
-   RESPONSIVE
-====================== */
-@media (max-width:576px) {
-    .form-container {
-        padding: 2rem 1.5rem;
-    }
-    .form-title {
-        font-size: 1.4rem;
-    }
-    .btn-submit {
-        font-size: 0.95rem;
-    }
+.alert {
+    border-radius: 0.6rem;
+    font-size: 0.9rem;
+    text-align: center;
+    margin-bottom: 1rem;
+    padding: 0.65rem 0.8rem;
 }
 </style>
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h4 class="form-title">👮 Créer un policier</h4>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="POST" novalidate>
+        {% csrf_token %}
+
+        <div class="input-group">
+            <i class="fa fa-envelope"></i>
+            {{ form.email }}
+            {% for error in form.email.errors %}
+                <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="input-group">
+            <i class="fa fa-user"></i>
+            {{ form.first_name }}
+            {% for error in form.first_name.errors %}
+                <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="input-group">
+            <i class="fa fa-user"></i>
+            {{ form.last_name }}
+            {% for error in form.last_name.errors %}
+                <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="input-group">
+            <i class="fa fa-phone"></i>
+            {{ form.telephone }}
+            {% for error in form.telephone.errors %}
+                <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="input-group">
+            <i class="fa fa-building"></i>
+            {{ form.commissariat }}
+            {% for error in form.commissariat.errors %}
+                <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <button type="submit" class="btn-submit">Créer</button>
+        <a href="{% url 'gerer_policiers' %}" class="btn-back">🔙 Retour</a>
+    </form>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
 {% endblock %}

@@ -1069,25 +1069,51 @@ def ajouter_commissariat(request):
         return redirect('gerer_commissariats')
     return render(request, 'frontend/admin/ajouter_commissariat.html', {'form': form})
 
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.core.mail import send_mail
+from django.conf import settings
+from django.utils.crypto import get_random_string
 
-@admin_required
+
+
+
+
+admin_required
 def creer_policier(request):
+    # Précharger tous les commissariats pour le formulaire
     form = PolicierForm(request.POST or None)
-    if request.method == "POST" and form.is_valid():
-        password = ''.join(random.choices(string.ascii_letters + string.digits, k=10))
-        policier = form.save(commit=False)
-        policier.set_password(password)
-        policier.save()
+    form.fields["commissariat"].queryset = Commissariat.objects.all()
 
-        send_mail(
-            "Création de votre compte Policier",
-            f"Bonjour {policier.first_name},\n\nVotre compte a été créé.\nIdentifiant: {policier.username}\nMot de passe: {password}",
-            settings.DEFAULT_FROM_EMAIL,
-            [policier.email],
-            fail_silently=False,
-        )
-        messages.success(request, "Policier créé et mot de passe envoyé par email ✅")
-        return redirect("creer_policier")
+    if request.method == "POST":
+        if form.is_valid():
+            # Génération d’un mot de passe sécurisé
+            password = get_random_string(10)
+
+            policier = form.save(commit=False)
+            policier.set_password(password)
+            policier.save()
+
+            # Envoi d’un email avec les identifiants
+            send_mail(
+                subject="Création de votre compte Policier",
+                message=(
+                    f"Bonjour {policier.first_name},\n\n"
+                    f"Votre compte a été créé avec succès.\n\n"
+                    f"👤 Identifiant : {policier.username}\n"
+                    f"🔐 Mot de passe : {password}\n\n"
+                    f"Merci de le modifier dès votre première connexion."
+                ),
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[policier.email],
+                fail_silently=False,
+            )
+
+            messages.success(request, "✅ Policier créé et mot de passe envoyé par email.")
+            return redirect("liste_policiers")  # redirige vers la liste après création
+        else:
+            messages.error(request, "⚠️ Veuillez corriger les erreurs dans le formulaire.")
+    
     return render(request, "frontend/admin/creer_policier.html", {"form": form})
 
 

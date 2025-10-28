@@ -1,113 +1,170 @@
 {% extends "frontend/admin/base_admin.html" %}
+{% load static %}
 
 {% block title %}Créer un administrateur{% endblock %}
-
-{% block content %}
-<div class="row justify-content-center mt-5">
-    <div class="col-md-6 col-lg-5 col-xl-4">
-        <div class="form-container">
-            <h4 class="form-title">🛡️ Créer un administrateur</h4>
-
-            {% if form.errors %}
-                <div class="alert alert-danger py-2 px-3 small">
-                    Veuillez corriger les erreurs ci-dessous.
-                </div>
-            {% endif %}
-
-            <form method="POST" novalidate>
-                {% csrf_token %}
-                {% for field in form %}
-                    <div class="mb-3">
-                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                        {{ field }}
-                        {% for error in field.errors %}
-                            <div class="text-error">{{ error }}</div>
-                        {% endfor %}
-                    </div>
-                {% endfor %}
-
-                <button type="submit" class="btn btn-submit w-100">✅ Créer</button>
-            </form>
-        </div>
-    </div>
-</div>
-{% endblock %}
 
 {% block extra_css %}
 <style>
 :root {
-    --main-color: #343a40;   /* Couleur principale (foncé) */
-    --accent-color: #ffc107; /* Couleur accent (doré) */
-    --light-color: #f8f9fa;  /* Fond / clair */
+    --main-color: #3E4C49;
+    --accent-color: #C8A048;
+    --light-color: #FFFFFF;
 }
 
-/* Conteneur du formulaire */
+/* BODY */
+body {
+    background: linear-gradient(135deg, var(--light-color), #f3f3f3);
+    font-family: 'Poppins', sans-serif;
+    color: var(--main-color);
+}
+
+/* FORM CONTAINER */
 .form-container {
     background: var(--light-color);
-    padding: 2rem;
     border-radius: 1rem;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-.form-container:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 25px rgba(0,0,0,0.15);
+    box-shadow: 0 12px 25px rgba(0,0,0,0.1);
+    padding: 2.5rem 2rem;
+    max-width: 500px;
+    margin: 3rem auto;
 }
 
-/* Titre du formulaire */
+/* FORM TITLE */
 .form-title {
-    color: var(--main-color);
+    color: var(--accent-color);
     font-weight: 700;
-    font-size: 1.5rem;
+    font-size: 2rem;
     text-align: center;
+    margin-bottom: 1.8rem;
+}
+
+/* INPUT GROUPS */
+.input-group {
+    position: relative;
     margin-bottom: 1.5rem;
 }
 
-/* Champs du formulaire */
-input, select, textarea {
+.input-group input,
+.input-group select {
     width: 100%;
-    height: 42px;
-    font-size: 0.95rem;
-    padding: 0.375rem 0.75rem;
-    border: 1px solid #ccc;
-    border-radius: 0.5rem;
-    transition: border-color 0.3s, box-shadow 0.3s;
+    height: 45px;
+    border-radius: 0.6rem;
+    border: 1px solid rgba(62,76,73,0.3);
+    padding-left: 2.5rem;
+    background: var(--light-color);
+    color: var(--main-color);
+    transition: 0.3s;
 }
-input:focus, select:focus, textarea:focus {
+
+.input-group input:focus,
+.input-group select:focus {
     border-color: var(--accent-color);
-    box-shadow: 0 0 5px rgba(255,193,7,0.4);
+    box-shadow: 0 0 10px rgba(200,160,72,0.35);
     outline: none;
+    transform: scale(1.02);
 }
 
-.form-label {
-    font-weight: 600;
-    margin-bottom: 0.3rem;
-    display: block;
+/* ICONS */
+.input-group i {
+    position: absolute;
+    top: 50%;
+    left: 0.75rem;
+    transform: translateY(-50%);
+    font-size: 1.2rem;
+    color: var(--main-color);
 }
 
-/* Bouton submit */
+/* BUTTON */
 .btn-submit {
-    background-color: var(--main-color);
-    border-color: var(--main-color);
+    background-color: var(--accent-color);
     color: var(--light-color);
+    border: none;
+    border-radius: 0.6rem;
+    height: 45px;
+    width: 100%;
     font-weight: 700;
-    transition: all 0.3s;
+    transition: background 0.3s ease, transform 0.2s ease;
 }
+
 .btn-submit:hover {
-    background-color: #212529; /* un peu plus foncé */
-    transform: translateY(-1px);
+    background-color: #A88433;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(200,160,72,0.3);
 }
 
-/* Messages d’erreur */
-.text-error {
-    color: #dc3545;
-    font-size: 0.85rem;
+/* ALERTS */
+.alert {
+    border-radius: 0.6rem;
+    font-size: 0.9rem;
+    text-align: center;
+    margin-bottom: 1rem;
+    padding: 0.65rem 0.8rem;
 }
 
-/* Responsive */
-@media (max-width:576px) {
-    .form-container { padding: 1.5rem; }
-    .form-title { font-size: 1.3rem; }
+/* BACK BUTTON */
+.btn-back {
+    background-color: #6c757d;
+    color: #fff;
+    font-weight: 600;
+    padding: 0.55rem 1rem;
+    border-radius: 0.6rem;
+    width: 100%;
+    margin-top: 10px;
+}
+.btn-back:hover {
+    background-color: #5a6268;
 }
 </style>
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h4 class="form-title">🛡️ Créer un administrateur</h4>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="POST" novalidate>
+        {% csrf_token %}
+
+        <div class="input-group">
+            <i class="fa fa-envelope"></i>
+            {{ form.email }}
+            {% for error in form.email.errors %}
+                <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="input-group">
+            <i class="fa fa-user"></i>
+            {{ form.first_name }}
+            {% for error in form.first_name.errors %}
+                <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="input-group">
+            <i class="fa fa-user"></i>
+            {{ form.last_name }}
+            {% for error in form.last_name.errors %}
+                <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="input-group">
+            <i class="fa fa-phone"></i>
+            {{ form.telephone }}
+            {% for error in form.telephone.errors %}
+                <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <button type="submit" class="btn-submit">Créer</button>
+        <a href="{% url 'gerer_utilisateurs' %}" class="btn-back">🔙 Retour</a>
+    </form>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
 {% endblock %}

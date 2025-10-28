@@ -46,17 +46,44 @@ class CommissariatForm(forms.ModelForm):
 # =========================
 # 👮 Formulaire de création de policier
 # =========================
+
+    from django import forms
+from django.utils.crypto import get_random_string
+from django.core.mail import send_mail
+from .models import Utilisateur, Commissariat
+from django.conf import settings
+
 class PolicierForm(forms.ModelForm):
     class Meta:
         model = Utilisateur
         fields = ["email", "first_name", "last_name", "telephone", "commissariat"]
         widgets = {
-            "email": forms.EmailInput(attrs={'class': 'form-control'}),
-            "first_name": forms.TextInput(attrs={'class': 'form-control'}),
-            "last_name": forms.TextInput(attrs={'class': 'form-control'}),
-            "telephone": forms.TextInput(attrs={'class': 'form-control'}),
-            "commissariat": forms.Select(attrs={'class': 'form-control'}),
+            "email": forms.EmailInput(attrs={
+                'class': 'form-control', 
+                'placeholder': 'Adresse e-mail'
+            }),
+            "first_name": forms.TextInput(attrs={
+                'class': 'form-control', 
+                'placeholder': 'Prénom'
+            }),
+            "last_name": forms.TextInput(attrs={
+                'class': 'form-control', 
+                'placeholder': 'Nom'
+            }),
+            "telephone": forms.TextInput(attrs={
+                'class': 'form-control', 
+                'placeholder': 'Téléphone'
+            }),
+            "commissariat": forms.Select(attrs={
+                'class': 'form-control'
+            }),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Charger la liste des commissariats
+        self.fields['commissariat'].queryset = Commissariat.objects.all().order_by('nom')
+        self.fields['commissariat'].empty_label = "Sélectionner un commissariat"
 
     def save(self, commit=True):
         user = super().save(commit=False)
@@ -65,13 +92,21 @@ class PolicierForm(forms.ModelForm):
             user.save()
         return user
 
+
 # =========================
 # 🧑‍💼 Formulaire de création d’administrateur
 # =========================
+
 class AdministrateurCreationForm(forms.ModelForm):
     class Meta:
         model = Utilisateur
         fields = ['email', 'first_name', 'last_name', 'telephone']
+        widgets = {
+            "email": forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email'}),
+            "first_name": forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Prénom'}),
+            "last_name": forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nom'}),
+            "telephone": forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Téléphone'}),
+        }
 
     def save(self, commit=True):
         user = super().save(commit=False)
