@@ -1,4 +1,4 @@
-{% extends "frontend/admin/base_profil.html" %}
+{% extends "frontend/base.html" %}
 {% block title %}Modifier Profil{% endblock %}
 
 {% block content %}
@@ -6,7 +6,7 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
+                <div class="card-header" style="background-color: #3E4C49; color: #C8A048;">
                     <h4 class="mb-0">✏️ Modifier mon profil</h4>
                 </div>
                 <div class="card-body">
@@ -21,10 +21,12 @@
                                 {% endif %}
                             </div>
                         {% endfor %}
-                        <button type="submit" class="btn btn-success">
+                        <button type="submit" style="background-color: #C8A048; color: #3E4C49; border:none;" class="btn">
                             💾 Enregistrer
                         </button>
-                        <a href="{% url 'profil_citoyen' %}" class="btn btn-secondary ms-2">🔙 Annuler</a>
+                        <a href="{% url 'profil_citoyen' %}" style="background-color: #6c757d; color: #fff;" class="btn ms-2">
+                            🔙 Annuler
+                        </a>
                     </form>
                 </div>
             </div>
