@@ -9,94 +9,38 @@
     --main-color: #3E4C49;
     --accent-color: #C8A048;
     --light-color: #FFFFFF;
-    --main-color-light: rgba(62,76,73,0.08);
-    --text-muted: #555;
 }
 
 /* === CARTES === */
 .card.objet-perdu {
-    border-radius: 1rem;
-    border: 1px solid rgba(62, 76, 73, 0.2);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    border-radius:1rem;
+    border:1px solid rgba(62,76,73,0.2);
+    box-shadow:0 4px 15px rgba(0,0,0,0.05);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
-.card.objet-perdu:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-}
-.card-body { padding: 1rem; background: var(--light-color); }
-.card-title { color: var(--main-color); font-weight: bold; }
+.card.objet-perdu:hover { transform: translateY(-4px); box-shadow:0 10px 25px rgba(0,0,0,0.15); }
+.card-body { padding:1rem; background: var(--light-color); }
+.card-title { color: var(--main-color); font-weight:bold; }
 
 /* === BADGES === */
-.badge-etat {
-    font-size: 0.8rem;
-    font-weight: 600;
-    padding: 0.3em 0.6em;
-    border-radius: 0.4rem;
-    margin-right: 0.3rem;
-}
-.badge-perdu { background-color: #dc3545; color: var(--light-color); }
+.badge-etat { font-size:0.8rem; font-weight:600; padding:0.3em 0.6em; border-radius:0.4rem; margin-right:0.3rem; }
+.badge-perdu { background-color:#dc3545; color: var(--light-color); }
 .badge-reclame { background-color: var(--accent-color); color: var(--main-color); }
+.badge-trouve { background-color: var(--main-color); color: var(--light-color); }
 
 /* === DETAILS === */
-.details-card {
-    background: rgba(62,76,73,0.05);
-    border-left: 4px solid var(--accent-color);
-    padding: 0 1rem;
-    margin-top: 0.5rem;
-    border-radius: 0.5rem;
-    max-height: 0;
-    overflow: hidden;
-    transition: all 0.4s ease;
-}
-.details-card.open {
-    max-height: 600px;
-    padding: 0.75rem 1rem;
-}
-.details-card p {
-    margin: 0.2rem 0;
-    font-size: 0.9rem;
-    color: var(--main-color);
-}
+.details-card { background: rgba(62,76,73,0.05); border-left:4px solid var(--accent-color); padding:0 1rem; margin-top:0.5rem; border-radius:0.5rem; max-height:0; overflow:hidden; transition: all 0.4s ease; }
+.details-card.open { max-height:600px; padding:0.75rem 1rem; }
+.details-card p { margin:0.2rem 0; font-size:0.9rem; color: var(--main-color); }
 
 /* === BOUTONS === */
-.btn-toggle {
-    background-color: var(--main-color);
-    color: var(--light-color);
-    border: none;
-    padding: 0.4rem 0.7rem;
-    border-radius: 0.4rem;
-    font-size: 0.85rem;
-    width: 100%;
-    margin-bottom: 0.5rem;
-    transition: all 0.3s ease;
-}
-.btn-toggle:hover {
-    background-color: var(--accent-color);
-    color: var(--main-color);
-}
-.btn-primary {
-    background-color: var(--accent-color);
-    color: var(--main-color);
-    border: none;
-    transition: 0.3s;
-}
-.btn-primary:hover { background-color: #b48a3d; }
-.btn-outline-danger {
-    border-color: var(--main-color);
-    color: var(--main-color);
-}
-.btn-outline-danger:hover {
-    background-color: var(--main-color);
-    color: var(--light-color);
-}
+.btn-toggle { background-color: var(--main-color); color: var(--light-color); border:none; padding:0.4rem 0.7rem; border-radius:0.4rem; font-size:0.85rem; width:100%; margin-bottom:0.5rem; transition: all 0.3s ease; }
+.btn-toggle:hover { background-color: var(--accent-color); color: var(--main-color); }
+.btn-primary { background-color: var(--accent-color); color: var(--main-color); border:none; transition:0.3s; }
+.btn-primary:hover { background-color:#b48a3d; }
 
 /* IMAGE OBJET */
-.card-img-top {
-    height: 200px;
-    object-fit: cover;
-    border-radius: 0.8rem 0.8rem 0 0;
-}
+.card-img-top { height:200px; object-fit:cover; border-radius:0.8rem 0.8rem 0 0; }
 </style>
 {% endblock %}
 
@@ -123,33 +67,39 @@
                     <h5 class="card-title">{{ declaration.objet.nom }}</h5>
                     <p class="text-muted small mb-2">👤 Déclaré par {{ declaration.citoyen.username }}</p>
 
-                    <!-- ✅ État initial AVANT les détails -->
+                    <!-- BADGES -->
                     <div class="mb-2">
                         <span class="badge badge-etat badge-perdu">État initial : {{ declaration.etat_initial|title }}</span>
-                        {% if declaration.objet.etat == "reclame" %}
+                        {% if declaration.objet.etat == EtatObjet.RECLAME %}
                             <span class="badge badge-etat badge-reclame">Réclamé</span>
+                        {% endif %}
+                        {% if declaration.trouve_par.count > 0 %}
+                            <span class="badge badge-etat badge-trouve">Trouvé par {{ declaration.trouve_par.count }} citoyen(s)</span>
+                        {% endif %}
+                        {% if user.is_authenticated and user in declaration.reclame_par.all %}
+                            <span class="badge badge-etat badge-reclame">Réclamé par vous</span>
                         {% endif %}
                     </div>
 
+                    <!-- DETAILS -->
                     <button class="btn btn-sm btn-toggle" type="button" data-target="#details-{{ declaration.id }}">
                         ℹ️ Voir les détails
                     </button>
-
                     <div class="details-card" id="details-{{ declaration.id }}">
                         <p><b>📜 Description :</b> {{ declaration.objet.description|default:"Aucune description" }}</p>
                         <p><b>📍 Lieu présumé de perte :</b> {{ declaration.lieu|default:"Non précisé" }}</p>
                         <p><b>🕒 Date de déclaration :</b> {{ declaration.date_declaration|date:"d/m/Y H:i" }}</p>
-                       
                         <p><b>📌 État actuel :</b> {{ declaration.objet.get_etat_display }}</p>
                     </div>
                 </div>
 
+                <!-- FOOTER BUTTON -->
                 <div class="card-footer text-end bg-transparent border-0">
                     {% if user.is_authenticated %}
                         {% if user == declaration.citoyen %}
                             <button type="button" class="btn btn-sm btn-primary" disabled>Vous avez déclaré cet objet</button>
-                        {% elif user in declaration.reclame_par.all %}
-                            <button type="button" class="btn btn-sm btn-primary" disabled>Déjà réclamé</button>
+                        {% elif user in declaration.trouve_par.all %}
+                            <button type="button" class="btn btn-sm btn-primary" disabled>Vous avez déjà trouvé</button>
                         {% else %}
                             <form method="POST" action="{% url 'je_le_trouve' declaration.id %}" class="d-inline">
                                 {% csrf_token %}

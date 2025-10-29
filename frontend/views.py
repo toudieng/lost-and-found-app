@@ -204,62 +204,59 @@ def repondre_message(request, message_id):
 
 @login_required
 
-
-
 def objets_perdus(request):
-    """
-    Liste publique des objets déclarés perdus ou réclamés,
-    affichant le déclarant et les détails de l'objet.
-    """
     query = request.GET.get('q', '').strip()
 
-    # Récupération des déclarations d'objets perdus ou réclamés
     declarations = (
         Declaration.objects
         .select_related('objet', 'citoyen')
-        .prefetch_related('reclame_par')
-        .filter(objet__etat__in=[EtatObjet.PERDU, EtatObjet.RECLAME])
+        .prefetch_related('reclame_par', 'trouve_par')
+        .filter(
+            Q(etat_initial=EtatObjet.PERDU) & 
+            Q(objet__etat__in=[EtatObjet.PERDU, EtatObjet.RECLAME])
+        )
         .order_by('-date_declaration')
     )
 
-    # Recherche
     if query:
         declarations = declarations.filter(objet__nom__icontains=query)
 
-    # Préparation de données pour le template
+    # Préparer les données pour le template
     for dec in declarations:
-        dec.declarant = dec.citoyen              # celui qui a déclaré
-        dec.details_objet = dec.objet            # les infos de l’objet
-        dec.est_reclame_par_user = (
-            request.user.is_authenticated and request.user in dec.reclame_par.all()
-        )
+        dec.declarant = dec.citoyen
+        dec.details_objet = dec.objet
+        dec.est_reclame_par_user = request.user.is_authenticated and request.user in dec.reclame_par.all()
 
     return render(request, "frontend/objets/objets_perdus.html", {
         "declarations": declarations,
         "query": query,
     })
 
-
-
 @login_required
 def objets_trouves(request):
     query = request.GET.get("q", "").strip()
     
-    # On récupère les objets trouvés ou réclamés
+    # 🔹 Filtrage : état initial = TROUVE ET (objet trouvé ou réclamé)
     declarations = Declaration.objects.filter(
-        objet__etat__in=[EtatObjet.TROUVE, EtatObjet.RECLAME]
+        Q(etat_initial=EtatObjet.TROUVE) &
+        Q(objet__etat__in=[EtatObjet.TROUVE, EtatObjet.RECLAME])
     ).select_related('citoyen', 'objet').order_by('-date_declaration')
     
     if query:
-        declarations = declarations.filter(objet__nom__icontains=query)
+        declarations = declarations.filter(
+            Q(objet__nom__icontains=query) |
+            Q(description__icontains=query) |
+            Q(lieu__icontains=query)
+        )
     
     context = {
-        "declarations": declarations,
+        "declarations": declarations.distinct(),
         "query": query,
-        "EtatObjet": EtatObjet,  # pour utiliser l'enum dans le template
+        "EtatObjet": EtatObjet,
     }
     
     return render(request, "frontend/objets/objets_trouves.html", context)
+
 
 
 def objet_detail(request, pk):
@@ -1167,42 +1164,45 @@ def je_le_trouve(request, declaration_id):
         messages.warning(request, "⚠️ Vous avez déjà signalé cet objet.")
         return redirect("objets_perdus")
 
-    # Ajouter l'utilisateur à la liste des citoyens ayant trouvé l'objet
-    declaration.trouve_par.add(request.user)
+    try:
+        with transaction.atomic():
+            # Ajouter l'utilisateur à la liste des citoyens ayant trouvé l'objet
+            declaration.trouve_par.add(request.user)
 
-    # Si l'objet était perdu, passer à RECLAME
-    if objet.etat == EtatObjet.PERDU:
-        objet.etat = EtatObjet.RECLAME
-        objet.save()
+            # Si l'objet était perdu, passer à RECLAME
+            if objet.etat == EtatObjet.PERDU:
+                objet.etat = EtatObjet.RECLAME
+                objet.save()
 
-        # Ajouter le premier trouveur comme réclamant
-        if not declaration.reclame_par.exists():
-            declaration.reclame_par.add(request.user)
+                # Ajouter le premier trouveur comme réclamant
+                if not declaration.reclame_par.exists():
+                    declaration.reclame_par.add(request.user)
 
-        # Notification au propriétaire
-        if declaration.citoyen and declaration.citoyen.email:
-            try:
-                send_mail(
-                    subject=f"[Objet Réclamé] Votre objet {objet.nom} a été signalé comme trouvé",
-                    message=(
-                        f"Bonjour {declaration.citoyen.username},\n\n"
-                        f"L'objet '{objet.nom}' a été retrouvé et signalé comme tel par un citoyen."
-                    ),
-                    from_email=settings.DEFAULT_FROM_EMAIL,
-                    recipient_list=[declaration.citoyen.email],
-                    fail_silently=True
-                )
-            except Exception:
-                pass
+    except Exception as e:
+        messages.error(request, f"⚠️ Une erreur est survenue : {e}")
+        return redirect("objets_perdus")
 
-        messages.success(request, "✅ L’objet a été marqué comme réclamé et le propriétaire notifié.")
-    else:
-        messages.info(request, "ℹ️ Votre signalement a été ajouté.")
+    # Notification par email au déclarant
+    if declaration.citoyen and declaration.citoyen.email:
+        objet_url = request.build_absolute_uri(reverse('objet_detail', args=[objet.id]))
+        try:
+            send_mail(
+                subject=f"[Objet Réclamé] Votre objet '{objet.nom}' a été retrouvé",
+                message=(
+                    f"Bonjour {declaration.citoyen.username},\n\n"
+                    f"L'objet que vous avez déclaré perdu a été retrouvé et signalé comme tel par {request.user.username}.\n\n"
+                    f"Détails : {objet_url}"
+                ),
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[declaration.citoyen.email],
+                fail_silently=True
+            )
+        except (BadHeaderError, ConnectionError, OSError):
+            messages.warning(request, "⚠️ Impossible d'envoyer l'email au déclarant.")
 
+    messages.success(request, f"✅ Vous avez signalé que vous avez trouvé l'objet '{objet.nom}'.")
     return redirect("objets_perdus")
 
-
-@login_required
 
 
 
@@ -1212,36 +1212,35 @@ def je_le_trouve(request, declaration_id):
 
 @login_required
 def ca_m_appartient(request, declaration_id):
-    # Récupération de la déclaration
     declaration = get_object_or_404(Declaration, id=declaration_id)
-    
-    # Vérification si l'objet est réclamable (TROUVE ou déjà RECLAME)
-    if declaration.objet.etat not in [EtatObjet.TROUVE, EtatObjet.RECLAME]:
-        messages.error(request, "⚠️ Cet objet n'est pas disponible pour réclamation.")
+
+    # Vérifications de base
+    if declaration.citoyen == request.user:
+        messages.warning(request, "⚠️ Vous ne pouvez pas réclamer votre propre objet.")
         return redirect("objets_trouves")
-    
-    # Vérifier si l'utilisateur a déjà réclamé
+
     if declaration.reclame_par.filter(id=request.user.id).exists():
         messages.warning(request, "⚠️ Vous avez déjà réclamé cet objet.")
         return redirect("objets_trouves")
-    
+
+    if declaration.objet.etat not in {EtatObjet.TROUVE, EtatObjet.RECLAME}:
+        messages.error(request, "⚠️ Cet objet n'est pas disponible pour réclamation.")
+        return redirect("objets_trouves")
+
     try:
         with transaction.atomic():
-            # Ajouter l'utilisateur à la liste des réclamants
             declaration.reclame_par.add(request.user)
-
-            # Si c'est la première réclamation, mettre l'objet en RECLAME
             if declaration.objet.etat == EtatObjet.TROUVE:
                 declaration.objet.etat = EtatObjet.RECLAME
                 declaration.objet.save()
     except Exception as e:
         messages.error(request, f"⚠️ Une erreur est survenue : {e}")
         return redirect("objets_trouves")
-    
-    # Envoi d'un email au déclarant
+
+    # Envoi d'email
     if declaration.citoyen and declaration.citoyen.email:
-        objet_url = request.build_absolute_uri(reverse('objet_detail', args=[declaration.objet.id]))
         try:
+            objet_url = request.build_absolute_uri(reverse('objet_detail', args=[declaration.objet.id]))
             send_mail(
                 subject=f"[Objet Trouvé] Votre objet '{declaration.objet.nom}' a été réclamé !",
                 message=(
@@ -1251,15 +1250,14 @@ def ca_m_appartient(request, declaration_id):
                 ),
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=[declaration.citoyen.email],
-                fail_silently=False,
+                fail_silently=True
             )
-        except (BadHeaderError, ConnectionError, OSError) as e:
-            messages.warning(request, f"⚠️ Impossible d'envoyer l'email : {e}")
-    
+        except Exception as e:
+            # Log si tu veux garder une trace
+            print(f"Erreur d'envoi email: {e}")
+
     messages.success(request, f"✅ Vous avez réclamé l'objet '{declaration.objet.nom}'.")
     return redirect("objets_trouves")
-
-
 
 
 # =============================

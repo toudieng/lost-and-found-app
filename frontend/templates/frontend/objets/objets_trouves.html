@@ -37,6 +37,7 @@
 }
 .badge-trouve { background-color: var(--main-color); color: var(--light-color); }
 .badge-reclame { background-color: var(--accent-color); color: var(--main-color); }
+.badge-count { background-color: #555; color: var(--light-color); }
 
 /* === DETAILS === */
 .details-card {
@@ -114,7 +115,7 @@
         <div class="col-md-6 col-lg-4">
             <div class="card objet-trouve">
                 {% if declaration.objet.image %}
-                    <img src="{{ declaration.objet.image.url }}" class="card-img-top" alt="{{ declaration.objet.nom }}">
+                    <img src="{{ declaration.objet.image.url }}" class="card-img-top" alt="{{ declaration.objet.nom }}" loading="lazy">
                 {% else %}
                     <img src="{% static 'img/default_objet.png' %}" class="card-img-top" alt="Image par défaut">
                 {% endif %}
@@ -123,11 +124,14 @@
                     <h5 class="card-title">{{ declaration.objet.nom }}</h5>
                     <p class="text-muted small mb-2">👤 Trouvé par {{ declaration.citoyen.username }}</p>
 
-                    <!-- ✅ État initial AVANT les détails -->
+                    <!-- BADGES -->
                     <div class="mb-2">
                         <span class="badge badge-etat badge-trouve">État initial : {{ declaration.etat_initial|title }}</span>
-                        {% if declaration.objet.etat == "reclame" %}
+                        {% if declaration.objet.etat == EtatObjet.RECLAME %}
                             <span class="badge badge-etat badge-reclame">Réclamé</span>
+                        {% endif %}
+                        {% if declaration.reclame_par.count > 0 %}
+                            <span class="badge badge-count">👥 {{ declaration.reclame_par.count }} réclamation{{ declaration.reclame_par.count|pluralize }}</span>
                         {% endif %}
                     </div>
 
