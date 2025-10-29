@@ -10,11 +10,12 @@
     --accent-color: #C8A048;
     --accent-color-dark: #b88f38;
     --light-color: #FFFFFF;
-    --main-color-light: rgba(62,76,73,0.1);
+    --light-bg: #f8f9fa;
+    --yellow-card: #ffe69c;
 }
 
 /* Layout */
-body { font-family: 'Segoe UI', sans-serif; background: #f8f9fa; }
+body { font-family: 'Segoe UI', sans-serif; background: var(--light-bg); }
 .main-content { padding: 2rem; background: var(--light-color); min-height: 80vh; border-radius: 1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
 
 /* Sidebar */
@@ -27,13 +28,13 @@ body { font-family: 'Segoe UI', sans-serif; background: #f8f9fa; }
 .welcome-title { color: var(--main-color); font-weight: 700; margin-bottom: 0.5rem; }
 
 /* Stats cards */
-.stats-card { border-radius: 1rem; padding: 1.5rem; background: var(--light-color); box-shadow: 0 4px 12px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 1rem; transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; }
+.stats-card { border-radius: 1rem; padding: 1.5rem; display: flex; align-items: center; gap: 1rem; transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; }
 .stats-card:hover { transform: scale(1.03); box-shadow: 0 8px 25px rgba(62,76,73,0.15); }
 .stats-icon { font-size: 2.5rem; }
 .stats-badge { padding: 0.2rem 0.5rem; border-radius: 12px; font-size: 0.75rem; font-weight: 600; color: var(--light-color); margin-left: 0.5rem; }
 
 /* Badge colors */
-.badge-perdus-trouves { background: var(--main-color); }
+.badge-perdus-trouves { background: var(--yellow-card); color: #3E4C49; }
 .badge-trouves-reclames { background: #6f42c1; }
 .badge-attente { background: #fd7e14; }
 .badge-historique { background: #20c997; }
@@ -86,7 +87,8 @@ body { font-family: 'Segoe UI', sans-serif; background: #f8f9fa; }
             {% for card in stats_cards %}
             <div class="col-md-3">
                 <a href="{{ card.url }}" class="text-decoration-none">
-                    <div class="stats-card">
+                    <div class="stats-card {% if card.label == 'Objets perdus & trouvés' %}bg-yellow-card{% endif %}" 
+                         style="background: {% if card.label == 'Objets perdus & trouvés' %}var(--yellow-card){% else %}var(--light-color){% endif %};">
                         <span class="stats-icon">{{ card.icon }}</span>
                         <div>
                             <h5 class="mb-0">
@@ -109,12 +111,16 @@ body { font-family: 'Segoe UI', sans-serif; background: #f8f9fa; }
             {% for obj in derniers_objets %}
             <div class="col-md-3">
                 <div class="card">
-                    <img src="{{ obj.photo.url }}" alt="{{ obj.nom }}">
+                    {% if obj.objet.image %}
+                        <img src="{{ obj.objet.image.url }}" alt="{{ obj.objet.nom }}">
+                    {% else %}
+                        <img src="{% static 'frontend/img/default-object.png' %}" alt="Objet">
+                    {% endif %}
                     <div class="card-body">
-                        <h6>{{ obj.nom|truncatewords:4 }}</h6>
-                        <small>{{ obj.date_perte|date:"d/m/Y H:i" }}</small>
+                        <h6>{{ obj.objet.nom|truncatewords:4 }}</h6>
+                        <small>{{ obj.date_declaration|date:"d/m/Y H:i" }}</small>
                         <br>
-                        <span class="badge {% if obj.statut == 'reclame' %}badge-trouves-reclames{% elif obj.statut == 'attente' %}badge-attente{% endif %}">{{ obj.statut }}</span>
+                        <span class="badge {% if obj.objet.etat == 'reclame' %}badge-trouves-reclames{% elif obj.objet.etat == 'en_attente' %}badge-attente{% else %}badge-perdus-trouves{% endif %}">{{ obj.objet.etat|capfirst }}</span>
                     </div>
                 </div>
             </div>
@@ -138,19 +144,14 @@ new Chart(ctx, {
     data: {
         labels: {{ chart_labels|safe }},
         datasets: [{
-            label: 'Objets perdus',
+            label: 'Objets perdus & trouvés',
             data: {{ chart_perdus|safe }},
-            backgroundColor: 'rgba(62,76,73,0.7)'
+            backgroundColor: 'rgba(255, 230, 156, 0.7)' // jaune clair
         },
         {
-            label: 'Objets trouvés',
+            label: 'Objets trouvés & réclamés',
             data: {{ chart_trouves|safe }},
-            backgroundColor: 'rgba(200,160,72,0.7)'
-        },
-        {
-            label: 'Restitutions',
-            data: {{ chart_restitutions|safe }},
-            backgroundColor: 'rgba(32,201,151,0.7)'
+            backgroundColor: 'rgba(111, 66, 193, 0.7)' // violet
         }]
     },
     options: {

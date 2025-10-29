@@ -278,8 +278,6 @@ def supprimer_objet(request, objet_id):
 #       DASHBOARD POLICIER
 # =============================
 
-
-
 @policier_required
 def dashboard_policier(request):
     current_year = timezone.now().year
@@ -289,7 +287,7 @@ def dashboard_policier(request):
     # --- Statistiques globales ---
     nb_objets_perdus_trouves = Declaration.objects.filter(
         etat_initial=EtatObjet.PERDU,
-        trouve_par__isnull=False
+         objet__etat=EtatObjet.RECLAME
     ).count()
 
     nb_objets_trouves_reclames = Declaration.objects.filter(
@@ -305,7 +303,7 @@ def dashboard_policier(request):
         objet__etat=EtatObjet.RESTITUE
     ).count()
 
-    # --- Stat-cards dynamiques avec URLs via reverse ---
+    # --- Stat-cards dynamiques ---
     stats_cards = [
         {
             "label": "Objets perdus & trouvés",
@@ -333,7 +331,7 @@ def dashboard_policier(request):
         },
     ]
 
-    # --- Fonction utilitaire pour stats mois par mois ---
+    # --- Données pour graphiques mois par mois ---
     def data_by_month(queryset):
         data = [0] * 12
         for decl in queryset:
@@ -343,7 +341,7 @@ def dashboard_policier(request):
     data_perdus_trouves = data_by_month(
         Declaration.objects.filter(
             etat_initial=EtatObjet.PERDU,
-            trouve_par__isnull=False,
+            objet__etat=EtatObjet.RECLAME,
             date_declaration__year=current_year
         )
     )
@@ -356,12 +354,15 @@ def dashboard_policier(request):
         )
     )
 
+    # --- Derniers objets récents ---
+    derniers_objets = Declaration.objects.order_by('-date_declaration')[:8]
+
     context = {
         "stats_cards": stats_cards,
-        "labels_perdus_trouves": months_labels,
-        "data_perdus_trouves": data_perdus_trouves,
-        "labels_trouves_reclames": months_labels,
-        "data_trouves_reclames": data_trouves_reclames,
+        "chart_labels": months_labels,
+        "chart_perdus": data_perdus_trouves,
+        "chart_trouves": data_trouves_reclames,
+        "derniers_objets": derniers_objets,
         "current_year": current_year,
     }
 
