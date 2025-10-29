@@ -5,14 +5,22 @@
 {% block extra_css %}
 <style>
 :root {
-    --main-color: #3E4C49;       
-    --accent-color: #C8A048;    
-    --light-color: #FFFFFF;      
+    --main-color: #3E4C49;
+    --accent-color: #C8A048;
+    --light-color: #FFFFFF;
 }
 
 /* === CARTES === */
-.card.objet-reclame { border-radius: 1rem; border: 1px solid rgba(200, 160, 72, 0.2); box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: transform 0.3s ease, box-shadow 0.3s ease; }
-.card.objet-reclame:hover { transform: translateY(-4px); box-shadow: 0 10px 25px rgba(0,0,0,0.15); }
+.card.objet-reclame {
+    border-radius: 1rem;
+    border: 1px solid rgba(200, 160, 72, 0.2);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.card.objet-reclame:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
 .card-body { padding: 1rem; background: var(--light-color); }
 .card-title { color: var(--main-color); }
 
@@ -22,7 +30,16 @@
 .badge-reclame { background-color: var(--accent-color); color: var(--main-color); }
 
 /* === DETAILS DÉROULANTS === */
-.details-card { background: rgba(62, 76, 73, 0.05); border-left: 4px solid var(--accent-color); padding: 0 1rem; margin-top: 0.5rem; border-radius: 0.5rem; max-height: 0; overflow: hidden; transition: all 0.4s ease; }
+.details-card {
+    background: rgba(62, 76, 73, 0.05);
+    border-left: 4px solid var(--accent-color);
+    padding: 0 1rem;
+    margin-top: 0.5rem;
+    border-radius: 0.5rem;
+    max-height: 0;
+    overflow: hidden;
+    transition: all 0.4s ease;
+}
 .details-card.open { max-height: 600px; padding: 0.75rem 1rem; }
 .details-card p { margin: 0.2rem 0; font-size: 0.9rem; color: var(--main-color); }
 
@@ -32,7 +49,15 @@
 .btn-primary:hover { background-color: #2d3836; }
 
 /* === BOUTON TOGGLE === */
-.btn-toggle { background-color: var(--main-color); color: var(--light-color); border: none; padding: 0.4rem 0.7rem; border-radius: 0.4rem; font-size: 0.85rem; transition: all 0.3s ease; }
+.btn-toggle {
+    background-color: var(--main-color);
+    color: var(--light-color);
+    border: none;
+    padding: 0.4rem 0.7rem;
+    border-radius: 0.4rem;
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
+}
 .btn-toggle:hover { background-color: var(--accent-color); color: var(--main-color); }
 </style>
 {% endblock %}
@@ -62,6 +87,7 @@
                         <button class="btn btn-sm btn-toggle mb-2 w-100 text-center" type="button" data-target="#details-{{ dec.id }}">
                             ℹ️ Voir les détails
                         </button>
+
                         <div class="details-card" id="details-{{ dec.id }}">
                             <p><b>👤 Réclamant :</b> {{ dec.reclamant_principal.username }}</p>
                             <p><b>Email :</b> {{ dec.reclamant_principal.email|default:"-" }}</p>
@@ -69,9 +95,9 @@
                             <hr>
 
                             <p><b>Trouveurs :</b></p>
-                            {% if dec.trouve_par.all %}
+                            {% if dec.trouveurs_list %}
                                 <ul class="list-unstyled">
-                                    {% for user in dec.trouve_par.all %}
+                                    {% for user in dec.trouveurs_list %}
                                         <li>{{ user.username }} | Email: {{ user.email|default:"-" }} | Téléphone: {{ user.telephone|default:"-" }}</li>
                                     {% endfor %}
                                 </ul>

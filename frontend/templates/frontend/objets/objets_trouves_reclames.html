@@ -1,13 +1,13 @@
 {% extends 'frontend/policier/base_policier.html' %}
 
-{% block title %}Objets réclamés{% endblock %}
+{% block title %}Objets trouvés et réclamés{% endblock %}
 
 {% block extra_css %}
 <style>
 :root {
-    --main-color: #3E4C49;
-    --accent-color: #C8A048;
-    --light-color: #FFFFFF;
+    --main-color: #3E4C49;       
+    --accent-color: #C8A048;    
+    --light-color: #FFFFFF;      
 }
 
 /* === CARTES === */
@@ -18,6 +18,7 @@
 
 /* === BADGES === */
 .badge-etat { font-size: 0.8rem; font-weight: 600; padding: 0.3em 0.6em; border-radius: 0.4rem; }
+.badge-trouve { background-color: #0d6efd; color: var(--light-color); }
 .badge-reclame { background-color: var(--accent-color); color: var(--main-color); }
 
 /* === DETAILS DÉROULANTS === */
@@ -27,11 +28,7 @@
 
 /* === BOUTONS === */
 .btn-action { font-weight: 500; border: none; transition: all 0.3s ease; }
-.btn-success { background-color: var(--accent-color); color: var(--main-color); }
-.btn-success:hover { background-color: #b48a3d; }
-.btn-danger { background-color: #a94442; }
-.btn-danger:hover { background-color: #8e2f2c; }
-.btn-primary { background-color: var(--main-color); }
+.btn-primary { background-color: var(--main-color); color: var(--light-color); }
 .btn-primary:hover { background-color: #2d3836; }
 
 /* === BOUTON TOGGLE === */
@@ -42,7 +39,7 @@
 
 {% block content %}
 <div class="container mt-4 mb-5">
-    <h2 class="fw-bold mb-4" style="color: var(--accent-color);">📌 Objets réclamés</h2>
+    <h2 class="fw-bold mb-4" style="color: var(--accent-color);">📌 Objets trouvés et réclamés</h2>
 
     {% if declarations %}
         <div class="row g-3">
@@ -55,24 +52,31 @@
                     <div class="card-body">
                         <h5 class="card-title fw-bold">
                             {{ dec.objet.nom }}
-                            <span class="badge badge-etat badge-reclame ms-1">RECLAME</span>
+                            <span class="badge badge-etat badge-trouve ms-1">TROUVÉ</span>
+                            <span class="badge badge-etat badge-reclame ms-1">RECLAMÉ</span>
                         </h5>
 
                         <button class="btn btn-sm btn-toggle mb-2 w-100 text-center" type="button" data-target="#details-{{ dec.id }}">
                             ℹ️ Voir les détails
                         </button>
+
                         <div class="details-card" id="details-{{ dec.id }}">
-                            <p><b>👤 Citoyen (réclamant) :</b> {{ dec.citoyen.username }}</p>
-                            <p><b>Email :</b> {{ dec.citoyen.email|default:"-" }}</p>
-
-                            <p><b>🔍 Trouveur :</b> {{ dec.trouveur_principal.username }} — <span class="text-muted">{{ dec.trouveur_principal.email|default:"-" }}</span></p>
+                            <p><b>🔍 Trouveur :</b> {{ dec.trouveur_principal.username }}</p>
+                            <p><b>Email :</b> {{ dec.trouveur_principal.email|default:"-" }}</p>
                             <p><b>Téléphone :</b> {{ dec.trouveur_principal.telephone|default:"-" }}</p>
-
-                            <p><b>État initial :</b> {{ dec.get_etat_initial_display }}</p>
                             <hr>
 
-                            <p><b>🏢 Commissariat :</b> {{ dec.commissariat.nom|default:"-" }}</p>
-                            <p><b>📅 Date déclaration :</b> {{ dec.date_declaration|date:"d/m/Y H:i" }}</p>
+                            <p><b>👤 Réclamants :</b></p>
+                            <ul class="list-unstyled">
+                                {% for user in dec.reclamants_list %}
+                                    <li>{{ user.username }} | Email: {{ user.email|default:"-" }} | Téléphone: {{ user.telephone|default:"-" }}</li>
+                                {% endfor %}
+                            </ul>
+                            <hr>
+
+                            <p class="text-muted mb-0">
+                                <small>📅 Date déclaration : {{ dec.date_declaration|date:"d/m/Y H:i" }}</small>
+                            </p>
                         </div>
                     </div>
 
@@ -85,7 +89,7 @@
         </div>
     {% else %}
         <div class="alert alert-secondary text-center mt-4 border" style="border-color: var(--accent-color); color: var(--main-color);">
-            Aucun objet réclamé actuellement.
+            Aucun objet trouvé et réclamé actuellement.
         </div>
     {% endif %}
 </div>

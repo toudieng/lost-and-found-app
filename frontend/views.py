@@ -520,22 +520,28 @@ from backend.objets.models import Declaration, EtatObjet
 from django.shortcuts import render
 from backend.objets.models import Declaration, EtatObjet
 
+
+
 def objets_trouves_reclames(request):
     """
-    Affiche les déclarations dont :
+    Affiche les objets dont :
     - l'état initial est TROUVE
     - l'objet est actuellement RECLAME
-    - et il y a au moins un réclamant
+    - au moins un réclamant
     """
-
     # 🔹 Requête avec préchargement des relations
-    declarations = Declaration.objects.filter(
-        etat_initial=EtatObjet.TROUVE,
-        objet__etat=EtatObjet.RECLAME,  # <-- ici
-        reclame_par__isnull=False
-    ).select_related('citoyen', 'objet') \
-     .prefetch_related('reclame_par') \
-     .distinct()
+    declarations = (
+        Declaration.objects
+        .filter(
+            etat_initial=EtatObjet.TROUVE,
+            objet__etat=EtatObjet.RECLAME
+        )
+        .annotate(nb_reclamants=Count('reclame_par'))
+        .filter(nb_reclamants__gt=0)
+        .select_related('citoyen', 'objet')  # trouveur
+        .prefetch_related('reclame_par')     # réclamants
+        .distinct()
+    )
 
     # 🔹 Attributs dynamiques pour le template
     for dec in declarations:
@@ -548,7 +554,6 @@ def objets_trouves_reclames(request):
     })
 
 
-
 def objets_perdus_trouves(request):
     """
     Affiche les objets perdus dont :
@@ -556,22 +561,16 @@ def objets_perdus_trouves(request):
     - l'état actuel de l'objet est 'RECLAME'
     - le réclamant principal est le citoyen qui les a déclarés
     """
+
     query = request.GET.get('q', '')
 
-    # Récupération des déclarations
-    declarations = Declaration.objects.filter(
-        etat_initial=EtatObjet.PERDU,
-        objet__etat=EtatObjet.RECLAME,
-        reclame_par=request.user  # si tu veux filtrer sur le user connecté
-    ).distinct()
-
-    # Si tu veux tous les réclamants sans filtrer sur l'utilisateur connecté :
+    # 🔹 Récupération des déclarations
     declarations = Declaration.objects.filter(
         etat_initial=EtatObjet.PERDU,
         objet__etat=EtatObjet.RECLAME
     ).distinct()
 
-    # Filtrage par recherche
+    # 🔹 Filtrage par recherche
     if query:
         declarations = declarations.filter(
             Q(objet__nom__icontains=query) |
@@ -579,13 +578,13 @@ def objets_perdus_trouves(request):
             Q(citoyen__username__icontains=query)
         )
 
-    # Préfetch pour optimiser l'accès aux relations
-    declarations = declarations.prefetch_related('trouve_par', 'reclame_par', 'citoyen', 'objet')
+    # 🔹 Préfetch pour optimiser l'accès aux relations
+    declarations = declarations.select_related('citoyen', 'objet').prefetch_related('trouve_par', 'reclame_par')
 
-    # Ajouter attributs pour le template
+    # 🔹 Ajouter attributs dynamiques pour le template
     for dec in declarations:
-        dec.reclamant_principal = dec.citoyen  # le déclarant est le réclamant
-        dec.trouveurs = dec.trouve_par.all()   # tous les trouveurs associés
+        dec.reclamant_principal = dec.citoyen  # le déclarant est le réclamant principal
+        dec.trouveurs_list = list(dec.trouve_par.all())  # tous les trouveurs associés
 
     context = {
         'declarations': declarations,
@@ -593,7 +592,6 @@ def objets_perdus_trouves(request):
     }
 
     return render(request, 'frontend/objets/objets_perdus_trouves.html', context)
-
 
 
 @login_required
