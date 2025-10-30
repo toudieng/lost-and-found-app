@@ -279,15 +279,24 @@ def supprimer_objet(request, objet_id):
 # =============================
 
 @policier_required
+
+
 def dashboard_policier(request):
-    current_year = timezone.now().year
-    months_labels = ["Jan", "Fév", "Mar", "Avr", "Mai", "Juin",
-                     "Juil", "Août", "Sep", "Oct", "Nov", "Déc"]
+    today = timezone.now()
+    current_year = today.year
+
+    # --- Labels des 6 derniers mois ---
+    months_labels = []
+    last_6_months = []
+    for i in range(5, -1, -1):  # 5 mois avant -> 0
+        month = today - relativedelta(months=i)
+        months_labels.append(month.strftime("%b"))  # "Jan", "Fév", ...
+        last_6_months.append((month.year, month.month))
 
     # --- Statistiques globales ---
     nb_objets_perdus_trouves = Declaration.objects.filter(
         etat_initial=EtatObjet.PERDU,
-         objet__etat=EtatObjet.RECLAME
+        objet__etat=EtatObjet.RECLAME
     ).count()
 
     nb_objets_trouves_reclames = Declaration.objects.filter(
@@ -303,66 +312,33 @@ def dashboard_policier(request):
         objet__etat=EtatObjet.RESTITUE
     ).count()
 
-    # --- Stat-cards dynamiques ---
     stats_cards = [
-        {
-            "label": "Objets perdus & trouvés",
-            "count": nb_objets_perdus_trouves,
-            "icon": "📌",
-            "url": reverse("objets_perdus_trouves"),
-        },
-        {
-            "label": "Objets trouvés & réclamés",
-            "count": nb_objets_trouves_reclames,
-            "icon": "📌",
-            "url": reverse("objets_trouves_reclames"),
-        },
-        {
-            "label": "Objets retrouvés (en attente)",
-            "count": nb_objets_trouves_attente,
-            "icon": "📦",
-            "url": reverse("objets_trouves_attente"),
-        },
-        {
-            "label": "Historique",
-            "count": nb_restitutions,
-            "icon": "📂",
-            "url": reverse("historique_restitutions"),
-        },
+        {"label": "Objets perdus & trouvés", "count": nb_objets_perdus_trouves, "icon": "📌", "url": reverse("objets_perdus_trouves")},
+        {"label": "Objets trouvés & réclamés", "count": nb_objets_trouves_reclames, "icon": "📌", "url": reverse("objets_trouves_reclames")},
+        {"label": "Objets retrouvés (en attente)", "count": nb_objets_trouves_attente, "icon": "📦", "url": reverse("objets_trouves_attente")},
+        {"label": "Historique", "count": nb_restitutions, "icon": "📂", "url": reverse("historique_restitutions")},
     ]
 
-    # --- Données pour graphiques mois par mois ---
-    def data_by_month(queryset):
-        data = [0] * 12
-        for decl in queryset:
-            data[decl.date_declaration.month - 1] += 1
+    # --- Données graphiques 6 derniers mois ---
+    def data_by_last_6_months(queryset):
+        data = []
+        for y, m in last_6_months:
+            count = queryset.filter(date_declaration__year=y, date_declaration__month=m).count()
+            data.append(count)
         return data
 
-    data_perdus_trouves = data_by_month(
-        Declaration.objects.filter(
-            etat_initial=EtatObjet.PERDU,
-            objet__etat=EtatObjet.RECLAME,
-            date_declaration__year=current_year
-        )
+    data_perdus_trouves = data_by_last_6_months(
+        Declaration.objects.filter(etat_initial=EtatObjet.PERDU, objet__etat=EtatObjet.RECLAME)
     )
-
-    data_trouves_reclames = data_by_month(
-        Declaration.objects.filter(
-            etat_initial=EtatObjet.TROUVE,
-            objet__etat=EtatObjet.RECLAME,
-            date_declaration__year=current_year
-        )
+    data_trouves_reclames = data_by_last_6_months(
+        Declaration.objects.filter(etat_initial=EtatObjet.TROUVE, objet__etat=EtatObjet.RECLAME)
     )
-
-    # --- Derniers objets récents ---
-    derniers_objets = Declaration.objects.order_by('-date_declaration')[:8]
 
     context = {
         "stats_cards": stats_cards,
         "chart_labels": months_labels,
         "chart_perdus": data_perdus_trouves,
         "chart_trouves": data_trouves_reclames,
-        "derniers_objets": derniers_objets,
         "current_year": current_year,
     }
 

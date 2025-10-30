@@ -1,3 +1,4 @@
+
 {% extends "frontend/policier/base_policier.html" %}
 {% load static %}
 
@@ -6,131 +7,213 @@
 {% block extra_css %}
 <style>
 :root {
-    --main-color: #3E4C49;
-    --accent-color: #C8A048;
-    --accent-color-dark: #b88f38;
-    --light-color: #FFFFFF;
-    --light-bg: #f8f9fa;
-    --yellow-card: #ffe69c;
+    --main-bg: #f5f8fa;
+    --sidebar-bg: #2f3e46;
+    --sidebar-hover: #3a4d56;
+    --primary: #3E4C49;
+    --secondary: #C8A048;
+    --success: #20c997;
+    --danger: #fd7e14;
+    --info: #6f42c1;
+    --white: #ffffff;
 }
 
-/* Layout */
-body { font-family: 'Segoe UI', sans-serif; background: var(--light-bg); }
-.main-content { padding: 2rem; background: var(--light-color); min-height: 80vh; border-radius: 1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+/* Global layout */
+body {
+    background-color: var(--main-bg);
+    font-family: 'Segoe UI', sans-serif;
+}
 
 /* Sidebar */
-.sidebar { background: var(--main-color); color: var(--light-color); min-height: 100vh; padding: 2rem 1rem; position: sticky; top: 0; }
-.sidebar h4 { color: var(--accent-color); text-align: center; margin-bottom: 1.5rem; }
-.sidebar .nav-link { color: #f0e5f0; border-radius: 0.5rem; padding: 0.6rem 1rem; transition: all 0.2s; }
-.sidebar .nav-link:hover, .sidebar .nav-link.active { background: var(--accent-color-dark); color: var(--light-color); }
+.sidebar {
+    background-color: var(--sidebar-bg);
+    color: var(--white);
+    min-height: 100vh;
+    padding: 2rem 1rem;
+    position: fixed;
+    width: 240px;
+    border-top-right-radius: 1.5rem;
+    border-bottom-right-radius: 1.5rem;
+    box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+}
+.sidebar h4 {
+    color: var(--secondary);
+    text-align: center;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    font-size: 1.3rem;
+}
+.sidebar .nav-link {
+    color: #dcdcdc;
+    border-radius: 8px;
+    padding: 0.8rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.2s ease-in-out;
+    font-weight: 500;
+    cursor: pointer;
+}
+.sidebar .nav-link:hover,
+.sidebar .nav-link.active {
+    background-color: var(--secondary);
+    color: var(--white);
+    font-weight: 600;
+}
 
-/* Welcome */
-.welcome-title { color: var(--main-color); font-weight: 700; margin-bottom: 0.5rem; }
+/* Main content */
+.main-content {
+    margin-left: 260px;
+    padding: 2rem;
+}
 
-/* Stats cards */
-.stats-card { border-radius: 1rem; padding: 1.5rem; display: flex; align-items: center; gap: 1rem; transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; }
-.stats-card:hover { transform: scale(1.03); box-shadow: 0 8px 25px rgba(62,76,73,0.15); }
-.stats-icon { font-size: 2.5rem; }
-.stats-badge { padding: 0.2rem 0.5rem; border-radius: 12px; font-size: 0.75rem; font-weight: 600; color: var(--light-color); margin-left: 0.5rem; }
+/* Header */
+.header {
+    background: var(--white);
+    padding: 1.5rem 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.header h2 {
+    font-weight: 700;
+    color: var(--primary);
+    margin: 0;
+}
+.header p {
+    color: #6c757d;
+    margin-bottom: 0;
+}
 
-/* Badge colors */
-.badge-perdus-trouves { background: var(--yellow-card); color: #3E4C49; }
-.badge-trouves-reclames { background: #6f42c1; }
-.badge-attente { background: #fd7e14; }
-.badge-historique { background: #20c997; }
+/* Profil utilisateur dans header */
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+.user-profile img {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--secondary);
+}
+.user-profile .dropdown-menu {
+    min-width: 160px;
+}
 
-/* Last objects cards */
-.last-objects .card { border-radius: 1rem; transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; }
-.last-objects .card:hover { transform: translateY(-3px); box-shadow: 0 6px 18px rgba(0,0,0,0.1); }
-.card img { border-top-left-radius: 1rem; border-top-right-radius: 1rem; object-fit: cover; height: 150px; width: 100%; }
-.card-body { padding: 0.5rem 0.75rem; }
-.card-body h6 { font-size: 0.9rem; margin-bottom: 0.2rem; }
-.card-body small { font-size: 0.75rem; color: #6c757d; }
-.card-body .badge { font-size: 0.65rem; margin-top: 0.2rem; }
+/* Stat cards */
+.stat-card {
+    background: var(--white);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.stat-card:hover {
+    transform: scale(1.03);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+}
+.stat-card .icon {
+    font-size: 2.2rem;
+    opacity: 0.8;
+}
+.stat-card h4 {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: var(--primary);
+}
+.stat-card small {
+    color: #6c757d;
+}
+
+/* Card colors */
+.bg-yellow { border-left: 6px solid #ffc107; }
+.bg-purple { border-left: 6px solid #6f42c1; }
+.bg-orange { border-left: 6px solid #fd7e14; }
+.bg-green  { border-left: 6px solid #20c997; }
+
+/* Chart section */
+.chart-container {
+    background: var(--white);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
 
 /* Responsive */
 @media (max-width: 768px) {
-    .main-content { padding: 1rem; margin-top: 1rem; }
-    .sidebar h4 { font-size: 1.3rem; }
+    .sidebar { position: relative; width: 100%; min-height: auto; border-radius: 0; }
+    .main-content { margin-left: 0; padding: 1rem; }
 }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="row">
-    <!-- Sidebar -->
-    <div class="col-md-3 col-lg-2 sidebar">
-        <h4>👮 Policier</h4>
-        <ul class="nav flex-column">
-            <li class="nav-item mb-2">
-                <a class="nav-link {% if request.resolver_match.url_name == 'objets_perdus_trouves' %}active{% endif %}" href="{% url 'objets_perdus_trouves' %}">📌 Objets perdus & trouvés</a>
-            </li>
-            <li class="nav-item mb-2">
-                <a class="nav-link {% if request.resolver_match.url_name == 'objets_trouves_reclames' %}active{% endif %}" href="{% url 'objets_trouves_reclames' %}">📌 Objets trouvés & réclamés</a>
-            </li>
-            <li class="nav-item mb-2">
-                <a class="nav-link {% if request.resolver_match.url_name == 'objets_trouves_attente' %}active{% endif %}" href="{% url 'objets_trouves_attente' %}">📦 Objets retrouvés (en attente)</a>
-            </li>
-            <li class="nav-item mb-2">
-                <a class="nav-link {% if request.resolver_match.url_name == 'historique_restitutions' %}active{% endif %}" href="{% url 'historique_restitutions' %}">📂 Historique des restitutions</a>
-            </li>
-        </ul>
+<div class="sidebar">
+    <h4>Tableau Policier</h4>
+    <ul class="nav flex-column">
+        <li class="nav-item mb-2">
+            <a class="nav-link {% if request.resolver_match.url_name == 'objets_perdus_trouves' %}active{% endif %}" href="{% url 'objets_perdus_trouves' %}">📦 Objets perdus & trouvés</a>
+        </li>
+        <li class="nav-item mb-2">
+            <a class="nav-link {% if request.resolver_match.url_name == 'objets_trouves_reclames' %}active{% endif %}" href="{% url 'objets_trouves_reclames' %}">📋 Objets trouvés & réclamés</a>
+        </li>
+        <li class="nav-item mb-2">
+            <a class="nav-link {% if request.resolver_match.url_name == 'objets_trouves_attente' %}active{% endif %}" href="{% url 'objets_trouves_attente' %}">🕒 En attente</a>
+        </li>
+        <li class="nav-item mb-2">
+            <a class="nav-link {% if request.resolver_match.url_name == 'historique_restitutions' %}active{% endif %}" href="{% url 'historique_restitutions' %}">📂 Historique</a>
+        </li>
+    </ul>
+</div>
+
+<div class="main-content">
+    <div class="header">
+        <div>
+            <h2>Bienvenue, {{ request.user.first_name }} 👋</h2>
+            <p>Gérez les objets et planifiez les restitutions depuis ce tableau de bord.</p>
+        </div>
+
+        <div class="user-profile dropdown">
+            {% if request.user.photo %}
+                <img src="{{ request.user.photo.url }}" alt="{{ request.user.get_full_name }}">
+            {% else %}
+                <img src="{% static 'frontend/img/default-user.png' %}" alt="Profil">
+            {% endif %}
+            <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="paramDropdown" data-bs-toggle="dropdown" aria-expanded="false"></button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="paramDropdown">
+                <li><a class="dropdown-item" href="{% url 'modifier_profil_police' %}">Modifier profil</a></li>
+                <li><a class="dropdown-item" href="{% url 'logout' %}">Déconnexion</a></li>
+            </ul>
+        </div>
     </div>
 
-    <!-- Main content -->
-    <div class="col-md-9 col-lg-10 main-content">
-        <h2 class="welcome-title">Bienvenue, Policier 👋</h2>
-        <p class="text-muted mb-4">Gérez les objets et planifiez les restitutions depuis ce tableau de bord.</p>
-
-        <!-- Stats cards -->
-        <div class="row g-3 mb-4">
-            {% for card in stats_cards %}
-            <div class="col-md-3">
-                <a href="{{ card.url }}" class="text-decoration-none">
-                    <div class="stats-card {% if card.label == 'Objets perdus & trouvés' %}bg-yellow-card{% endif %}" 
-                         style="background: {% if card.label == 'Objets perdus & trouvés' %}var(--yellow-card){% else %}var(--light-color){% endif %};">
-                        <span class="stats-icon">{{ card.icon }}</span>
-                        <div>
-                            <h5 class="mb-0">
-                                {{ card.count|default:"0" }}
-                                <span class="stats-badge {% if card.label == 'Objets perdus & trouvés' %}badge-perdus-trouves{% elif card.label == 'Objets trouvés & réclamés' %}badge-trouves-reclames{% elif card.label == 'Objets retrouvés (en attente)' %}badge-attente{% else %}badge-historique{% endif %}">
-                                    {{ card.count|default:"0" }}
-                                </span>
-                            </h5>
-                            <small>{{ card.label }}</small>
-                        </div>
-                    </div>
-                </a>
-            </div>
-            {% endfor %}
-        </div>
-
-        <!-- Derniers objets -->
-        <h4 class="mt-4">Derniers objets enregistrés</h4>
-        <div class="row g-3 last-objects">
-            {% for obj in derniers_objets %}
-            <div class="col-md-3">
-                <div class="card">
-                    {% if obj.objet.image %}
-                        <img src="{{ obj.objet.image.url }}" alt="{{ obj.objet.nom }}">
-                    {% else %}
-                        <img src="{% static 'frontend/img/default-object.png' %}" alt="Objet">
-                    {% endif %}
-                    <div class="card-body">
-                        <h6>{{ obj.objet.nom|truncatewords:4 }}</h6>
-                        <small>{{ obj.date_declaration|date:"d/m/Y H:i" }}</small>
-                        <br>
-                        <span class="badge {% if obj.objet.etat == 'reclame' %}badge-trouves-reclames{% elif obj.objet.etat == 'en_attente' %}badge-attente{% else %}badge-perdus-trouves{% endif %}">{{ obj.objet.etat|capfirst }}</span>
-                    </div>
+    <!-- Stat cards -->
+    <div class="row g-3 mb-4">
+        {% for card in stats_cards %}
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-card {% cycle 'bg-yellow' 'bg-purple' 'bg-orange' 'bg-green' %}">
+                <div>
+                    <h4>{{ card.count|default:"0" }}</h4>
+                    <small>{{ card.label }}</small>
                 </div>
+                <div class="icon">{{ card.icon }}</div>
             </div>
-            {% empty %}
-            <p>Aucun objet récent</p>
-            {% endfor %}
         </div>
+        {% endfor %}
+    </div>
 
-        <!-- Graphique -->
-        <h4 class="mt-4">Évolution des objets</h4>
+    <!-- Graphique -->
+    <div class="chart-container mt-5">
+        <h4>Évolution des objets</h4>
         <canvas id="chartObjets" height="100"></canvas>
     </div>
 </div>
@@ -138,27 +221,42 @@ body { font-family: 'Segoe UI', sans-serif; background: var(--light-bg); }
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+// Chart
 const ctx = document.getElementById('chartObjets').getContext('2d');
 new Chart(ctx, {
-    type: 'bar',
+    type: 'line',
     data: {
         labels: {{ chart_labels|safe }},
-        datasets: [{
-            label: 'Objets perdus & trouvés',
-            data: {{ chart_perdus|safe }},
-            backgroundColor: 'rgba(255, 230, 156, 0.7)' // jaune clair
-        },
-        {
-            label: 'Objets trouvés & réclamés',
-            data: {{ chart_trouves|safe }},
-            backgroundColor: 'rgba(111, 66, 193, 0.7)' // violet
-        }]
+        datasets: [
+            {
+                label: 'Objets perdus & trouvés',
+                data: {{ chart_perdus|safe }},
+                borderColor: '#ffc107',
+                backgroundColor: 'rgba(255,193,7,0.2)',
+                tension: 0.3,
+                fill: true
+            },
+            {
+                label: 'Objets trouvés & réclamés',
+                data: {{ chart_trouves|safe }},
+                borderColor: '#6f42c1',
+                backgroundColor: 'rgba(111,66,193,0.2)',
+                tension: 0.3,
+                fill: true
+            }
+        ]
     },
     options: {
         responsive: true,
         plugins: { legend: { position: 'top' } },
         scales: { y: { beginAtZero: true } }
     }
+});
+
+// Clic sidebar & dropdown avec son
+const clickSound = new Audio("{% static 'frontend/sounds/click.mp3' %}");
+document.querySelectorAll('.sidebar .nav-link, .user-profile button, .dropdown-item').forEach(el => {
+    el.addEventListener('click', () => { clickSound.play(); });
 });
 </script>
 {% endblock %}
