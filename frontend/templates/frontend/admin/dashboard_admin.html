@@ -6,123 +6,119 @@
 {% block extra_css %}
 <style>
 :root {
-    --main-color: #3E4C49;          
+    --main-color:#2f3e46;          
     --accent-color: #C8A048;        
     --accent-color-dark: #b88f38;   
     --light-color: #FFFFFF;          
-    --main-color-light: rgba(62,76,73,0.1);
+    --main-color-light: rgba(62,76,73,0.1); 
     --shadow-color: rgba(0,0,0,0.12);
 }
 
-/* =========================
-   SIDEBAR
-========================= */
+/* ================= SIDEBAR ================= */
 .sidebar {
-    background: linear-gradient(180deg, var(--main-color), #2f3b37);
+    background: linear-gradient(180deg, var(--main-color), #2f3e46);
     color: var(--light-color);
     min-height: 100vh;
     padding: 1.5rem 0.8rem;
-    position: sticky;
+    position: fixed;
+    width: 240px;
+    border-top-right-radius: 1.5rem;
+    border-bottom-right-radius: 1.5rem;
+    box-shadow: 4px 0 15px rgba(0,0,0,0.1);
     top: 0;
-    transition: all 0.3s;
+    left: 0;
 }
 .sidebar h4 {
     color: var(--accent-color);
-    text-align: center;
-    margin-bottom: 1rem;
-    font-size: 1.2rem;
+    text-align:center;
+    margin-bottom:1.5rem;
+    font-size:1.3rem;
 }
 .sidebar .nav-link {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--light-color);
-    border-radius: 0.4rem;
-    padding: 0.5rem 0.8rem;
-    font-weight: 500;
-    font-size: 0.95rem;
-    transition: all 0.2s ease-in-out;
+    display:flex;
+    align-items:center;
+    gap:0.5rem;
+    color:var(--light-color);
+    border-radius:0.4rem;
+    padding:0.5rem 0.8rem;
+    font-weight:500;
+    font-size:0.95rem;
+    transition: all 0.2s;
 }
-.sidebar .nav-link:hover,
-.sidebar .nav-link.active {
+.sidebar .nav-link:hover, .sidebar .nav-link.active {
     background: var(--main-color-light);
     color: var(--accent-color);
 }
-.sidebar .nav-link i {
-    font-size: 1.1rem;
-}
+.sidebar .nav-link i { font-size:1.1rem; }
 
-/* =========================
-   CONTENU PRINCIPAL
-========================= */
+/* ================= MAIN CONTENT ================= */
 .main-content {
-    padding: 1.5rem;
+    margin-left: 260px;
+    padding:2rem;
     background: var(--light-color);
-    min-height: 100vh;
-}
-.welcome-title {
-    color: var(--main-color);
-    font-weight: 700;
-    margin-bottom: 0.5rem;
-    font-size: 1.8rem;
-}
-.section-title {
-    font-weight: 700;
-    font-size: 1.3rem;
-    margin-top: 2rem;
-    color: var(--main-color);
-    border-left: 5px solid var(--accent-color);
-    padding-left: 0.7rem;
+    min-height:100vh;
 }
 
-/* =========================
-   CARTES STATISTIQUES
-========================= */
-.stats-container {
+/* ================= HEADER FIXE PROFIL ================= */
+.header-fixed {
+    position: fixed;
+    top: 1rem;
+    right: 2rem;
     display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    margin-top: 1rem;
+    align-items: center;
+    gap: 0.5rem;
+    z-index: 1000;
+}
+
+/* Profil utilisateur */
+.user-profile img {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--accent-color);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+    transition: transform 0.2s ease, filter 0.2s ease;
+}
+.user-profile img:hover {
+    transform: scale(1.1);
+    filter: brightness(1.2);
+}
+
+/* ================= STAT CARDS ================= */
+.stats-container {
+    display:flex;
+    flex-wrap:wrap;
+    gap:1rem;
+    margin-top:4rem;
 }
 .stats-card {
-    border-radius: 1rem;
-    padding: 1rem 1.2rem;
+    border-radius:1rem;
+    padding:1rem 1.2rem;
     background: var(--light-color);
-    box-shadow: 0 5px 15px var(--shadow-color);
-    flex: 1 1 220px;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    transition: all 0.3s ease-in-out;
-    cursor: pointer;
-    min-width: 220px;
-    animation: fadeInUp 0.5s ease forwards;
+    box-shadow:0 5px 15px var(--shadow-color);
+    flex:1 1 220px;
+    display:flex;
+    flex-direction:column;
+    gap:0.5rem;
+    cursor:pointer;
+    min-width:220px;
+    transition: transform 0.2s, box-shadow 0.2s;
 }
 .stats-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(62,76,73,0.18);
+    box-shadow:0 10px 30px rgba(62,76,73,0.18);
 }
-.stats-icon {
-    font-size: 2rem;
-}
-
-/* Badges colorés */
-.stats-card h5 {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 1.6rem;
-}
+.stats-icon { font-size:2rem; }
+.stats-card h5 { display:flex; align-items:center; justify-content:space-between; font-size:1.6rem; }
 .stats-badge {
-    padding: 0.25rem 0.6rem;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    font-weight: 600;
+    padding:0.25rem 0.6rem;
+    border-radius:12px;
+    font-size:0.75rem;
+    font-weight:600;
     color: var(--light-color);
-    background: linear-gradient(135deg, var(--accent-color), var(--accent-color-dark));
+    background:linear-gradient(135deg, var(--accent-color), var(--accent-color-dark));
 }
-
-/* Couleurs badges spécifiques */
 .badge-commissariat { background: linear-gradient(135deg, #4a5c59, #2e3a36); }
 .badge-policiers { background: linear-gradient(135deg, #256d74, #1b4b52); }
 .badge-citoyens { background: linear-gradient(135deg, #17a2b8, #0e6c7a); }
@@ -131,146 +127,162 @@
 .badge-restitutions { background: linear-gradient(135deg, #20c997, #159470); }
 .badge-messages { background: linear-gradient(135deg, #fd7e14, #e0690c); }
 
-/* =========================
-   LISTES DANS CARTES
-========================= */
 .stats-card ul {
-    list-style: none;
-    padding-left: 0;
-    max-height: 180px;
-    overflow-y: auto;
-    margin-top: 0.3rem;
+    list-style:none;
+    padding-left:0;
+    max-height:180px;
+    overflow-y:auto;
+    margin-top:0.3rem;
     scrollbar-width: thin;
     scrollbar-color: var(--main-color-light) transparent;
 }
-.stats-card ul::-webkit-scrollbar {
-    width: 6px;
-}
-.stats-card ul::-webkit-scrollbar-thumb {
-    background-color: var(--main-color-light);
-    border-radius: 3px;
-}
-.stats-card ul li {
-    font-size: 0.85rem;
-    padding: 0.3rem 0.5rem;
-    border-radius: 4px;
-    margin-bottom: 2px;
-}
-.stats-card ul li.new {
-    font-weight: 600;
-    background: var(--main-color-light);
-}
+.stats-card ul::-webkit-scrollbar { width:6px; }
+.stats-card ul::-webkit-scrollbar-thumb { background-color: var(--main-color-light); border-radius:3px; }
+.stats-card ul li { font-size:0.85rem; padding:0.3rem 0.5rem; border-radius:4px; margin-bottom:2px; }
+.stats-card ul li.new { font-weight:600; background: var(--main-color-light); }
 
-/* =========================
-   ANIMATIONS
-========================= */
-@keyframes fadeInUp {
-    0% { opacity: 0; transform: translateY(20px); }
-    100% { opacity: 1; transform: translateY(0); }
-}
-
-/* =========================
-   RESPONSIVE
-========================= */
+/* ================= RESPONSIVE ================= */
 @media (max-width: 768px) {
-    .sidebar {
-        position: relative;
-        min-height: auto;
-        padding: 1rem 0.5rem;
-    }
-    .main-content {
-        padding: 1rem;
-    }
-    .stats-container {
-        justify-content: center;
-    }
+    .sidebar { position:relative; width:100%; min-height:auto; border-radius:0; }
+    .main-content { margin-left:0; padding:1rem; }
+    .stats-container { justify-content:center; margin-top:6rem; }
+    .header-fixed { position: static; margin-bottom:1rem; }
 }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="row">
-    <!-- Sidebar -->
-    <div class="col-md-3 col-lg-2 sidebar">
-        <h4>⚙️ Admin</h4>
-        <ul class="nav flex-column">
-            <li class="nav-item mb-2">
-                <a class="nav-link {% if request.resolver_match.url_name == 'gerer_commissariats' %}active{% endif %}" href="{% url 'gerer_commissariats' %}">🏢 Commissariats</a>
-            </li>
-            <li class="nav-item mb-2">
-                <a class="nav-link {% if request.resolver_match.url_name == 'gerer_utilisateurs' %}active{% endif %}" href="{% url 'gerer_utilisateurs' %}">👥 Administrateurs</a>
-            </li>
-            <li class="nav-item mb-2">
-                <a class="nav-link {% if request.resolver_match.url_name == 'liste_citoyens' %}active{% endif %}" href="{% url 'liste_citoyens' %}">🧍 Citoyens</a>
-            </li>
-            <li class="nav-item mb-2">
-                <a class="nav-link {% if request.resolver_match.url_name == 'gerer_policiers' %}active{% endif %}" href="{% url 'gerer_policiers' %}">👮 Policiers</a>
-            </li>
-            <li class="nav-item mb-2">
-                <a class="nav-link {% if request.resolver_match.url_name == 'voir_stats' %}active{% endif %}" href="{% url 'voir_stats' %}">📊 Statistiques</a>
-            </li>
-            <li class="nav-item mb-2">
-                <a class="nav-link {% if request.resolver_match.url_name == 'liste_messages' %}active{% endif %}" href="{% url 'liste_messages' %}">💬 Messages citoyens</a>
-            </li>
-             <li class="nav-item mb-2">
-                <a class="nav-link {% if request.resolver_match.url_name == 'historique_restitutions' %}active{% endif %}" href="{% url 'historique_restitutions' %}">📂 Historique des restitutions</a>
-            </li>
-        </ul>
+<div class="sidebar">
+    <h4>⚙️ Admin</h4>
+    <ul class="nav flex-column">
+        <li class="nav-item mb-2"><a class="nav-link {% if request.resolver_match.url_name == 'gerer_utilisateurs' %}active{% endif %}" href="{% url 'gerer_utilisateurs' %}">👥 Administrateurs</a></li>
+        <li class="nav-item mb-2"><a class="nav-link {% if request.resolver_match.url_name == 'liste_citoyens' %}active{% endif %}" href="{% url 'liste_citoyens' %}">🧍 Citoyens</a></li>
+        <li class="nav-item mb-2"><a class="nav-link {% if request.resolver_match.url_name == 'gerer_policiers' %}active{% endif %}" href="{% url 'gerer_policiers' %}">👮 Policiers</a></li>
+        <li class="nav-item mb-2"><a class="nav-link {% if request.resolver_match.url_name == 'voir_stats' %}active{% endif %}" href="{% url 'voir_stats' %}">📊 Statistiques</a></li>
+        <li class="nav-item mb-2"><a class="nav-link {% if request.resolver_match.url_name == 'liste_messages' %}active{% endif %}" href="{% url 'liste_messages' %}">💬 Messages citoyens</a></li>
+        <li class="nav-item mb-2"><a class="nav-link {% if request.resolver_match.url_name == 'historique_restitutions' %}active{% endif %}" href="{% url 'historique_restitutions' %}">📂 Historique des restitutions</a></li>
+    </ul>
+</div>
+
+<!-- Header fixe photo + déconnexion -->
+<div class="header-fixed">
+    <div class="user-profile" data-bs-toggle="modal" data-bs-target="#profilAdminModal">
+        {% if request.user.photo %}
+            <img src="{{ request.user.photo.url }}" alt="{{ request.user.get_full_name }}">
+        {% else %}
+            <img src="{% static 'frontend/img/default-user.png' %}" alt="Profil">
+        {% endif %}
     </div>
+    <a class="btn btn-secondary" href="{% url 'logout' %}">Déconnexion</a>
+</div>
 
-    <!-- Contenu principal -->
-    <div class="col-md-9 col-lg-10 main-content">
-        <h2 class="welcome-title">Bienvenue, Administrateur 👋</h2>
-        <p class="text-muted mb-4">Surveillez les activités, gérez les utilisateurs et consultez les indicateurs clés.</p>
+<!-- Modal profil admin -->
+<div class="modal fade" id="profilAdminModal" tabindex="-1" aria-labelledby="profilAdminLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="profilAdminLabel">Profil Administrateur</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center">
+        {% if request.user.photo %}
+            <img src="{{ request.user.photo.url }}" alt="{{ request.user.get_full_name }}" style="width:120px; height:120px; border-radius:50%; object-fit:cover; border:3px solid #C8A048; margin-bottom:1rem;">
+        {% else %}
+            <img src="{% static 'frontend/img/default-user.png' %}" alt="Profil" style="width:120px; height:120px; border-radius:50%; margin-bottom:1rem;">
+        {% endif %}
+        <h5>{{ request.user.get_full_name }}</h5>
+        <p><strong>Username:</strong> {{ request.user.username }}</p>
+        <p><strong>Email:</strong> {{ request.user.email }}</p>
+        <p><strong>Téléphone:</strong> {{ request.user.telephone|default:"Non défini" }}</p>
+        <p><strong>Rôle:</strong> {{ request.user.get_role_display }}</p>
+        <p><strong>Statut:</strong> {% if request.user.est_banni %}Banni{% else %}Actif{% endif %}</p>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-primary" href="{% url 'modifier_profil_admin' %}">Modifier profil</a>
+      </div>
+    </div>
+  </div>
+</div>
 
-        <h4 class="section-title mt-4">Statistiques principales</h4>
-        <div class="stats-container">
-            <div class="stats-card" onclick="location.href='{% url 'gerer_commissariats' %}'">
-                <span class="stats-icon">🏢</span>
-                <h5>{{ nb_commissariats }} <span class="stats-badge badge-commissariat">{{ nb_commissariats }}</span></h5>
-                <small>Commissariats</small>
-            </div>
-            <div class="stats-card" onclick="location.href='{% url 'gerer_policiers' %}'">
-                <span class="stats-icon">👮</span>
-                <h5>{{ nb_policiers }} <span class="stats-badge badge-policiers">{{ nb_policiers }}</span></h5>
-                <small>Policiers actifs</small>
-            </div>
-            <div class="stats-card" onclick="location.href='{% url 'liste_citoyens' %}'">
-                <span class="stats-icon">🧍</span>
-                <h5>{{ nb_citoyens }} <span class="stats-badge badge-citoyens">{{ nb_citoyens }}</span></h5>
-                <small>Citoyens enregistrés</small>
-            </div>
-            <div class="stats-card">
-                <span class="stats-icon">🎒</span>
-                <h5>{{ nb_objets_perdus }} <span class="stats-badge badge-objets-perdus">{{ nb_objets_perdus }}</span></h5>
-                <small>Objets perdus</small>
-            </div>
-            <div class="stats-card">
-                <span class="stats-icon">📦</span>
-                <h5>{{ nb_objets_trouves }} <span class="stats-badge badge-objets-trouves">{{ nb_objets_trouves }}</span></h5>
-                <small>Objets trouvés</small>
-            </div>
-            <div class="stats-card">
-                <span class="stats-icon">✅</span>
-                <h5>{{ nb_restitutions }} <span class="stats-badge badge-restitutions">{{ nb_restitutions }}</span></h5>
-                <small>Restitutions effectuées</small>
-            </div>
-            <div class="stats-card">
-                <span class="stats-icon">💬</span>
-                <h5>{{ messages_recus|length }} <span class="stats-badge badge-messages">{{ messages_recus|length }}</span></h5>
-                <small>Messages récents</small>
-                <ul>
-                    {% for msg in messages_recus %}
-                        <li class="{% if not msg.reponse %}new{% endif %}">
-                            <strong>{{ msg.nom }}</strong>: {{ msg.contenu|truncatewords:6 }}
-                            <small>({{ msg.date_envoi|date:"d/m H:i" }})</small>
-                        </li>
-                    {% empty %}
-                        <li>Aucun message récent</li>
-                    {% endfor %}
-                </ul>
-            </div>
+<div class="main-content">
+    <h4 class="section-title mt-4">Statistiques principales</h4>
+    <div class="stats-container">
+        <div class="stats-card" onclick="location.href='{% url 'gerer_policiers' %}'">
+            <span class="stats-icon">👮</span>
+            <h5>{{ nb_policiers }} <span class="stats-badge badge-policiers">{{ nb_policiers }}</span></h5>
+            <small>Policiers actifs</small>
+        </div>
+        <div class="stats-card" onclick="location.href='{% url 'liste_citoyens' %}'">
+            <span class="stats-icon">🧍</span>
+            <h5>{{ nb_citoyens }} <span class="stats-badge badge-citoyens">{{ nb_citoyens }}</span></h5>
+            <small>Citoyens enregistrés</small>
+        </div>
+        <div class="stats-card">
+            <span class="stats-icon">🎒</span>
+            <h5>{{ nb_objets_perdus }} <span class="stats-badge badge-objets-perdus">{{ nb_objets_perdus }}</span></h5>
+            <small>Objets perdus</small>
+        </div>
+        <div class="stats-card">
+            <span class="stats-icon">📦</span>
+            <h5>{{ nb_objets_trouves }} <span class="stats-badge badge-objets-trouves">{{ nb_objets_trouves }}</span></h5>
+            <small>Objets trouvés</small>
+        </div>
+        <div class="stats-card">
+            <span class="stats-icon">✅</span>
+            <h5>{{ nb_restitutions }} <span class="stats-badge badge-restitutions">{{ nb_restitutions }}</span></h5>
+            <small>Restitutions effectuées</small>
+        </div>
+        <div class="stats-card">
+            <span class="stats-icon">💬</span>
+            <h5>{{ messages_recus|length }} <span class="stats-badge badge-messages">{{ messages_recus|length }}</span></h5>
+            <small>Messages récents</small>
+            <ul>
+                {% for msg in messages_recus %}
+                    <li class="{% if not msg.reponse %}new{% endif %}">
+                        <strong>{{ msg.nom }}</strong>: {{ msg.contenu|truncatewords:6 }} <small>({{ msg.date_envoi|date:"d/m H:i" }})</small>
+                    </li>
+                {% empty %}
+                    <li>Aucun message récent</li>
+                {% endfor %}
+            </ul>
         </div>
     </div>
+
+    <h4 class="section-title mt-4">Répartition des objets</h4>
+    <canvas id="objetsChart" style="max-width:100%; height:300px;"></canvas>
 </div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const ctx = document.getElementById('objetsChart').getContext('2d');
+new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: ['Objets perdus', 'Objets trouvés', 'Restitutions'],
+        datasets: [{
+            label: 'Nombre',
+            data: [ {{ nb_objets_perdus }}, {{ nb_objets_trouves }}, {{ nb_restitutions }} ],
+            backgroundColor: [
+                'rgba(200,160,72,0.7)',
+                'rgba(123,93,199,0.7)',
+                'rgba(32,201,151,0.7)'
+            ],
+            borderColor: [
+                'rgba(200,160,72,1)',
+                'rgba(123,93,199,1)',
+                'rgba(32,201,151,1)'
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive:true,
+        plugins: { legend: { display:false } },
+        scales: { y: { beginAtZero:true, stepSize:1 } }
+    }
+});
+</script>
 {% endblock %}
