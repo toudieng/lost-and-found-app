@@ -15,7 +15,7 @@
     --transition: all 0.3s ease;
 }
 
-/* ================= SIDEBAR ================= */
+/* === SIDEBAR === */
 .sidebar {
     background: linear-gradient(180deg, var(--main-color), #354b52);
     color: var(--light-color);
@@ -32,30 +32,30 @@
 }
 .sidebar h4 {
     color: var(--accent-color);
-    text-align:center;
-    margin-bottom:2rem;
-    font-size:1.4rem;
-    letter-spacing:0.5px;
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 1.4rem;
+    letter-spacing: 0.5px;
 }
 .sidebar .nav-link {
-    display:flex;
-    align-items:center;
-    gap:0.7rem;
-    color:var(--light-color);
-    border-radius:0.5rem;
-    padding:0.6rem 0.9rem;
-    font-weight:500;
-    font-size:0.96rem;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    color: var(--light-color);
+    border-radius: 0.5rem;
+    padding: 0.6rem 0.9rem;
+    font-weight: 500;
+    font-size: 0.96rem;
     transition: var(--transition);
 }
-.sidebar .nav-link:hover, .sidebar .nav-link.active {
+.sidebar .nav-link:hover, 
+.sidebar .nav-link.active {
     background: var(--main-color-light);
     color: var(--accent-color);
     transform: translateX(5px);
 }
-.sidebar .nav-link i { font-size:1.1rem; }
 
-/* ================= HEADER FIXE PROFIL ================= */
+/* === HEADER FIXE === */
 .header-fixed {
     position: fixed;
     top: 1rem;
@@ -83,7 +83,7 @@
     filter: brightness(1.15);
 }
 
-/* Dropdown profil avec animation */
+/* === DROPDOWN PROFIL === */
 .dropdown-menu-custom {
     position: absolute;
     top: 80px;
@@ -98,7 +98,6 @@
     opacity: 0;
     transform: translateY(-10px);
     transition: all 0.3s ease;
-    z-index: 1100;
 }
 .dropdown-menu-custom.show {
     display: flex;
@@ -121,20 +120,20 @@
     font-weight: 600;
 }
 
-/* ================= MAIN CONTENT ================= */
+/* === MAIN === */
 .main-content {
     margin-left: 260px;
-    padding: 2rem;
+    padding: 1.2rem 2rem;
     background: var(--light-color);
     min-height: 100vh;
 }
 
-/* ================= STAT CARDS ================= */
+/* === STATS === */
 .stats-container {
     display: flex;
     flex-wrap: wrap;
     gap: 1.2rem;
-    margin-top: 5rem;
+    margin-top: 4rem;
 }
 .stats-card {
     border-radius: 1rem;
@@ -146,73 +145,60 @@
     flex-direction: column;
     gap: 0.7rem;
     cursor: pointer;
-    min-width: 230px;
     transition: var(--transition);
     position: relative;
     overflow: hidden;
-}
-.stats-card::after {
-    content: "";
-    position: absolute;
-    top:0; left:0;
-    width:100%; height:100%;
-    background: linear-gradient(120deg, transparent, rgba(200,160,72,0.08));
-    transition: var(--transition);
 }
 .stats-card:hover {
     transform: translateY(-7px);
     box-shadow: 0 12px 30px rgba(62,76,73,0.18);
 }
-.stats-icon { font-size:2.2rem; }
 .stats-card h5 {
-    display:flex; align-items:center; justify-content:space-between;
-    font-size:1.6rem; font-weight:600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.6rem;
+    font-weight: 600;
 }
 .stats-badge {
-    padding:0.3rem 0.7rem;
-    border-radius:14px;
-    font-size:0.8rem;
-    font-weight:600;
+    padding: 0.3rem 0.7rem;
+    border-radius: 14px;
+    font-size: 0.8rem;
+    font-weight: 600;
     color: var(--light-color);
-    background:linear-gradient(135deg, var(--accent-color), var(--accent-color-dark));
 }
-.badge-policiers { background: linear-gradient(135deg, #256d74, #1b4b52); }
-.badge-citoyens { background: linear-gradient(135deg, #17a2b8, #0e6c7a); }
-.badge-objets-perdus { background: linear-gradient(135deg, var(--accent-color), var(--accent-color-dark)); color: var(--main-color); }
-.badge-objets-trouves { background: linear-gradient(135deg, #7b5dc7, #5c3aa1); }
-.badge-restitutions { background: linear-gradient(135deg, #20c997, #159470); }
-.badge-messages { background: linear-gradient(135deg, #fd7e14, #e0690c); }
+.badge-policiers { background: #256d74; }
+.badge-citoyens { background: #17a2b8; }
+.badge-objets-perdus { background: var(--accent-color); color: var(--main-color); }
+.badge-objets-trouves { background: #7b5dc7; }
+.badge-restitutions { background: #20c997; }
+.badge-messages { background: #fd7e14; }
 
 .stats-card ul {
     list-style: none;
     padding-left: 0;
     max-height: 180px;
     overflow-y: auto;
-    margin-top: 0.4rem;
-    scrollbar-width: thin;
-    scrollbar-color: var(--main-color-light) transparent;
-}
-.stats-card ul::-webkit-scrollbar { width: 6px; }
-.stats-card ul::-webkit-scrollbar-thumb {
-    background-color: var(--main-color-light);
-    border-radius: 3px;
-}
-.stats-card ul li {
-    font-size: 0.85rem;
-    padding: 0.35rem 0.5rem;
-    border-radius: 4px;
-    margin-bottom: 3px;
-}
-.stats-card ul li.new {
-    font-weight: 600;
-    background: var(--main-color-light);
 }
 
-/* ================= RESPONSIVE ================= */
+/* === CHART SECTION (Remontée + fond dégradé) === */
+.chart-container {
+    background: linear-gradient(135deg, #fafafa 0%, #f3f3f3 100%);
+    border-radius: 1rem;
+    padding: 1.2rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    margin-top: 0.8rem; /* ↓ Remontée du graphe */
+    margin-bottom: 0;
+}
+.chart-container canvas {
+    height: 380px !important; /* ↑ Plus haut */
+    width: 100% !important;
+}
+
+/* === RESPONSIVE === */
 @media (max-width: 768px) {
     .sidebar { position: relative; width: 100%; min-height: auto; border-radius: 0; }
     .main-content { margin-left: 0; padding: 1.2rem; }
-    .stats-container { justify-content: center; margin-top: 7rem; }
     .header-fixed { top: 0.5rem; right: 1rem; }
 }
 </style>
@@ -222,16 +208,15 @@
 <div class="sidebar">
     <h4>⚙️ Admin</h4>
     <ul class="nav flex-column">
-        <li class="nav-item mb-2"><a class="nav-link {% if request.resolver_match.url_name == 'gerer_utilisateurs' %}active{% endif %}" href="{% url 'gerer_utilisateurs' %}">👥 Administrateurs</a></li>
-        <li class="nav-item mb-2"><a class="nav-link {% if request.resolver_match.url_name == 'liste_citoyens' %}active{% endif %}" href="{% url 'liste_citoyens' %}">🧍 Citoyens</a></li>
-        <li class="nav-item mb-2"><a class="nav-link {% if request.resolver_match.url_name == 'gerer_policiers' %}active{% endif %}" href="{% url 'gerer_policiers' %}">👮 Policiers</a></li>
-        <li class="nav-item mb-2"><a class="nav-link {% if request.resolver_match.url_name == 'voir_stats' %}active{% endif %}" href="{% url 'voir_stats' %}">📊 Statistiques</a></li>
-        <li class="nav-item mb-2"><a class="nav-link {% if request.resolver_match.url_name == 'liste_messages' %}active{% endif %}" href="{% url 'liste_messages' %}">💬 Messages citoyens</a></li>
-        <li class="nav-item mb-2"><a class="nav-link {% if request.resolver_match.url_name == 'historique_restitutions' %}active{% endif %}" href="{% url 'historique_restitutions' %}">📂 Historique des restitutions</a></li>
+        <li><a class="nav-link {% if request.resolver_match.url_name == 'gerer_utilisateurs' %}active{% endif %}" href="{% url 'gerer_utilisateurs' %}">👥 Administrateurs</a></li>
+        <li><a class="nav-link {% if request.resolver_match.url_name == 'liste_citoyens' %}active{% endif %}" href="{% url 'liste_citoyens' %}">🧍 Citoyens</a></li>
+        <li><a class="nav-link {% if request.resolver_match.url_name == 'gerer_policiers' %}active{% endif %}" href="{% url 'gerer_policiers' %}">👮 Policiers</a></li>
+        <li><a class="nav-link {% if request.resolver_match.url_name == 'voir_stats' %}active{% endif %}" href="{% url 'voir_stats' %}">📊 Statistiques</a></li>
+        <li><a class="nav-link {% if request.resolver_match.url_name == 'liste_messages' %}active{% endif %}" href="{% url 'liste_messages' %}">💬 Messages</a></li>
+        <li><a class="nav-link {% if request.resolver_match.url_name == 'historique_restitutions' %}active{% endif %}" href="{% url 'historique_restitutions' %}">📂 Restitutions</a></li>
     </ul>
 </div>
 
-<!-- Header fixe photo + menu -->
 <div class="header-fixed">
     <div class="user-profile" id="profileMenu">
         {% if request.user.photo %}
@@ -241,85 +226,43 @@
         {% endif %}
         <div class="dropdown-menu-custom" id="dropdownMenu">
             <a href="#" data-bs-toggle="modal" data-bs-target="#profilAdminModal">👤 Voir profil</a>
-            <a href="{% url 'logout' %}"></i> 🚪Déconnexion</a>
+            <a href="{% url 'logout' %}">🚪 Déconnexion</a>
         </div>
     </div>
-</div>
-
-<!-- Modal profil admin -->
-<div class="modal fade" id="profilAdminModal" tabindex="-1" aria-labelledby="profilAdminLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content text-center">
-      <div class="modal-header">
-        <h5 class="modal-title">Profil Administrateur</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        {% if request.user.photo %}
-            <img src="{{ request.user.photo.url }}" class="mb-3" style="width:120px; height:120px; border-radius:50%; border:3px solid var(--accent-color); object-fit:cover;">
-        {% else %}
-            <img src="{% static 'frontend/img/default-user.png' %}" class="mb-3" style="width:120px; height:120px; border-radius:50%;">
-        {% endif %}
-        <h5>{{ request.user.get_full_name }}</h5>
-        <p><strong>Email:</strong> {{ request.user.email }}</p>
-        <p><strong>Téléphone:</strong> {{ request.user.telephone|default:"Non défini" }}</p>
-        <p><strong>Rôle:</strong> {{ request.user.get_role_display }}</p>
-        <p><strong>Statut:</strong> {% if request.user.est_banni %}<span class="text-danger fw-bold">Banni</span>{% else %}<span class="text-success fw-bold">Actif</span>{% endif %}</p>
-      </div>
-      <div class="modal-footer">
-        <a class="btn btn-primary" href="{% url 'modifier_profil_admin' %}">Modifier le profil</a>
-      </div>
-    </div>
-  </div>
 </div>
 
 <div class="main-content">
-    <h4 class="section-title mt-4">Statistiques principales</h4>
+    <h4 class="mt-4">Statistiques principales</h4>
     <div class="stats-container">
         <div class="stats-card" onclick="location.href='{% url 'gerer_policiers' %}'">
-            <span class="stats-icon">👮</span>
-            <h5>{{ nb_policiers }} <span class="stats-badge badge-policiers">{{ nb_policiers }}</span></h5>
+            👮 <h5>{{ nb_policiers }} <span class="stats-badge badge-policiers">{{ nb_policiers }}</span></h5>
             <small>Policiers actifs</small>
         </div>
         <div class="stats-card" onclick="location.href='{% url 'liste_citoyens' %}'">
-            <span class="stats-icon">🧍</span>
-            <h5>{{ nb_citoyens }} <span class="stats-badge badge-citoyens">{{ nb_citoyens }}</span></h5>
+            🧍 <h5>{{ nb_citoyens }} <span class="stats-badge badge-citoyens">{{ nb_citoyens }}</span></h5>
             <small>Citoyens enregistrés</small>
         </div>
+        <div class="stats-card">🎒 <h5>{{ nb_objets_perdus }} <span class="stats-badge badge-objets-perdus">{{ nb_objets_perdus }}</span></h5>
+            <small>Objets perdus</small></div>
+        <div class="stats-card">📦 <h5>{{ nb_objets_trouves }} <span class="stats-badge badge-objets-trouves">{{ nb_objets_trouves }}</span></h5>
+            <small>Objets trouvés</small></div>
+        <div class="stats-card">✅ <h5>{{ nb_restitutions }} <span class="stats-badge badge-restitutions">{{ nb_restitutions }}</span></h5>
+            <small>Restitutions</small></div>
         <div class="stats-card">
-            <span class="stats-icon">🎒</span>
-            <h5>{{ nb_objets_perdus }} <span class="stats-badge badge-objets-perdus">{{ nb_objets_perdus }}</span></h5>
-            <small>Objets perdus</small>
-        </div>
-        <div class="stats-card">
-            <span class="stats-icon">📦</span>
-            <h5>{{ nb_objets_trouves }} <span class="stats-badge badge-objets-trouves">{{ nb_objets_trouves }}</span></h5>
-            <small>Objets trouvés</small>
-        </div>
-        <div class="stats-card">
-            <span class="stats-icon">✅</span>
-            <h5>{{ nb_restitutions }} <span class="stats-badge badge-restitutions">{{ nb_restitutions }}</span></h5>
-            <small>Restitutions effectuées</small>
-        </div>
-        <div class="stats-card">
-            <span class="stats-icon">💬</span>
-            <h5>{{ messages_recus|length }} <span class="stats-badge badge-messages">{{ messages_recus|length }}</span></h5>
+            💬 <h5>{{ messages_recus|length }} <span class="stats-badge badge-messages">{{ messages_recus|length }}</span></h5>
             <small>Messages récents</small>
             <ul>
                 {% for msg in messages_recus %}
-                    <li class="{% if not msg.reponse %}new{% endif %}">
-                        <strong>{{ msg.nom }}</strong>: {{ msg.contenu|truncatewords:6 }}
-                        <small>({{ msg.date_envoi|date:"d/m H:i" }})</small>
-                    </li>
-                {% empty %}
-                    <li>Aucun message récent</li>
-                {% endfor %}
+                    <li><strong>{{ msg.nom }}</strong>: {{ msg.contenu|truncatewords:6 }} <small>({{ msg.date_envoi|date:"d/m H:i" }})</small></li>
+                {% empty %}<li>Aucun message récent</li>{% endfor %}
             </ul>
         </div>
     </div>
 
-    <h4 class="section-title mt-4">Répartition des objets</h4>
-    <canvas id="objetsChart" style="max-width:100%; height:300px;"></canvas>
+    <h4 class="mt-4">Répartition des objets</h4>
+    <div class="chart-container">
+        <canvas id="objetsChart"></canvas>
+    </div>
 </div>
 {% endblock %}
 
@@ -328,35 +271,21 @@
 <script>
 const profileMenu = document.getElementById('profileMenu');
 const dropdown = document.getElementById('dropdownMenu');
-profileMenu.addEventListener('click', () => {
-    dropdown.classList.toggle('show');
-});
+profileMenu.addEventListener('click', () => dropdown.classList.toggle('show'));
 
-const ctx = document.getElementById('objetsChart').getContext('2d');
-new Chart(ctx, {
+new Chart(document.getElementById('objetsChart'), {
     type: 'bar',
     data: {
         labels: ['Objets perdus', 'Objets trouvés', 'Restitutions'],
         datasets: [{
-            label: 'Nombre',
             data: [{{ nb_objets_perdus }}, {{ nb_objets_trouves }}, {{ nb_restitutions }}],
-            backgroundColor: [
-                'rgba(200,160,72,0.8)',
-                'rgba(123,93,199,0.8)',
-                'rgba(32,201,151,0.8)'
-            ],
+            backgroundColor: ['#C8A048', '#7b5dc7', '#20c997'],
             borderRadius: 8
         }]
     },
     options: {
-        responsive: true,
-        plugins: {
-            legend: { display: false },
-            tooltip: { backgroundColor: 'rgba(47,62,70,0.9)', titleColor: '#fff' }
-        },
-        scales: {
-            y: { beginAtZero: true, ticks: { stepSize: 1 } }
-        }
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true } }
     }
 });
 </script>

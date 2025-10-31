@@ -18,7 +18,11 @@
 }
 
 /* Global layout */
-body { background-color: var(--main-bg); font-family: 'Segoe UI', sans-serif; margin:0; }
+body {
+    background-color: var(--main-bg);
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+}
 
 /* Sidebar */
 .sidebar {
@@ -58,7 +62,11 @@ body { background-color: var(--main-bg); font-family: 'Segoe UI', sans-serif; ma
 }
 
 /* Main content */
-.main-content { margin-left: 260px; padding: 2rem; transition: all 0.3s ease; }
+.main-content {
+    margin-left: 260px;
+    padding: 2rem;
+    transition: all 0.3s ease;
+}
 
 /* Header */
 .header {
@@ -66,13 +74,20 @@ body { background-color: var(--main-bg); font-family: 'Segoe UI', sans-serif; ma
     padding: 1.5rem 2rem;
     border-radius: 1rem;
     box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
-.header h2 { font-weight: 700; color: var(--primary); margin: 0; }
-.header p, .header small { color: #6c757d; margin-bottom: 0; }
+.header h2 {
+    font-weight: 700;
+    color: var(--primary);
+    margin: 0;
+}
+.header p, .header small {
+    color: #6c757d;
+    margin-bottom: 0;
+}
 
 /* Profil utilisateur dropdown */
 .user-profile {
@@ -83,13 +98,17 @@ body { background-color: var(--main-bg); font-family: 'Segoe UI', sans-serif; ma
     cursor: pointer;
 }
 .user-profile img {
-    width: 70px; height: 70px;
+    width: 70px;
+    height: 70px;
     border-radius: 50%;
     object-fit: cover;
     border: 3px solid var(--secondary);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
-.user-profile img:hover { transform: scale(1.1); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+.user-profile img:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
 
 /* Dropdown menu */
 .dropdown-menu-custom {
@@ -140,10 +159,23 @@ body { background-color: var(--main-bg); font-family: 'Segoe UI', sans-serif; ma
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     transition: transform 0.2s, box-shadow 0.2s;
 }
-.stat-card:hover { transform: scale(1.03); box-shadow: 0 6px 18px rgba(0,0,0,0.1); }
-.stat-card .icon { font-size: 2.2rem; opacity: 0.85; }
-.stat-card h4 { margin: 0; font-size: 1.3rem; font-weight: bold; color: var(--primary); }
-.stat-card small { color: #6c757d; }
+.stat-card:hover {
+    transform: scale(1.03);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+}
+.stat-card .icon {
+    font-size: 2.2rem;
+    opacity: 0.85;
+}
+.stat-card h4 {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: var(--primary);
+}
+.stat-card small {
+    color: #6c757d;
+}
 
 /* Card colors */
 .bg-yellow { border-left: 6px solid #ffc107; }
@@ -157,7 +189,12 @@ body { background-color: var(--main-bg); font-family: 'Segoe UI', sans-serif; ma
     border-radius: 1rem;
     padding: 1.5rem;
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    margin-top: 2rem;
+    margin-top: 1rem; /* Graph remonté */
+}
+
+/* Espace réduit entre les stats et le graphique */
+.row.g-3.mb-4 {
+    margin-bottom: 1rem !important;
 }
 
 /* Responsive */
@@ -181,7 +218,6 @@ body { background-color: var(--main-bg); font-family: 'Segoe UI', sans-serif; ma
 </div>
 
 <div class="main-content">
-    <!-- Header + Profil -->
     <div class="header">
         <div>
             <h2>Bienvenue, {{ request.user.first_name }}</h2>
@@ -205,7 +241,6 @@ body { background-color: var(--main-bg); font-family: 'Segoe UI', sans-serif; ma
         </div>
     </div>
 
-    <!-- Stat cards -->
     <div class="row g-3 mb-4">
         {% for card in stats_cards %}
         <div class="col-md-3 col-sm-6">
@@ -220,14 +255,13 @@ body { background-color: var(--main-bg); font-family: 'Segoe UI', sans-serif; ma
         {% endfor %}
     </div>
 
-    <!-- Graphique -->
     <div class="chart-container">
         <h4>Évolution des objets</h4>
         <canvas id="chartObjets" height="100"></canvas>
     </div>
 </div>
 
-<!-- Modal profil policier -->
+<!-- Modal Profil -->
 <div class="modal fade" id="profilPolicierModal" tabindex="-1" aria-labelledby="profilPolicierLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content text-center">
@@ -257,13 +291,11 @@ body { background-color: var(--main-bg); font-family: 'Segoe UI', sans-serif; ma
     </div>
   </div>
 </div>
-
 {% endblock %}
 
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-// Chart.js
 const ctx = document.getElementById('chartObjets').getContext('2d');
 new Chart(ctx, {
     type: 'line',
@@ -295,19 +327,13 @@ new Chart(ctx, {
     }
 });
 
-// Toggle dropdown profil
 const profileMenu = document.getElementById('profileMenu');
 const dropdownMenu = document.getElementById('dropdownMenu');
-
 profileMenu.addEventListener('click', () => {
     dropdownMenu.classList.toggle('show');
 });
-
-// Fermer si clic en dehors
-document.addEventListener('click', function(e){
-    if (!profileMenu.contains(e.target)) {
-        dropdownMenu.classList.remove('show');
-    }
+document.addEventListener('click', e => {
+    if (!profileMenu.contains(e.target)) dropdownMenu.classList.remove('show');
 });
 </script>
 {% endblock %}
