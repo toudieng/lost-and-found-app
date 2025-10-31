@@ -889,8 +889,6 @@ def preuve_restitution_pdf(request, pk):
 #       DASHBOARD ADMIN
 # =============================
 
-from django.contrib.auth.decorators import login_required
-
 @login_required(login_url='login')
 def dashboard_admin(request):
     """
@@ -900,7 +898,6 @@ def dashboard_admin(request):
 
     # Statistiques
     nb_commissariats = Commissariat.objects.count()
-    nb_utilisateurs = Utilisateur.objects.filter(role='admin').count()
     nb_policiers = Utilisateur.objects.filter(role='policier').count()
     nb_citoyens = Utilisateur.objects.filter(role='citoyen').count()
 
@@ -908,8 +905,6 @@ def dashboard_admin(request):
     nb_objets_trouves = Objet.objects.filter(etat=EtatObjet.TROUVE).count()
     nb_objets_en_attente = Objet.objects.filter(etat=EtatObjet.EN_ATTENTE).count()
     nb_objets_restitues = Objet.objects.filter(etat=EtatObjet.RESTITUE).count()
-
-    nb_restitutions = Restitution.objects.count()
 
     # Notifications récentes
     notifications = Notification.objects.order_by('-date')[:5]
@@ -920,14 +915,12 @@ def dashboard_admin(request):
     # Cards dynamiques pour le template
     stats_cards = [
         {'label': 'Commissariats', 'count': nb_commissariats, 'icon': '🏢'},
-        {'label': 'Administrateurs', 'count': nb_utilisateurs, 'icon': '👨‍💼'},
         {'label': 'Policiers', 'count': nb_policiers, 'icon': '👮'},
         {'label': 'Citoyens', 'count': nb_citoyens, 'icon': '🧍'},
         {'label': 'Objets perdus', 'count': nb_objets_perdus, 'icon': '📦'},
         {'label': 'Objets trouvés', 'count': nb_objets_trouves, 'icon': '📬'},
         {'label': 'Objets en attente', 'count': nb_objets_en_attente, 'icon': '⏳'},
         {'label': 'Objets restitués', 'count': nb_objets_restitues, 'icon': '✅'},
-        {'label': 'Restitutions', 'count': nb_restitutions, 'icon': '📂'},
     ]
 
     # Graphique évolution (12 derniers objets)

@@ -15,7 +15,7 @@
     --transition: all 0.3s ease;
 }
 
-/* ================= SIDEBAR ================= */
+/* SIDEBAR */
 .sidebar {
     background: linear-gradient(180deg, var(--main-color), #354b52);
     color: var(--light-color);
@@ -55,7 +55,7 @@
 }
 .sidebar .nav-link i { font-size:1.1rem; }
 
-/* ================= HEADER FIXE PROFIL ================= */
+/* HEADER FIXE PROFIL */
 .header-fixed {
     position: fixed;
     top: 1rem;
@@ -82,8 +82,6 @@
     transform: scale(1.07);
     filter: brightness(1.15);
 }
-
-/* Dropdown profil */
 .dropdown-menu-custom {
     position: absolute;
     top: 80px;
@@ -100,11 +98,7 @@
     transition: all 0.3s ease;
     z-index: 1100;
 }
-.dropdown-menu-custom.show {
-    display: flex;
-    opacity: 1;
-    transform: translateY(0);
-}
+.dropdown-menu-custom.show { display: flex; opacity:1; transform: translateY(0);}
 .dropdown-menu-custom a {
     padding: 0.5rem 1rem;
     border-radius: 0.4rem;
@@ -121,15 +115,10 @@
     font-weight: 600;
 }
 
-/* ================= MAIN CONTENT ================= */
-.main-content {
-    margin-left: 260px;
-    padding: 2rem;
-    background: var(--light-color);
-    min-height: 100vh;
-}
+/* MAIN CONTENT */
+.main-content { margin-left: 260px; padding: 2rem; background: var(--light-color); min-height:100vh; }
 
-/* ================= STAT CARDS ================= */
+/* STAT CARDS */
 .stats-container {
     display: flex;
     flex-wrap: wrap;
@@ -159,15 +148,9 @@
     background: linear-gradient(120deg, transparent, rgba(200,160,72,0.08));
     transition: var(--transition);
 }
-.stats-card:hover {
-    transform: translateY(-7px);
-    box-shadow: 0 12px 30px rgba(62,76,73,0.18);
-}
+.stats-card:hover { transform: translateY(-7px); box-shadow: 0 12px 30px rgba(62,76,73,0.18);}
 .stats-icon { font-size:2.2rem; }
-.stats-card h5 {
-    display:flex; align-items:center; justify-content:space-between;
-    font-size:1.6rem; font-weight:600;
-}
+.stats-card h5 { display:flex; align-items:center; justify-content:space-between; font-size:1.6rem; font-weight:600;}
 .stats-badge {
     padding:0.3rem 0.7rem;
     border-radius:14px;
@@ -177,7 +160,7 @@
     background:linear-gradient(135deg, var(--accent-color), var(--accent-color-dark));
 }
 
-/* ================= CHART CONTAINER ================= */
+/* CHART CONTAINER */
 .chart-container {
     background: var(--light-color);
     border-radius: 1rem;
@@ -187,7 +170,7 @@
     height: 400px;
 }
 
-/* ================= RESPONSIVE ================= */
+/* RESPONSIVE */
 @media (max-width: 768px) {
     .sidebar { position: relative; width: 100%; min-height: auto; border-radius: 0; }
     .main-content { margin-left: 0; padding: 1.2rem; }
@@ -206,7 +189,6 @@
         <li class="nav-item mb-2"><a class="nav-link {% if request.resolver_match.url_name == 'gerer_policiers' %}active{% endif %}" href="{% url 'gerer_policiers' %}">👮 Policiers</a></li>
         <li class="nav-item mb-2"><a class="nav-link {% if request.resolver_match.url_name == 'voir_stats' %}active{% endif %}" href="{% url 'voir_stats' %}">📊 Statistiques</a></li>
         <li class="nav-item mb-2"><a class="nav-link {% if request.resolver_match.url_name == 'liste_messages' %}active{% endif %}" href="{% url 'liste_messages' %}">💬 Messages citoyens</a></li>
-        <li class="nav-item mb-2"><a class="nav-link {% if request.resolver_match.url_name == 'historique_restitutions' %}active{% endif %}" href="{% url 'historique_restitutions' %}">📂 Historique des restitutions</a></li>
     </ul>
 </div>
 
@@ -309,13 +291,6 @@ new Chart(ctx, {
             legend: {
                 position: 'top',
                 labels: { usePointStyle:true, pointStyle:'circle', padding:20, font:{ size:14 } },
-                onClick: (e, legendItem, legend) => {
-                    const index = legendItem.datasetIndex;
-                    const ci = legend.chart;
-                    const meta = ci.getDatasetMeta(index);
-                    meta.hidden = meta.hidden === null ? !ci.data.datasets[index].hidden : null;
-                    ci.update();
-                }
             },
             tooltip: {
                 mode: 'index',
