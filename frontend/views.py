@@ -579,20 +579,21 @@ def objets_trouves_attente(request):
     dont l'état actuel est EN_ATTENTE.
     """
 
-    # Précharger les déclarations liées à chaque objet
-    declarations_prefetch = Prefetch(
-        'objet__declarations',
-        queryset=Declaration.objects.prefetch_related('trouve_par', 'reclame_par'),
-        to_attr='declarations_prefetch'
+    restitutions = (
+        Restitution.objects
+        .select_related('objet', 'citoyen', 'commissariat')
+        .prefetch_related(
+            Prefetch(
+                'objet__declarations',
+                queryset=Declaration.objects.prefetch_related('trouve_par', 'reclame_par'),
+                to_attr='declarations_prefetch'
+            )
+        )
+        .filter(
+            statut=StatutRestitution.PLANIFIEE,
+            objet__etat=EtatObjet.EN_ATTENTE
+        )
     )
-
-    # Récupérer les restitutions planifiées avec objet en attente
-    restitutions = Restitution.objects.select_related(
-        'objet', 'citoyen', 'commissariat'
-    ).filter(
-        statut=StatutRestitution.PLANIFIEE,
-        objet__etat=EtatObjet.EN_ATTENTE
-    ).prefetch_related(declarations_prefetch)
 
     return render(request, "frontend/objets/objets_trouves_attente.html", {
         "restitutions": restitutions

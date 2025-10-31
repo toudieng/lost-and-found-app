@@ -62,16 +62,48 @@
                         <button class="btn btn-sm btn-toggle mb-2 w-100 text-center" type="button" data-target="#details-{{ r.id }}">
                             ℹ️ Voir les détails
                         </button>
+
                         <div class="details-card" id="details-{{ r.id }}">
                             <p><b>👤 Citoyen (réclamant) :</b> {{ r.citoyen.username }}</p>
                             <p><b>Email :</b> {{ r.citoyen.email|default:"-" }}</p>
+                            <p><b>Téléphone :</b> {{ r.citoyen.numero|default:"-" }}</p>
 
                             {% if r.objet.declarations_prefetch %}
                                 {% for dec in r.objet.declarations_prefetch %}
-                                    {% if dec.trouve_par.first %}
-                                        <p><b>🔍 Trouveur :</b> {{ dec.trouve_par.first.username }} — 
-                                           <span class="text-muted">{{ dec.trouve_par.first.email|default:"-" }}</span>
-                                        </p>
+                                    {% if dec.etat_initial == 'trouve' %}
+                                        {% if dec.trouve_par.all %}
+                                            <p><b>Déclarant :</b></p>
+                                            <ul>
+                                            {% for user in dec.trouve_par.all %}
+                                                <li>{{ user.username }} — Email: {{ user.email|default:"-" }} — Tel: {{ user.numero|default:"-" }}</li>
+                                            {% endfor %}
+                                            </ul>
+                                        {% endif %}
+                                        {% if dec.reclame_par.all %}
+                                            <p><b>Réclamant :</b></p>
+                                            <ul>
+                                            {% for user in dec.reclame_par.all %}
+                                                <li>{{ user.username }} — Email: {{ user.email|default:"-" }} — Tel: {{ user.numero|default:"-" }}</li>
+                                            {% endfor %}
+                                            </ul>
+                                        {% endif %}
+                                    {% elif dec.etat_initial == 'perdu' %}
+                                        {% if dec.reclame_par.all %}
+                                            <p><b>Déclarant :</b></p>
+                                            <ul>
+                                            {% for user in dec.reclame_par.all %}
+                                                <li>{{ user.username }} — Email: {{ user.email|default:"-" }} — Tel: {{ user.numero|default:"-" }}</li>
+                                            {% endfor %}
+                                            </ul>
+                                        {% endif %}
+                                        {% if dec.trouve_par.all %}
+                                            <p><b>Trouveur :</b></p>
+                                            <ul>
+                                            {% for user in dec.trouve_par.all %}
+                                                <li>{{ user.username }} — Email: {{ user.email|default:"-" }} — Tel: {{ user.numero|default:"-" }}</li>
+                                            {% endfor %}
+                                            </ul>
+                                        {% endif %}
                                     {% endif %}
                                     <p><b>État de la déclaration :</b> {{ dec.get_etat_initial_display }}</p>
                                     <hr>
