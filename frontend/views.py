@@ -889,6 +889,8 @@ def preuve_restitution_pdf(request, pk):
 #       DASHBOARD ADMIN
 # =============================
 
+from django.contrib.auth.decorators import login_required
+
 @login_required(login_url='login')
 def dashboard_admin(request):
     """
@@ -896,58 +898,56 @@ def dashboard_admin(request):
     Affiche les statistiques globales du système ainsi que les messages citoyens récents.
     """
 
-    # Statistiques des utilisateurs
+    # Statistiques
     nb_commissariats = Commissariat.objects.count()
     nb_utilisateurs = Utilisateur.objects.filter(role='admin').count()
     nb_policiers = Utilisateur.objects.filter(role='policier').count()
     nb_citoyens = Utilisateur.objects.filter(role='citoyen').count()
 
-    # Statistiques sur les objets
     nb_objets_perdus = Objet.objects.filter(etat=EtatObjet.PERDU).count()
     nb_objets_trouves = Objet.objects.filter(etat=EtatObjet.TROUVE).count()
-    nb_objets_reclames = Objet.objects.filter(etat=EtatObjet.RECLAME).count()
     nb_objets_en_attente = Objet.objects.filter(etat=EtatObjet.EN_ATTENTE).count()
     nb_objets_restitues = Objet.objects.filter(etat=EtatObjet.RESTITUE).count()
 
-    # Restitutions
     nb_restitutions = Restitution.objects.count()
 
-    # Notifications récentes (5 dernières)
+    # Notifications récentes
     notifications = Notification.objects.order_by('-date')[:5]
 
-    # Messages citoyens récents (5 derniers)
+    # Messages citoyens récents
     messages_recus = Message.objects.order_by('-date_envoi')[:5]
 
-    # Graphique évolution (par mois ou par date d'ajout)
-    # Ici on prend juste les 12 derniers objets ajoutés pour exemple
-    derniers_objets = Objet.objects.order_by('-id')[:12]  # id croissant ≈ date création
+    # Cards dynamiques pour le template
+    stats_cards = [
+        {'label': 'Commissariats', 'count': nb_commissariats, 'icon': '🏢'},
+        {'label': 'Administrateurs', 'count': nb_utilisateurs, 'icon': '👨‍💼'},
+        {'label': 'Policiers', 'count': nb_policiers, 'icon': '👮'},
+        {'label': 'Citoyens', 'count': nb_citoyens, 'icon': '🧍'},
+        {'label': 'Objets perdus', 'count': nb_objets_perdus, 'icon': '📦'},
+        {'label': 'Objets trouvés', 'count': nb_objets_trouves, 'icon': '📬'},
+        {'label': 'Objets en attente', 'count': nb_objets_en_attente, 'icon': '⏳'},
+        {'label': 'Objets restitués', 'count': nb_objets_restitues, 'icon': '✅'},
+        {'label': 'Restitutions', 'count': nb_restitutions, 'icon': '📂'},
+    ]
 
-    chart_labels = [f"{obj.nom}" for obj in derniers_objets]
+    # Graphique évolution (12 derniers objets)
+    derniers_objets = Objet.objects.order_by('-id')[:12]
+    chart_labels = [obj.nom for obj in derniers_objets]
     chart_perdus = [1 if obj.etat == EtatObjet.PERDU else 0 for obj in derniers_objets]
     chart_trouves = [1 if obj.etat == EtatObjet.TROUVE else 0 for obj in derniers_objets]
+    chart_attente = [1 if obj.etat == EtatObjet.EN_ATTENTE else 0 for obj in derniers_objets]
 
     context = {
-        'nb_commissariats': nb_commissariats,
-        'nb_utilisateurs': nb_utilisateurs,
-        'nb_policiers': nb_policiers,
-        'nb_citoyens': nb_citoyens,
-        'nb_objets_perdus': nb_objets_perdus,
-        'nb_objets_trouves': nb_objets_trouves,
-        'nb_objets_reclames': nb_objets_reclames,
-        'nb_objets_en_attente': nb_objets_en_attente,
-        'nb_objets_restitues': nb_objets_restitues,
-        'nb_restitutions': nb_restitutions,
+        'stats_cards': stats_cards,
         'notifications': notifications,
         'messages_recus': messages_recus,
-        # Pour le graphique style policier
-        'chart_labels': chart_labels[::-1],  # inverser pour affichage chronologique
+        'chart_labels': chart_labels[::-1],  # inversé pour chronologie
         'chart_perdus': chart_perdus[::-1],
         'chart_trouves': chart_trouves[::-1],
+        'chart_attente': chart_attente[::-1],
     }
 
     return render(request, "frontend/admin/dashboard_admin.html", context)
-
-
 
 
 @admin_required
