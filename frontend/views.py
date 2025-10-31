@@ -872,10 +872,7 @@ def preuve_restitution_pdf(request, pk):
 #       DASHBOARD ADMIN
 # =============================
 
-
-
 @login_required(login_url='login')
-
 def dashboard_admin(request):
     """
     Tableau de bord Administrateur :
@@ -904,7 +901,14 @@ def dashboard_admin(request):
     # Messages citoyens récents (5 derniers)
     messages_recus = Message.objects.order_by('-date_envoi')[:5]
 
-    # Contexte pour le template
+    # Graphique évolution (par mois ou par date d'ajout)
+    # Ici on prend juste les 12 derniers objets ajoutés pour exemple
+    derniers_objets = Objet.objects.order_by('-id')[:12]  # id croissant ≈ date création
+
+    chart_labels = [f"{obj.nom}" for obj in derniers_objets]
+    chart_perdus = [1 if obj.etat == EtatObjet.PERDU else 0 for obj in derniers_objets]
+    chart_trouves = [1 if obj.etat == EtatObjet.TROUVE else 0 for obj in derniers_objets]
+
     context = {
         'nb_commissariats': nb_commissariats,
         'nb_utilisateurs': nb_utilisateurs,
@@ -917,10 +921,16 @@ def dashboard_admin(request):
         'nb_objets_restitues': nb_objets_restitues,
         'nb_restitutions': nb_restitutions,
         'notifications': notifications,
-        'messages_recus': messages_recus,  # Ajout des messages citoyens
+        'messages_recus': messages_recus,
+        # Pour le graphique style policier
+        'chart_labels': chart_labels[::-1],  # inverser pour affichage chronologique
+        'chart_perdus': chart_perdus[::-1],
+        'chart_trouves': chart_trouves[::-1],
     }
 
     return render(request, "frontend/admin/dashboard_admin.html", context)
+
+
 
 
 @admin_required

@@ -18,7 +18,7 @@
 }
 
 /* Global layout */
-body { background-color: var(--main-bg); font-family: 'Segoe UI', sans-serif; }
+body { background-color: var(--main-bg); font-family: 'Segoe UI', sans-serif; margin:0; }
 
 /* Sidebar */
 .sidebar {
@@ -31,28 +31,117 @@ body { background-color: var(--main-bg); font-family: 'Segoe UI', sans-serif; }
     border-top-right-radius: 1.5rem;
     border-bottom-right-radius: 1.5rem;
     box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
 }
-.sidebar h4 { color: var(--secondary); text-align: center; font-weight: 700; margin-bottom: 2rem; font-size: 1.3rem; }
-.sidebar .nav-link { color: #dcdcdc; border-radius: 8px; padding: 0.8rem 1rem; display: flex; align-items: center; justify-content: space-between; transition: all 0.2s ease-in-out; font-weight: 500; cursor: pointer; }
-.sidebar .nav-link:hover, .sidebar .nav-link.active { background-color: var(--secondary); color: var(--white); font-weight: 600; }
+.sidebar h4 {
+    color: var(--secondary);
+    text-align: center;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    font-size: 1.3rem;
+}
+.sidebar .nav-link {
+    color: #dcdcdc;
+    border-radius: 8px;
+    padding: 0.8rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.2s ease-in-out;
+    font-weight: 500;
+    cursor: pointer;
+}
+.sidebar .nav-link:hover, .sidebar .nav-link.active {
+    background-color: var(--secondary);
+    color: var(--white);
+    font-weight: 600;
+}
 
 /* Main content */
-.main-content { margin-left: 260px; padding: 2rem; }
+.main-content { margin-left: 260px; padding: 2rem; transition: all 0.3s ease; }
 
 /* Header */
-.header { background: var(--white); padding: 1.5rem 2rem; border-radius: 1rem; box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; }
+.header {
+    background: var(--white);
+    padding: 1.5rem 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 .header h2 { font-weight: 700; color: var(--primary); margin: 0; }
 .header p, .header small { color: #6c757d; margin-bottom: 0; }
 
-/* Profil utilisateur dans header */
-.user-profile { display: flex; align-items: center; gap: 0.8rem; }
-.user-profile img { width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 3px solid var(--secondary); cursor: pointer; }
-.user-profile .dropdown-menu { min-width: 160px; }
+/* Profil utilisateur dropdown */
+.user-profile {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    cursor: pointer;
+}
+.user-profile img {
+    width: 70px; height: 70px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--secondary);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.user-profile img:hover { transform: scale(1.1); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+
+/* Dropdown menu */
+.dropdown-menu-custom {
+    position: absolute;
+    top: 80px;
+    right: 0;
+    background: var(--white);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    border-radius: 0.7rem;
+    padding: 0.5rem 0;
+    display: none;
+    flex-direction: column;
+    min-width: 220px;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 1100;
+}
+.dropdown-menu-custom.show {
+    display: flex;
+    opacity: 1;
+    transform: translateY(0);
+}
+.dropdown-menu-custom a {
+    padding: 0.5rem 1rem;
+    border-radius: 0.4rem;
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    transition: all 0.2s ease;
+}
+.dropdown-menu-custom a:hover {
+    background: var(--secondary);
+    color: var(--white);
+    font-weight: 600;
+}
 
 /* Stat cards */
-.stat-card { background: var(--white); border-radius: 1rem; padding: 1.5rem; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition: transform 0.2s, box-shadow 0.2s; }
+.stat-card {
+    background: var(--white);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
 .stat-card:hover { transform: scale(1.03); box-shadow: 0 6px 18px rgba(0,0,0,0.1); }
-.stat-card .icon { font-size: 2.2rem; opacity: 0.8; }
+.stat-card .icon { font-size: 2.2rem; opacity: 0.85; }
 .stat-card h4 { margin: 0; font-size: 1.3rem; font-weight: bold; color: var(--primary); }
 .stat-card small { color: #6c757d; }
 
@@ -63,12 +152,19 @@ body { background-color: var(--main-bg); font-family: 'Segoe UI', sans-serif; }
 .bg-green  { border-left: 6px solid #20c997; }
 
 /* Chart section */
-.chart-container { background: var(--white); border-radius: 1rem; padding: 1.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+.chart-container {
+    background: var(--white);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    margin-top: 2rem;
+}
 
 /* Responsive */
 @media (max-width: 768px) {
     .sidebar { position: relative; width: 100%; min-height: auto; border-radius: 0; }
     .main-content { margin-left: 0; padding: 1rem; }
+    .header { flex-direction: column; align-items: flex-start; gap: 1rem; }
 }
 </style>
 {% endblock %}
@@ -85,22 +181,27 @@ body { background-color: var(--main-bg); font-family: 'Segoe UI', sans-serif; }
 </div>
 
 <div class="main-content">
+    <!-- Header + Profil -->
     <div class="header">
         <div>
-            <h2>Bienvenue, {{ request.user.first_name }} </h2>
+            <h2>Bienvenue, {{ request.user.first_name }}</h2>
             <p>Gérez les objets et planifiez les restitutions depuis ce tableau de bord.</p>
             {% if request.user.commissariat %}
                 <small><strong>Commissariat:</strong> {{ request.user.commissariat.nom }}</small>
             {% endif %}
         </div>
 
-        <div class="user-profile d-flex align-items-center">
+        <div class="user-profile" id="profileMenu">
             {% if request.user.photo %}
-                <img src="{{ request.user.photo.url }}" alt="{{ request.user.get_full_name }}" data-bs-toggle="modal" data-bs-target="#profilPolicierModal">
+                <img src="{{ request.user.photo.url }}" alt="{{ request.user.get_full_name }}">
             {% else %}
-                <img src="{% static 'frontend/img/default-user.png' %}" alt="Profil" data-bs-toggle="modal" data-bs-target="#profilPolicierModal">
+                <img src="{% static 'frontend/img/default-user.png' %}" alt="Profil">
             {% endif %}
-            <a class="btn btn-secondary btn-sm ms-2" href="{% url 'logout' %}">Déconnexion</a>
+            
+            <div class="dropdown-menu-custom" id="dropdownMenu">
+                <a href="#" data-bs-toggle="modal" data-bs-target="#profilPolicierModal"><i class="bi bi-person-circle me-2"></i>👤 Voir profil</a>
+                <a href="{% url 'logout' %}"><i class="bi bi-box-arrow-right me-2"></i> 🚪Déconnexion</a>
+            </div>
         </div>
     </div>
 
@@ -120,7 +221,7 @@ body { background-color: var(--main-bg); font-family: 'Segoe UI', sans-serif; }
     </div>
 
     <!-- Graphique -->
-    <div class="chart-container mt-5">
+    <div class="chart-container">
         <h4>Évolution des objets</h4>
         <canvas id="chartObjets" height="100"></canvas>
     </div>
@@ -129,16 +230,16 @@ body { background-color: var(--main-bg); font-family: 'Segoe UI', sans-serif; }
 <!-- Modal profil policier -->
 <div class="modal fade" id="profilPolicierModal" tabindex="-1" aria-labelledby="profilPolicierLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
+    <div class="modal-content text-center">
       <div class="modal-header">
         <h5 class="modal-title" id="profilPolicierLabel">Profil Policier</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
-      <div class="modal-body text-center">
+      <div class="modal-body">
         {% if request.user.photo %}
-            <img src="{{ request.user.photo.url }}" alt="{{ request.user.get_full_name }}" style="width:120px; height:120px; border-radius:50%; object-fit:cover; border:3px solid #C8A048; margin-bottom:1rem;">
+            <img src="{{ request.user.photo.url }}" class="mb-3" style="width:120px; height:120px; border-radius:50%; border:3px solid var(--secondary); object-fit:cover;">
         {% else %}
-            <img src="{% static 'frontend/img/default-user.png' %}" alt="Profil" style="width:120px; height:120px; border-radius:50%; margin-bottom:1rem;">
+            <img src="{% static 'frontend/img/default-user.png' %}" class="mb-3" style="width:120px; height:120px; border-radius:50%;">
         {% endif %}
         <h5>{{ request.user.get_full_name }}</h5>
         <p><strong>Username:</strong> {{ request.user.username }}</p>
@@ -148,18 +249,21 @@ body { background-color: var(--main-bg); font-family: 'Segoe UI', sans-serif; }
         {% if request.user.commissariat %}
             <p><strong>Commissariat:</strong> {{ request.user.commissariat.nom }}</p>
         {% endif %}
-        <p><strong>Statut:</strong> {% if request.user.est_banni %}Banni{% else %}Actif{% endif %}</p>
+        <p><strong>Statut:</strong> {% if request.user.est_banni %}<span class="text-danger fw-bold">Banni</span>{% else %}<span class="text-success fw-bold">Actif</span>{% endif %}</p>
       </div>
       <div class="modal-footer">
-        <a class="btn btn-primary" href="{% url 'modifier_profil_police' %}">Modifier profil</a>
+        <a class="btn btn-primary" href="{% url 'modifier_profil_police' %}">Modifier le profil</a>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Chart.js -->
+{% endblock %}
+
+{% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+// Chart.js
 const ctx = document.getElementById('chartObjets').getContext('2d');
 new Chart(ctx, {
     type: 'line',
@@ -188,6 +292,21 @@ new Chart(ctx, {
         responsive: true,
         plugins: { legend: { position: 'top' } },
         scales: { y: { beginAtZero: true } }
+    }
+});
+
+// Toggle dropdown profil
+const profileMenu = document.getElementById('profileMenu');
+const dropdownMenu = document.getElementById('dropdownMenu');
+
+profileMenu.addEventListener('click', () => {
+    dropdownMenu.classList.toggle('show');
+});
+
+// Fermer si clic en dehors
+document.addEventListener('click', function(e){
+    if (!profileMenu.contains(e.target)) {
+        dropdownMenu.classList.remove('show');
     }
 });
 </script>
