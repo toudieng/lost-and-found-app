@@ -111,9 +111,15 @@ def profil_police(request):
     return profil_view(request, "frontend/policier/profil.html")
 
 
+
+
 @login_required
 def modifier_profil_police(request):
-    return profil_view(request, "frontend/policier/modifier_profil.html", form_redirect="profil_police")
+    # Ajouter un message d'information
+    messages.info(request, "Vous pouvez modifier votre profil ci-dessous.")
+
+    # Appel de la vue profil avec template
+    return profil_view(request, "frontend/policier/modifier_profil.html")
 
 
 @login_required
@@ -121,9 +127,19 @@ def profil_citoyen(request):
     return profil_view(request, "frontend/citoyen/profil_citoyen.html")
 
 
-@login_required
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+
+@login_required(login_url='login')  # Redirige vers login si non connecté
 def modifier_profil_citoyen(request):
-    return profil_view(request, "frontend/citoyen/modifier_profil_citoyen.html", form_redirect="dashboard_citoyen")
+    # Message d'information à l'ouverture du formulaire
+    messages.info(request, f"Bienvenue {request.user.username}, vous pouvez modifier votre profil.")
+    
+    return profil_view(
+        request, 
+        "frontend/citoyen/modifier_profil_citoyen.html", 
+        form_redirect="dashboard_citoyen"
+    )
 
 # -------------------- NOTIFICATIONS --------------------
 

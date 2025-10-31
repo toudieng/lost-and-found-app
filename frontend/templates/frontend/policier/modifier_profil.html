@@ -5,65 +5,151 @@
 
 {% block extra_css %}
 <style>
-.card {
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+/* Messages */
+.alert { margin-bottom: 1rem; }
+
+/* Conteneur centré */
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+    padding: 2rem 0;
 }
 
-h2 {
-    color: var(--main-color);
-    font-weight: 700;
-    margin-bottom: 1.5rem;
+/* Formulaire card */
+.card { 
+    border-radius: 12px; 
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12); 
+    background-color: #fff8e7; /* Blanc doré clair */
+    padding: 2rem;
+    width: 100%;
+    max-width: 500px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.15);
 }
 
-label {
-    font-weight: 500;
-    color: #495057;
+/* Titres */
+h2 { 
+    color: var(--main-color); 
+    font-weight: 700; 
+    margin-bottom: 1.5rem; 
+    text-align: center;
 }
 
-input, select, textarea {
-    border-radius: 6px;
-    border: 1px solid #ced4da;
-    padding: 6px 10px;
+/* Boutons */
+.btn-back { 
+    background-color: #6c757d; 
+    color: #fff; 
+    border: none; 
+    border-radius: 6px; 
+    padding: 6px 12px; 
+    text-decoration: none; 
+    display: inline-flex; 
+    align-items: center; 
+    gap: 0.4rem; 
+}
+.btn-back:hover { background-color: #5a6268; }
+
+.btn-success { 
+    background-color: var(--accent-color); 
+    border: none; 
+    font-weight: 600; 
+    transition: 0.2s; 
+}
+.btn-success:hover { background-color: var(--accent-color-dark); }
+
+/* Input group icons */
+.input-group-text { 
+    background-color: #f1f3f5; 
+    border-radius: 6px 0 0 6px; 
+    display:flex; 
+    align-items:center; 
+    justify-content:center; 
+    width:40px; 
+    transition: transform 0.2s, color 0.2s;
+}
+.input-group-text i { 
+    color: #ffc107; 
+    transition: transform 0.2s, color 0.2s; 
+}
+.input-group-text i:hover {
+    color: #ffca2c; /* léger doré plus clair au hover */
+    transform: scale(1.2); /* légère augmentation de taille */
 }
 
-input:focus, select:focus, textarea:focus {
+.form-control:hover, .form-select:hover {
+    background-color: #fffdf5; 
+}
+
+.input-group { margin-bottom: 1rem; }
+
+.form-control { 
+    border-radius:0 6px 6px 0; 
+    border-left:none; 
+    transition: border-color 0.2s, box-shadow 0.2s; 
+}
+.form-control:focus { 
     border-color: var(--accent-color);
     box-shadow: 0 0 0 0.2rem rgba(200,160,72,0.25);
-}
-
-.btn-success {
-    background-color: var(--accent-color);
-    border: none;
-    transition: 0.2s;
-}
-
-.btn-success:hover {
-    background-color: var(--accent-color-dark);
 }
 </style>
 {% endblock %}
 
-{% block content %}
-<div class="container mt-4">
-    <h2>✏️ Modifier Profil</h2>
 
-    <div class="card p-4 mt-3">
-        <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            {% for field in form %}
-                <div class="mb-3">
-                    <label class="form-label">{{ field.label }}</label>
-                    {{ field }}
-                    {% if field.help_text %}
-                        <small class="form-text text-muted">{{ field.help_text }}</small>
-                    {% endif %}
-                    {% if field.errors %}
-                        <div class="text-danger small mt-1">{{ field.errors|striptags }}</div>
-                    {% endif %}
+
+{% block content %}
+<div class="container">
+
+    <div class="card">
+        <!-- Messages Django -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             {% endfor %}
-            <button type="submit" class="btn btn-success">💾 Enregistrer</button>
+        {% endif %}
+
+        <h2>✏️ Modifier Profil</h2>
+
+        <form method="post" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="input-group">
+                    <span class="input-group-text">
+                        {% if "username" in field.name %}
+                            <i class="bi bi-person-fill"></i>
+                        {% elif "email" in field.name %}
+                            <i class="bi bi-envelope-fill"></i>
+                        {% elif "telephone" in field.name or "phone" in field.name %}
+                            <i class="bi bi-telephone-fill"></i>
+                        {% elif "password" in field.name %}
+                            <i class="bi bi-lock-fill"></i>
+                        {% elif "photo" in field.name %}
+                            <i class="bi bi-image-fill"></i>
+                        {% else %}
+                            <i class="bi bi-pencil-fill"></i>
+                        {% endif %}
+                    </span>
+                    {{ field }}
+                </div>
+                {% if field.help_text %}
+                    <small class="form-text text-muted mb-2">{{ field.help_text }}</small>
+                {% endif %}
+                {% if field.errors %}
+                    <div class="text-danger small mb-2">{{ field.errors|striptags }}</div>
+                {% endif %}
+            {% endfor %}
+
+            <div class="d-flex justify-content-end gap-2 mt-3">
+                <a href="{% url 'dashboard_policier' %}" class="btn btn-back">← Retour</a>
+                <button type="submit" class="btn btn-success">💾 Enregistrer</button>
+            </div>
         </form>
     </div>
 </div>
