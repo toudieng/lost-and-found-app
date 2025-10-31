@@ -277,10 +277,14 @@ def supprimer_objet(request, objet_id):
 # =============================
 #       DASHBOARD POLICIER
 # =============================
+from django.shortcuts import render
+from django.urls import reverse
+from django.utils import timezone
+from dateutil.relativedelta import relativedelta
+
+import json
 
 @policier_required
-
-
 def dashboard_policier(request):
     today = timezone.now()
     current_year = today.year
@@ -288,9 +292,9 @@ def dashboard_policier(request):
     # --- Labels des 6 derniers mois ---
     months_labels = []
     last_6_months = []
-    for i in range(5, -1, -1):  # 5 mois avant -> 0
+    for i in range(5, -1, -1):
         month = today - relativedelta(months=i)
-        months_labels.append(month.strftime("%b"))  # "Jan", "Fév", ...
+        months_labels.append(month.strftime("%b"))
         last_6_months.append((month.year, month.month))
 
     # --- Statistiques globales ---
@@ -319,7 +323,7 @@ def dashboard_policier(request):
         {"label": "Historique", "count": nb_restitutions, "icon": "📂", "url": reverse("historique_restitutions")},
     ]
 
-    # --- Données graphiques 6 derniers mois ---
+    # --- Fonction pour obtenir les données des 6 derniers mois ---
     def data_by_last_6_months(queryset):
         data = []
         for y, m in last_6_months:
@@ -333,12 +337,24 @@ def dashboard_policier(request):
     data_trouves_reclames = data_by_last_6_months(
         Declaration.objects.filter(etat_initial=EtatObjet.TROUVE, objet__etat=EtatObjet.RECLAME)
     )
+    data_attente = data_by_last_6_months(
+        Declaration.objects.filter(objet__etat=EtatObjet.EN_ATTENTE)
+    )
+
+    # --- Assurer que toutes les séries ont 6 valeurs ---
+    def pad_to_6(lst):
+        return lst + [0]*(6 - len(lst))
+
+    data_perdus_trouves = pad_to_6(data_perdus_trouves)
+    data_trouves_reclames = pad_to_6(data_trouves_reclames)
+    data_attente = pad_to_6(data_attente)
 
     context = {
         "stats_cards": stats_cards,
-        "chart_labels": months_labels,
-        "chart_perdus": data_perdus_trouves,
-        "chart_trouves": data_trouves_reclames,
+        "chart_labels": json.dumps(months_labels),
+        "chart_perdus": json.dumps(data_perdus_trouves),
+        "chart_trouves": json.dumps(data_trouves_reclames),
+        "chart_attente": json.dumps(data_attente),
         "current_year": current_year,
     }
 
