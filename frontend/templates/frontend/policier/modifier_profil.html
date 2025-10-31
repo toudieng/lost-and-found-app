@@ -41,16 +41,6 @@ input:focus, select:focus, textarea:focus {
 .btn-success:hover {
     background-color: var(--accent-color-dark);
 }
-
-.btn-secondary {
-    background-color: #6c757d;
-    border: none;
-    transition: 0.2s;
-}
-
-.btn-secondary:hover {
-    background-color: #5a6268;
-}
 </style>
 {% endblock %}
 
@@ -73,10 +63,7 @@ input:focus, select:focus, textarea:focus {
                     {% endif %}
                 </div>
             {% endfor %}
-            <div class="d-flex gap-2">
-                <button type="submit" class="btn btn-success">💾 Enregistrer</button>
-                <a href="{% url 'profil_police' %}" class="btn btn-secondary">Annuler</a>
-            </div>
+            <button type="submit" class="btn btn-success">💾 Enregistrer</button>
         </form>
     </div>
 </div>
