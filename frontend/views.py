@@ -1146,24 +1146,17 @@ def ajax_supprimer_commissariat(request, pk):
 
 
 
-
-
-admin_required
+@admin_required
 def creer_policier(request):
-    # Précharger tous les commissariats pour le formulaire
-    form = PolicierForm(request.POST or None)
-    form.fields["commissariat"].queryset = Commissariat.objects.all()
+    form = PolicierForm(request.POST or None, request.FILES or None)
 
     if request.method == "POST":
         if form.is_valid():
-            # Génération d’un mot de passe sécurisé
             password = get_random_string(10)
-
             policier = form.save(commit=False)
             policier.set_password(password)
             policier.save()
 
-            # Envoi d’un email avec les identifiants
             send_mail(
                 subject="Création de votre compte Policier",
                 message=(
@@ -1179,11 +1172,13 @@ def creer_policier(request):
             )
 
             messages.success(request, "✅ Policier créé et mot de passe envoyé par email.")
-            return redirect("liste_policiers")  # redirige vers la liste après création
+            return redirect("gerer_policiers")
         else:
             messages.error(request, "⚠️ Veuillez corriger les erreurs dans le formulaire.")
-    
+
     return render(request, "frontend/admin/creer_policier.html", {"form": form})
+
+
 
 
 def is_admin(user):
