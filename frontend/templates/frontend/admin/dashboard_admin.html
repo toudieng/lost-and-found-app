@@ -69,7 +69,7 @@ body { background-color: var(--main-bg); font-family: 'Segoe UI', sans-serif; ma
     align-items: center;
 }
 .header h2 { font-weight: 700; color: var(--primary); margin: 0; }
-.header small { color: #6c757d; }
+.header p { color: #6c757d; margin: 0; }
 
 /* Profil utilisateur dropdown */
 .user-profile { position: relative; display: flex; align-items: center; gap: 0.8rem; cursor: pointer; }
@@ -104,7 +104,11 @@ body { background-color: var(--main-bg); font-family: 'Segoe UI', sans-serif; ma
 .chart-container { background: var(--white); border-radius: 1rem; padding: 1.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-top: 1rem; height: 400px; }
 
 /* Responsive */
-@media (max-width: 768px) { .sidebar { position: relative; width: 100%; min-height: auto; border-radius: 0; } .main-content { margin-left: 0; padding: 1rem; } .header { flex-direction: column; align-items: flex-start; gap: 1rem; } }
+@media (max-width: 768px) { 
+    .sidebar { position: relative; width: 100%; min-height: auto; border-radius: 0; } 
+    .main-content { margin-left: 0; padding: 1rem; } 
+    .header { flex-direction: column; align-items: flex-start; gap: 1rem; } 
+}
 </style>
 {% endblock %}
 
@@ -124,11 +128,15 @@ body { background-color: var(--main-bg); font-family: 'Segoe UI', sans-serif; ma
 <div class="main-content">
     <div class="header">
         <div>
-            <h2>Bienvenue, {{ request.user.usename }}</h2>
+            <h2>Bienvenue, {{ request.user.get_full_name }}</h2>
             <p>Gérez les utilisateurs et les objets depuis ce tableau de bord.</p>
         </div>
         <div class="user-profile" id="profileMenu">
-            {% if request.user.photo %}<img src="{{ request.user.photo.url }}"> {% else %}<img src="{% static 'frontend/img/default-user.png' %}">{% endif %}
+            {% if request.user.photo %}
+                <img src="{{ request.user.photo.url }}">
+            {% else %}
+                <img src="{% static 'frontend/img/default-user.png' %}">
+            {% endif %}
             <div class="dropdown-menu-custom" id="dropdownMenu">
                 <a href="#" data-bs-toggle="modal" data-bs-target="#profilModal">👤 Voir profil</a>
                 <a href="{% url 'logout' %}">🚪 Déconnexion</a>
@@ -159,7 +167,11 @@ body { background-color: var(--main-bg); font-family: 'Segoe UI', sans-serif; ma
     <div class="modal-content text-center">
       <div class="modal-header"><h5>Profil Administrateur</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
       <div class="modal-body">
-        {% if request.user.photo %}<img src="{{ request.user.photo.url }}" class="mb-3" style="width:120px; height:120px; border-radius:50%; border:3px solid var(--secondary); object-fit:cover;">{% else %}<img src="{% static 'frontend/img/default-user.png' %}" class="mb-3" style="width:120px; height:120px; border-radius:50%;">{% endif %}
+        {% if request.user.photo %}
+            <img src="{{ request.user.photo.url }}" class="mb-3" style="width:120px; height:120px; border-radius:50%; border:3px solid var(--secondary); object-fit:cover;">
+        {% else %}
+            <img src="{% static 'frontend/img/default-user.png' %}" class="mb-3" style="width:120px; height:120px; border-radius:50%;">
+        {% endif %}
         <h5>{{ request.user.get_full_name }}</h5>
         <p><strong>Email:</strong> {{ request.user.email }}</p>
         <p><strong>Rôle:</strong> Administrateur</p>
@@ -183,49 +195,16 @@ document.addEventListener('click', e => { if (!profileMenu.contains(e.target)) d
 const sidebar = document.getElementById('sidebar');
 document.getElementById('toggleSidebar').addEventListener('click', () => sidebar.classList.toggle('collapsed'));
 
-/* Chart.js ligne avec points, hover, tooltip et légende interactive */
+/* Chart.js */
 const ctx = document.getElementById('chartObjets').getContext('2d');
 new Chart(ctx, {
     type: 'line',
     data: {
         labels: {{ chart_labels|safe }},
         datasets: [
-            {
-                label: 'Objets perdus',
-                data: {{ chart_perdus|safe }},
-                borderColor: '#FFC107',
-                backgroundColor: 'rgba(255,193,7,0.2)',
-                tension: 0.4,
-                fill: true,
-                pointRadius: 6,
-                pointHoverRadius: 8,
-                borderWidth: 3,
-                pointBackgroundColor: '#FFC107'
-            },
-            {
-                label: 'Objets trouvés',
-                data: {{ chart_trouves|safe }},
-                borderColor: '#6F42C1',
-                backgroundColor: 'rgba(111,66,193,0.2)',
-                tension: 0.4,
-                fill: true,
-                pointRadius: 6,
-                pointHoverRadius: 8,
-                borderWidth: 3,
-                pointBackgroundColor: '#6F42C1'
-            },
-            {
-                label: 'Objets restitués',
-                data: {{ chart_restitues|safe }},
-                borderColor: '#20C997',
-                backgroundColor: 'rgba(32,201,151,0.2)',
-                tension: 0.4,
-                fill: true,
-                pointRadius: 6,
-                pointHoverRadius: 8,
-                borderWidth: 3,
-                pointBackgroundColor: '#20C997'
-            }
+            { label: 'Objets perdus', data: {{ chart_perdus|safe }}, borderColor: '#FFC107', backgroundColor: 'rgba(255,193,7,0.2)', tension: 0.4, fill: true, pointRadius: 6, pointHoverRadius: 8, borderWidth: 3, pointBackgroundColor: '#FFC107' },
+            { label: 'Objets trouvés', data: {{ chart_trouves|safe }}, borderColor: '#6F42C1', backgroundColor: 'rgba(111,66,193,0.2)', tension: 0.4, fill: true, pointRadius: 6, pointHoverRadius: 8, borderWidth: 3, pointBackgroundColor: '#6F42C1' },
+            { label: 'Objets restitués', data: {{ chart_restitues|safe }}, borderColor: '#20C997', backgroundColor: 'rgba(32,201,151,0.2)', tension: 0.4, fill: true, pointRadius: 6, pointHoverRadius: 8, borderWidth: 3, pointBackgroundColor: '#20C997' }
         ]
     },
     options: {
@@ -243,13 +222,7 @@ new Chart(ctx, {
                     ci.update();
                 }
             },
-            tooltip: {
-                mode: 'index',
-                intersect: false,
-                backgroundColor: 'rgba(0,0,0,0.75)',
-                titleFont: { size: 14, weight: 'bold' },
-                bodyFont: { size: 13 }
-            }
+            tooltip: { mode: 'index', intersect: false, backgroundColor: 'rgba(0,0,0,0.75)', titleFont: { size: 14, weight: 'bold' }, bodyFont: { size: 13 } }
         },
         interaction: { mode: 'nearest', intersect: false },
         scales: {
