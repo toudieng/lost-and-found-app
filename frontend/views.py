@@ -889,59 +889,90 @@ def preuve_restitution_pdf(request, pk):
 #       DASHBOARD ADMIN
 # =============================
 
+
+from datetime import timedelta
+from django.utils.timezone import now
+from django.db.models import Count
+from django.db.models.functions import TruncMonth
+
+
 @login_required(login_url='login')
 def dashboard_admin(request):
     """
     Tableau de bord Administrateur :
-    Affiche les statistiques globales du système ainsi que les messages citoyens récents.
+    Affiche les statistiques globales du système et les messages citoyens récents
+    en se basant sur la date de déclaration des objets.
     """
 
-    # Statistiques
+    # === 1️⃣ Statistiques globales ===
     nb_commissariats = Commissariat.objects.count()
     nb_policiers = Utilisateur.objects.filter(role='policier').count()
     nb_citoyens = Utilisateur.objects.filter(role='citoyen').count()
 
-    nb_objets_perdus = Objet.objects.filter(etat=EtatObjet.PERDU).count()
-    nb_objets_trouves = Objet.objects.filter(etat=EtatObjet.TROUVE).count()
-    nb_objets_en_attente = Objet.objects.filter(etat=EtatObjet.EN_ATTENTE).count()
+    nb_objets_perdus = Declaration.objects.filter(etat_initial=EtatObjet.PERDU).count()
+    nb_objets_trouves = Declaration.objects.filter(etat_initial=EtatObjet.TROUVE).count()
+    nb_objets_en_attente = Declaration.objects.filter(etat_initial=EtatObjet.EN_ATTENTE).count()
     nb_objets_restitues = Objet.objects.filter(etat=EtatObjet.RESTITUE).count()
 
-    # Notifications récentes
+    # === 2️⃣ Notifications et messages récents ===
     notifications = Notification.objects.order_by('-date')[:5]
-
-    # Messages citoyens récents
     messages_recus = Message.objects.order_by('-date_envoi')[:5]
 
-    # Cards dynamiques pour le template
+    # === 3️⃣ Statistiques par mois sur les 6 derniers mois ===
+    date_limite = now() - timedelta(days=180)
+    declarations_par_mois = (
+        Declaration.objects.filter(date_declaration__gte=date_limite)
+        .annotate(mois=TruncMonth('date_declaration'))
+        .values('mois', 'etat_initial')
+        .annotate(total=Count('id'))
+        .order_by('mois')
+    )
+
+    # Préparer labels et datasets pour les graphiques
+    labels = sorted({d['mois'].strftime('%b %Y') for d in declarations_par_mois})
+    perdus, trouves, attente = [], [], []
+
+    for mois in labels:
+        perdus.append(sum(
+            d['total'] for d in declarations_par_mois
+            if d['etat_initial'] == EtatObjet.PERDU and d['mois'].strftime('%b %Y') == mois
+        ))
+        trouves.append(sum(
+            d['total'] for d in declarations_par_mois
+            if d['etat_initial'] == EtatObjet.TROUVE and d['mois'].strftime('%b %Y') == mois
+        ))
+        attente.append(sum(
+            d['total'] for d in declarations_par_mois
+            if d['etat_initial'] == EtatObjet.EN_ATTENTE and d['mois'].strftime('%b %Y') == mois
+        ))
+
+    # === 4️⃣ Statistiques pour les cartes ===
     stats_cards = [
         {'label': 'Commissariats', 'count': nb_commissariats, 'icon': '🏢'},
         {'label': 'Policiers', 'count': nb_policiers, 'icon': '👮'},
         {'label': 'Citoyens', 'count': nb_citoyens, 'icon': '🧍'},
         {'label': 'Objets perdus', 'count': nb_objets_perdus, 'icon': '📦'},
-        {'label': 'Objets trouvés', 'count': nb_objets_trouves, 'icon': '📬'},
+        {'label': 'Objets trouvés', 'count': nb_objets_trouves, 'icon': '🔍'},
         {'label': 'Objets en attente', 'count': nb_objets_en_attente, 'icon': '⏳'},
         {'label': 'Objets restitués', 'count': nb_objets_restitues, 'icon': '✅'},
     ]
 
-    # Graphique évolution (12 derniers objets)
-    derniers_objets = Objet.objects.order_by('-id')[:12]
-    chart_labels = [obj.nom for obj in derniers_objets]
-    chart_perdus = [1 if obj.etat == EtatObjet.PERDU else 0 for obj in derniers_objets]
-    chart_trouves = [1 if obj.etat == EtatObjet.TROUVE else 0 for obj in derniers_objets]
-    chart_attente = [1 if obj.etat == EtatObjet.EN_ATTENTE else 0 for obj in derniers_objets]
+    # === 5️⃣ Déclarations récentes pour mise en valeur ===
+    declarations_recents = Declaration.objects.order_by('-date_declaration')[:6]
 
+    # === 6️⃣ Contexte pour le template ===
     context = {
         'stats_cards': stats_cards,
         'notifications': notifications,
         'messages_recus': messages_recus,
-        'chart_labels': chart_labels[::-1],  # inversé pour chronologie
-        'chart_perdus': chart_perdus[::-1],
-        'chart_trouves': chart_trouves[::-1],
-        'chart_attente': chart_attente[::-1],
+        'chart_labels': labels,
+        'chart_perdus': perdus,
+        'chart_trouves': trouves,
+        'chart_attente': attente,
+        'declarations_recents': declarations_recents,
     }
 
     return render(request, "frontend/admin/dashboard_admin.html", context)
-
 
 @admin_required
 def gerer_commissariats(request):

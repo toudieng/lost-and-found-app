@@ -6,99 +6,123 @@
 {% block extra_css %}
 <style>
 :root {
-    --main-color: #2f3e46;
-    --accent-color: #C8A048;
-    --accent-color-dark: #b88f38;
-    --light-color: #FFFFFF;
-    --main-color-light: rgba(62,76,73,0.08);
-    --shadow-color: rgba(0,0,0,0.12);
-    --transition: all 0.3s ease;
+    --main-bg: #f5f8fa;
+    --sidebar-bg: #2f3e46;
+    --sidebar-hover: #3a4d56;
+    --primary: #3E4C49;
+    --secondary: #C8A048;
+    --white: #ffffff;
+}
+
+/* GLOBAL */
+body {
+    background-color: var(--main-bg);
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
 }
 
 /* SIDEBAR */
 .sidebar {
-    background: linear-gradient(180deg, var(--main-color), #354b52);
-    color: var(--light-color);
+    background-color: var(--sidebar-bg);
+    color: var(--white);
     min-height: 100vh;
-    padding: 1.8rem 1rem;
+    padding: 2rem 1rem;
     position: fixed;
-    width: 250px;
+    width: 240px;
     border-top-right-radius: 1.5rem;
     border-bottom-right-radius: 1.5rem;
-    box-shadow: 4px 0 15px rgba(0,0,0,0.15);
-    top: 0;
-    left: 0;
-    z-index: 900;
+    box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    overflow-y: auto;
 }
+.sidebar.collapsed { width: 70px; padding: 2rem 0.5rem; }
 .sidebar h4 {
-    color: var(--accent-color);
-    text-align:center;
-    margin-bottom:2rem;
-    font-size:1.4rem;
-    letter-spacing:0.5px;
+    color: var(--secondary);
+    text-align: center;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    font-size: 1.3rem;
 }
 .sidebar .nav-link {
-    display:flex;
-    align-items:center;
-    gap:0.7rem;
-    color:var(--light-color);
-    border-radius:0.5rem;
-    padding:0.6rem 0.9rem;
-    font-weight:500;
-    font-size:0.96rem;
-    transition: var(--transition);
-}
-.sidebar .nav-link:hover, .sidebar .nav-link.active {
-    background: var(--main-color-light);
-    color: var(--accent-color);
-    transform: translateX(5px);
-}
-.sidebar .nav-link i { font-size:1.1rem; }
-
-/* HEADER FIXE PROFIL */
-.header-fixed {
-    position: fixed;
-    top: 1rem;
-    right: 2rem;
+    color: #dcdcdc;
+    border-radius: 8px;
+    padding: 0.8rem 1rem;
     display: flex;
     align-items: center;
-    gap: 1rem;
-    z-index: 1000;
+    justify-content: space-between;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
 }
+.sidebar .nav-link i { font-size: 1.2rem; margin-right: 0.5rem; }
+.sidebar .nav-link span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sidebar.collapsed .nav-link span { display: none; }
+.sidebar .nav-link:hover, .sidebar .nav-link.active {
+    background-color: var(--secondary);
+    color: var(--white);
+    font-weight: 600;
+}
+
+/* MAIN */
+.main-content {
+    margin-left: 260px;
+    padding: 2rem;
+    transition: all 0.3s ease;
+}
+.sidebar.collapsed ~ .main-content { margin-left: 80px; }
+
+/* HEADER */
+.header {
+    background: var(--white);
+    padding: 1.5rem 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.header h2 { font-weight: 700; color: var(--primary); margin: 0; }
+.header small { color: #6c757d; }
+
+/* PROFIL */
 .user-profile {
     position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
     cursor: pointer;
 }
 .user-profile img {
-    width: 65px;
-    height: 65px;
+    width: 70px;
+    height: 70px;
     border-radius: 50%;
     object-fit: cover;
-    border: 3px solid var(--accent-color);
-    box-shadow: 0 3px 10px rgba(0,0,0,0.25);
-    transition: var(--transition);
+    border: 3px solid var(--secondary);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 .user-profile img:hover {
-    transform: scale(1.07);
-    filter: brightness(1.15);
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
+
+/* DROPDOWN */
 .dropdown-menu-custom {
     position: absolute;
     top: 80px;
     right: 0;
-    background: var(--light-color);
+    background: var(--white);
     box-shadow: 0 5px 20px rgba(0,0,0,0.15);
     border-radius: 0.7rem;
-    padding: 0.4rem 0;
+    padding: 0.5rem 0;
     display: none;
     flex-direction: column;
-    min-width: 180px;
+    min-width: 220px;
     opacity: 0;
     transform: translateY(-10px);
     transition: all 0.3s ease;
     z-index: 1100;
 }
-.dropdown-menu-custom.show { display: flex; opacity:1; transform: translateY(0);}
+.dropdown-menu-custom.show { display: flex; opacity: 1; transform: translateY(0); }
 .dropdown-menu-custom a {
     padding: 0.5rem 1rem;
     border-radius: 0.4rem;
@@ -107,126 +131,166 @@
     font-weight: 500;
     display: flex;
     align-items: center;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
 }
 .dropdown-menu-custom a:hover {
-    background: var(--accent-color);
-    color: var(--light-color);
-    font-weight: 600;
+    background: var(--secondary);
+    color: var(--white);
 }
-
-/* MAIN CONTENT */
-.main-content { margin-left: 260px; padding: 2rem; background: var(--light-color); min-height:100vh; }
 
 /* STAT CARDS */
-.stats-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1.2rem;
-    margin-top: 5rem;
-}
-.stats-card {
+.stat-card {
+    background: var(--white);
     border-radius: 1rem;
     padding: 1.5rem;
-    background: var(--light-color);
-    box-shadow: 0 5px 20px var(--shadow-color);
-    flex: 1 1 230px;
     display: flex;
-    flex-direction: column;
-    gap: 0.7rem;
-    cursor: pointer;
-    min-width: 230px;
-    transition: var(--transition);
-    position: relative;
-    overflow: hidden;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    transition: transform 0.2s, box-shadow 0.2s;
 }
-.stats-card::after {
-    content: "";
-    position: absolute;
-    top:0; left:0;
-    width:100%; height:100%;
-    background: linear-gradient(120deg, transparent, rgba(200,160,72,0.08));
-    transition: var(--transition);
+.stat-card:hover {
+    transform: scale(1.03);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.1);
 }
-.stats-card:hover { transform: translateY(-7px); box-shadow: 0 12px 30px rgba(62,76,73,0.18);}
-.stats-icon { font-size:2.2rem; }
-.stats-card h5 { display:flex; align-items:center; justify-content:space-between; font-size:1.6rem; font-weight:600;}
-.stats-badge {
-    padding:0.3rem 0.7rem;
-    border-radius:14px;
-    font-size:0.8rem;
-    font-weight:600;
-    color: var(--light-color);
-    background:linear-gradient(135deg, var(--accent-color), var(--accent-color-dark));
-}
+.stat-card .icon { font-size: 2.2rem; opacity: 0.85; }
+.stat-card h4 { margin: 0; font-size: 1.3rem; font-weight: bold; color: var(--primary); }
+.stat-card small { color: #6c757d; }
 
-/* CHART CONTAINER */
+.bg-yellow { border-left: 6px solid #ffc107; }
+.bg-purple { border-left: 6px solid #6f42c1; }
+.bg-orange { border-left: 6px solid #fd7e14; }
+.bg-green  { border-left: 6px solid #20c997; }
+
+/* CHART */
 .chart-container {
-    background: var(--light-color);
+    background: var(--white);
     border-radius: 1rem;
     padding: 1.5rem;
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    margin-top: 2rem;
+    margin-top: 1rem;
     height: 400px;
+}
+
+/* MODAL PROFIL */
+.modal.fade .modal-dialog {
+    transform: translateY(-50px);
+    transition: transform 0.3s ease-out;
+}
+.modal.show .modal-dialog { transform: translateY(0); }
+.modal-content {
+    border-radius: 1rem;
+    border: none;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+.modal-header {
+    background: var(--primary);
+    color: var(--white);
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
+}
+.modal-header h5 { font-weight: bold; }
+.modal-body { text-align: center; }
+.modal-body img {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    border: 4px solid var(--secondary);
+    margin-bottom: 1rem;
+}
+.modal-footer button {
+    border-radius: 8px;
 }
 
 /* RESPONSIVE */
 @media (max-width: 768px) {
     .sidebar { position: relative; width: 100%; min-height: auto; border-radius: 0; }
-    .main-content { margin-left: 0; padding: 1.2rem; }
-    .stats-container { justify-content: center; margin-top: 7rem; }
-    .header-fixed { top: 0.5rem; right: 1rem; }
+    .main-content { margin-left: 0; padding: 1rem; }
+    .header { flex-direction: column; align-items: flex-start; gap: 1rem; }
 }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="sidebar">
-    <h4>⚙️ Admin</h4>
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+    <h4>Tableau Admin</h4>
     <ul class="nav flex-column">
-        <li class="nav-item mb-2"><a class="nav-link {% if request.resolver_match.url_name == 'gerer_utilisateurs' %}active{% endif %}" href="{% url 'gerer_utilisateurs' %}">👥 Administrateurs</a></li>
-        <li class="nav-item mb-2"><a class="nav-link {% if request.resolver_match.url_name == 'liste_citoyens' %}active{% endif %}" href="{% url 'liste_citoyens' %}">🧍 Citoyens</a></li>
-        <li class="nav-item mb-2"><a class="nav-link {% if request.resolver_match.url_name == 'gerer_policiers' %}active{% endif %}" href="{% url 'gerer_policiers' %}">👮 Policiers</a></li>
-        <li class="nav-item mb-2"><a class="nav-link {% if request.resolver_match.url_name == 'voir_stats' %}active{% endif %}" href="{% url 'voir_stats' %}">📊 Statistiques</a></li>
-        <li class="nav-item mb-2"><a class="nav-link {% if request.resolver_match.url_name == 'liste_messages' %}active{% endif %}" href="{% url 'liste_messages' %}">💬 Messages citoyens</a></li>
+        <li class="nav-item mb-2"><a class="nav-link {% if request.resolver_match.url_name == 'gerer_utilisateurs' %}active{% endif %}" href="{% url 'gerer_utilisateurs' %}"><i class="bi bi-person-gear"></i> <span>Administrateurs</span></a></li>
+        <li class="nav-item mb-2"><a class="nav-link {% if request.resolver_match.url_name == 'liste_citoyens' %}active{% endif %}" href="{% url 'liste_citoyens' %}"><i class="bi bi-people"></i> <span>Citoyens</span></a></li>
+        <li class="nav-item mb-2"><a class="nav-link {% if request.resolver_match.url_name == 'gerer_policiers' %}active{% endif %}" href="{% url 'gerer_policiers' %}"><i class="bi bi-shield-lock"></i> <span>Policiers</span></a></li>
+        <li class="nav-item mb-2"><a class="nav-link {% if request.resolver_match.url_name == 'voir_stats' %}active{% endif %}" href="{% url 'voir_stats' %}"><i class="bi bi-graph-up"></i> <span>Statistiques</span></a></li>
+        <li class="nav-item mb-2"><a class="nav-link {% if request.resolver_match.url_name == 'liste_messages' %}active{% endif %}" href="{% url 'liste_messages' %}"><i class="bi bi-chat-text"></i> <span>Messages</span></a></li>
     </ul>
 </div>
 
-<div class="header-fixed">
-    <div class="user-profile" id="profileMenu">
+<!-- Main content -->
+<div class="main-content">
+    <div class="header">
+        <div>
+            <h2>Bienvenue, {{ request.user.first_name }}</h2>
+            <small>Gérez les utilisateurs et les objets depuis votre tableau de bord administrateur.</small>
+        </div>
+        <div class="user-profile" id="profileMenu">
+            {% if request.user.photo %}
+                <img src="{{ request.user.photo.url }}" alt="{{ request.user.get_full_name }}">
+            {% else %}
+                <img src="{% static 'frontend/img/default-user.png' %}" alt="Profil">
+            {% endif %}
+            <div class="dropdown-menu-custom" id="dropdownMenu">
+                <a href="#" data-bs-toggle="modal" data-bs-target="#profilModal">👤 Voir profil</a>
+                <a href="{% url 'logout' %}">🚪 Déconnexion</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistiques -->
+    <div class="row g-3 mb-4">
+        {% for card in stats_cards %}
+        <div class="col-lg-3 col-md-6 col-sm-6">
+            <div class="stat-card {% cycle 'bg-yellow' 'bg-purple' 'bg-orange' 'bg-green' %}">
+                <div>
+                    <h4>{{ card.count|default:"0" }}</h4>
+                    <small>{{ card.label }}</small>
+                </div>
+                <div class="icon">{{ card.icon }}</div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Chart -->
+    <div class="chart-container">
+        <h4>Évolution des objets</h4>
+        <canvas id="chartObjets"></canvas>
+    </div>
+</div>
+
+<!-- Modal Profil -->
+<div class="modal fade" id="profilModal" tabindex="-1" aria-labelledby="profilModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="profilModalLabel">Profil Administrateur</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
         {% if request.user.photo %}
             <img src="{{ request.user.photo.url }}" alt="{{ request.user.get_full_name }}">
         {% else %}
             <img src="{% static 'frontend/img/default-user.png' %}" alt="Profil">
         {% endif %}
-        <div class="dropdown-menu-custom" id="dropdownMenu">
-            <a href="{% url 'modifier_profil_admin' %}">👤 Profil</a>
-            <a href="{% url 'logout' %}">🚪 Déconnexion</a>
-        </div>
+        <h5 class="mt-2">{{ request.user.get_full_name }}</h5>
+        <p class="text-muted mb-1">{{ request.user.email }}</p>
+        <p><strong>Rôle :</strong> Administrateur</p>
+        <p><strong>Date d’inscription :</strong> {{ request.user.date_joined|date:"d/m/Y" }}</p>
+      </div>
+      <div class="modal-footer">
+        <a href="{% url 'modifier_profil_admin' %}" class="btn btn-warning">Modifier</a>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+      </div>
     </div>
-</div>
-
-<!-- Stat cards -->
-<div class="stats-container">
-    {% for card in stats_cards %}
-        <div class="stats-card">
-            <h5>{{ card.count|default:"0" }} <span class="stats-badge">{{ card.label }}</span></h5>
-            <div class="stats-icon">{{ card.icon }}</div>
-            {% if card.list %}
-                <ul>
-                    {% for item in card.list %}
-                        <li>{{ item }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-        </div>
-    {% endfor %}
-</div>
-
-<!-- Chart -->
-<div class="chart-container">
-    <h4>Évolution des objets</h4>
-    <canvas id="chartObjets"></canvas>
+  </div>
 </div>
 {% endblock %}
 
@@ -239,7 +303,7 @@ const dropdownMenu = document.getElementById('dropdownMenu');
 profileMenu.addEventListener('click', () => dropdownMenu.classList.toggle('show'));
 document.addEventListener('click', e => { if (!profileMenu.contains(e.target)) dropdownMenu.classList.remove('show'); });
 
-/* Chart.js ligne */
+/* Chart.js */
 const ctx = document.getElementById('chartObjets').getContext('2d');
 new Chart(ctx, {
     type: 'line',
@@ -252,11 +316,7 @@ new Chart(ctx, {
                 borderColor: '#FFC107',
                 backgroundColor: 'rgba(255,193,7,0.2)',
                 tension: 0.4,
-                fill: true,
-                pointRadius: 6,
-                pointHoverRadius: 8,
-                borderWidth: 3,
-                pointBackgroundColor: '#FFC107'
+                fill: true
             },
             {
                 label: 'Objets trouvés',
@@ -264,11 +324,7 @@ new Chart(ctx, {
                 borderColor: '#6F42C1',
                 backgroundColor: 'rgba(111,66,193,0.2)',
                 tension: 0.4,
-                fill: true,
-                pointRadius: 6,
-                pointHoverRadius: 8,
-                borderWidth: 3,
-                pointBackgroundColor: '#6F42C1'
+                fill: true
             },
             {
                 label: 'Objets en attente',
@@ -276,35 +332,15 @@ new Chart(ctx, {
                 borderColor: '#FD7E14',
                 backgroundColor: 'rgba(253,126,20,0.2)',
                 tension: 0.4,
-                fill: true,
-                pointRadius: 6,
-                pointHoverRadius: 8,
-                borderWidth: 3,
-                pointBackgroundColor: '#FD7E14'
+                fill: true
             }
         ]
     },
     options: {
         responsive: true,
         maintainAspectRatio: false,
-        plugins: {
-            legend: {
-                position: 'top',
-                labels: { usePointStyle:true, pointStyle:'circle', padding:20, font:{ size:14 } },
-            },
-            tooltip: {
-                mode: 'index',
-                intersect: false,
-                backgroundColor: 'rgba(0,0,0,0.75)',
-                titleFont: { size: 14, weight: 'bold' },
-                bodyFont: { size: 13 }
-            }
-        },
-        interaction: { mode: 'nearest', intersect: false },
-        scales: {
-            y: { beginAtZero:true, ticks:{ stepSize:1, font:{size:13} }, grid:{ color:'rgba(0,0,0,0.05)' } },
-            x: { ticks:{ font:{size:13} }, grid:{ color:'rgba(0,0,0,0.05)' } }
-        }
+        plugins: { legend: { position: 'top' } },
+        scales: { y: { beginAtZero: true } }
     }
 });
 </script>
