@@ -14,10 +14,15 @@
     --danger: #fd7e14;
     --info: #6f42c1;
     --white: #ffffff;
+
+    --card-yellow: #ffc107;
+    --card-purple: #6f42c1;
+    --card-orange: #fd7e14;
+    --card-green: #20c997;
 }
 
-/* Global layout */
-body { background-color: var(--main-bg); font-family: 'Segoe UI', sans-serif; margin: 0; }
+/* Reset & body */
+body { background-color: var(--main-bg); font-family: 'Segoe UI', sans-serif; margin:0; }
 
 /* Sidebar */
 .sidebar {
@@ -35,7 +40,14 @@ body { background-color: var(--main-bg); font-family: 'Segoe UI', sans-serif; ma
     overflow-y: auto;
 }
 .sidebar.collapsed { width: 70px; padding: 2rem 0.5rem; }
-.sidebar h4 { color: var(--secondary); text-align: center; font-weight: 700; margin-bottom: 2rem; font-size: 1.3rem; transition: opacity 0.3s; }
+.sidebar h4 {
+    color: var(--secondary);
+    text-align: center;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    font-size: 1.3rem;
+    transition: opacity 0.3s;
+}
 .sidebar.collapsed h4 { opacity: 0; }
 .sidebar .nav-link {
     color: #dcdcdc;
@@ -73,7 +85,13 @@ body { background-color: var(--main-bg); font-family: 'Segoe UI', sans-serif; ma
 
 /* Profil utilisateur dropdown */
 .user-profile { position: relative; display: flex; align-items: center; gap: 0.8rem; cursor: pointer; }
-.user-profile img { width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 3px solid var(--secondary); transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.user-profile img {
+    width: 70px; height: 70px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--secondary);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
 .user-profile img:hover { transform: scale(1.1); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
 
 /* Dropdown menu */
@@ -88,45 +106,52 @@ body { background-color: var(--main-bg); font-family: 'Segoe UI', sans-serif; ma
 .dropdown-menu-custom a:hover { background: var(--secondary); color: var(--white); font-weight: 600; }
 
 /* Stat cards */
-.stat-card { background: var(--white); border-radius: 1rem; padding: 1.5rem; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition: transform 0.2s, box-shadow 0.2s; }
+.stat-card {
+    background: var(--white); border-radius: 1rem; padding: 1.5rem;
+    display: flex; align-items: center; justify-content: space-between;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition: transform 0.2s, box-shadow 0.2s;
+}
 .stat-card:hover { transform: scale(1.03); box-shadow: 0 6px 18px rgba(0,0,0,0.1); }
 .stat-card .icon { font-size: 2.2rem; opacity: 0.85; }
 .stat-card h4 { margin: 0; font-size: 1.3rem; font-weight: bold; color: var(--primary); }
 .stat-card small { color: #6c757d; }
 
 /* Card colors */
-.bg-yellow { border-left: 6px solid #ffc107; }
-.bg-purple { border-left: 6px solid #6f42c1; }
-.bg-orange { border-left: 6px solid #fd7e14; }
-.bg-green  { border-left: 6px solid #20c997; }
+.bg-yellow { border-left: 6px solid var(--card-yellow); }
+.bg-purple { border-left: 6px solid var(--card-purple); }
+.bg-orange { border-left: 6px solid var(--card-orange); }
+.bg-green  { border-left: 6px solid var(--card-green); }
 
-/* Chart section */
+/* Chart container */
 .chart-container { background: var(--white); border-radius: 1rem; padding: 1.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-top: 1rem; height: 400px; }
 
 /* Responsive */
-@media (max-width: 768px) { 
-    .sidebar { position: relative; width: 100%; min-height: auto; border-radius: 0; } 
-    .main-content { margin-left: 0; padding: 1rem; } 
-    .header { flex-direction: column; align-items: flex-start; gap: 1rem; } 
+@media (max-width: 768px) {
+    .sidebar { position: relative; width: 100%; min-height: auto; border-radius: 0; }
+    .main-content { margin-left: 0; padding: 1rem; }
+    .header { flex-direction: column; align-items: flex-start; gap: 1rem; }
 }
 </style>
 {% endblock %}
 
 {% block content %}
+<!-- Sidebar -->
 <div class="sidebar" id="sidebar">
     <h4>Tableau Admin</h4>
     <ul class="nav flex-column">
-         <li class="nav-item mb-2"><a class="nav-link {% if request.resolver_match.url_name == ' gerer_commissariats' %}active{% endif %}" href="{% url 'gerer_commissariats' %}"><i class="bi bi-person-gear"></i> <span> gerer commissariats</span></a></li>
+        <li class="nav-item mb-2"><a class="nav-link {% if request.resolver_match.url_name == 'gerer_commissariats' %}active{% endif %}" href="{% url 'gerer_commissariats' %}"><i class="bi bi-building"></i> <span>Commissariats</span></a></li>
         <li class="nav-item mb-2"><a class="nav-link {% if request.resolver_match.url_name == 'gerer_utilisateurs' %}active{% endif %}" href="{% url 'gerer_utilisateurs' %}"><i class="bi bi-person-gear"></i> <span>Administrateurs</span></a></li>
         <li class="nav-item mb-2"><a class="nav-link {% if request.resolver_match.url_name == 'liste_citoyens' %}active{% endif %}" href="{% url 'liste_citoyens' %}"><i class="bi bi-people"></i> <span>Citoyens</span></a></li>
         <li class="nav-item mb-2"><a class="nav-link {% if request.resolver_match.url_name == 'gerer_policiers' %}active{% endif %}" href="{% url 'gerer_policiers' %}"><i class="bi bi-shield-lock"></i> <span>Policiers</span></a></li>
-        <li class="nav-item mb-2"><a class="nav-link {% if request.resolver_match.url_name == 'voir_stats' %}active{% endif %}" href="{% url 'voir_stats' %}"><i class="bi bi-graph-up"></i> <span>Statistiques</span></a></li>
     </ul>
 </div>
 
+<!-- Toggle sidebar button -->
 <button id="toggleSidebar" class="btn btn-secondary position-fixed top-0 start-100 translate-middle-y m-2 z-1100">☰</button>
 
+<!-- Main content -->
 <div class="main-content">
+    <!-- Header -->
     <div class="header">
         <div>
             <h2>Bienvenue, {{ request.user.get_full_name }}</h2>
@@ -134,9 +159,9 @@ body { background-color: var(--main-bg); font-family: 'Segoe UI', sans-serif; ma
         </div>
         <div class="user-profile" id="profileMenu">
             {% if request.user.photo %}
-                <img src="{{ request.user.photo.url }}">
+                <img src="{{ request.user.photo.url }}" alt="{{ request.user.get_full_name }}">
             {% else %}
-                <img src="{% static 'frontend/img/default-user.png' %}">
+                <img src="{% static 'frontend/img/default-user.png' %}" alt="Admin">
             {% endif %}
             <div class="dropdown-menu-custom" id="dropdownMenu">
                 <a href="#" data-bs-toggle="modal" data-bs-target="#profilModal">👤 Voir profil</a>
@@ -145,6 +170,7 @@ body { background-color: var(--main-bg); font-family: 'Segoe UI', sans-serif; ma
         </div>
     </div>
 
+    <!-- Stats cards -->
     <div class="row g-3 mb-4">
         {% for card in stats_cards %}
         <div class="col-lg-3 col-md-6 col-sm-6">
@@ -156,6 +182,7 @@ body { background-color: var(--main-bg); font-family: 'Segoe UI', sans-serif; ma
         {% endfor %}
     </div>
 
+    <!-- Chart -->
     <div class="chart-container">
         <h4>Évolution des objets</h4>
         <canvas id="chartObjets"></canvas>
@@ -186,17 +213,21 @@ body { background-color: var(--main-bg); font-family: 'Segoe UI', sans-serif; ma
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-/* Dropdown profil */
+// Dropdown profil
 const profileMenu = document.getElementById('profileMenu');
 const dropdownMenu = document.getElementById('dropdownMenu');
 profileMenu.addEventListener('click', () => dropdownMenu.classList.toggle('show'));
 document.addEventListener('click', e => { if (!profileMenu.contains(e.target)) dropdownMenu.classList.remove('show'); });
 
-/* Sidebar toggle */
+// Sidebar toggle
 const sidebar = document.getElementById('sidebar');
-document.getElementById('toggleSidebar').addEventListener('click', () => sidebar.classList.toggle('collapsed'));
+const mainContent = document.querySelector('.main-content');
+document.getElementById('toggleSidebar').addEventListener('click', () => {
+    sidebar.classList.toggle('collapsed');
+    mainContent.classList.toggle('expanded');
+});
 
-/* Chart.js */
+// Chart.js
 const ctx = document.getElementById('chartObjets').getContext('2d');
 new Chart(ctx, {
     type: 'line',

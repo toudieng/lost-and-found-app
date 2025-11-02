@@ -896,13 +896,11 @@ from django.db.models import Count
 from django.db.models.functions import TruncMonth
 
 
-
 @login_required(login_url='login')
 def dashboard_admin(request):
     """
     Tableau de bord Administrateur :
-    Affiche les statistiques globales du système et les messages citoyens récents
-    en se basant sur la date de déclaration des objets.
+    Affiche les statistiques globales, notifications et graphiques des objets.
     """
 
     # === 1️⃣ Statistiques globales ===
@@ -919,8 +917,8 @@ def dashboard_admin(request):
     notifications = Notification.objects.order_by('-date')[:5]
     messages_recus = Message.objects.order_by('-date_envoi')[:5]
 
-    # === 3️⃣ Statistiques par mois sur les 6 derniers mois ===
-    date_limite = now() - timedelta(days=180)
+    # === 3️⃣ Statistiques mensuelles pour graphique ===
+    date_limite = now() - timedelta(days=180)  # 6 derniers mois
     declarations_par_mois = (
         Declaration.objects.filter(date_declaration__gte=date_limite)
         .annotate(mois=TruncMonth('date_declaration'))
@@ -929,7 +927,7 @@ def dashboard_admin(request):
         .order_by('mois')
     )
 
-    # Préparer labels et datasets pour les graphiques
+    # Préparer labels et datasets
     labels = sorted({d['mois'].strftime('%b %Y') for d in declarations_par_mois})
     chart_perdus, chart_trouves, chart_attente, chart_restitues = [], [], [], []
 
@@ -951,7 +949,7 @@ def dashboard_admin(request):
             if d['etat_initial'] == EtatObjet.RESTITUE and d['mois'].strftime('%b %Y') == mois
         ))
 
-    # === 4️⃣ Statistiques pour les cartes ===
+    # === 4️⃣ Stat cards pour affichage rapide ===
     stats_cards = [
         {'label': 'Commissariats', 'count': nb_commissariats, 'icon': '🏢'},
         {'label': 'Policiers', 'count': nb_policiers, 'icon': '👮'},
@@ -962,7 +960,7 @@ def dashboard_admin(request):
         {'label': 'Objets restitués', 'count': nb_objets_restitues, 'icon': '✅'},
     ]
 
-    # === 5️⃣ Déclarations récentes pour mise en valeur ===
+    # === 5️⃣ Déclarations récentes ===
     declarations_recents = Declaration.objects.order_by('-date_declaration')[:6]
 
     # === 6️⃣ Contexte pour le template ===
@@ -979,6 +977,9 @@ def dashboard_admin(request):
     }
 
     return render(request, "frontend/admin/dashboard_admin.html", context)
+
+
+
 
 @admin_required
 def gerer_commissariats(request):
