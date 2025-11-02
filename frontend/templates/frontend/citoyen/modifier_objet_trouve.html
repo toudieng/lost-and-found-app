@@ -1,76 +1,184 @@
 {% extends "frontend/base.html" %}
-{% load widget_tweaks %}
+{% load static %}
 
 {% block extra_css %}
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+:root {
+    --main-color: #2f3e46;
+    --accent-color: #C8A048; /* doré */
+    --accent-color-dark: #b88f38;
+    --light-color: #FFFFFF;
+    --border-color: #DEE2E6;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+}
+
+body {
+    background: #f5f6f8;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* 🪶 Conteneur principal */
 .form-container {
-    background: #fff;
+    background: var(--light-color);
     padding: 2rem;
     border-radius: 1rem;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 6px 24px var(--shadow-color);
+    transition: all 0.3s ease;
+    animation: fadeIn 0.5s ease-in-out;
 }
-.form-container:hover { 
-    transform: translateY(-4px); 
-    box-shadow: 0 12px 25px rgba(0,0,0,0.15); 
-}
-
-.form-title { 
-    color:#343a40; 
-    font-weight:700; 
-    font-size:1.5rem; 
-    text-align:center; 
+.form-container:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.15);
 }
 
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.form-title {
+    color: var(--accent-color);
+    font-weight: 700;
+    font-size: 1.8rem;
+    text-align: center;
+    margin-bottom: 1.8rem;
+    letter-spacing: 0.5px;
+}
+
+/* 🟨 Champs + icônes */
+.input-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    overflow: hidden;
+    background-color: #fafafa;
+    transition: box-shadow 0.3s, border-color 0.3s;
+}
+
+.input-group:hover {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 6px rgba(200, 160, 72, 0.25);
+}
+
+/* Partie icône */
+.input-group-text {
+    background: var(--main-color);
+    color: var(--accent-color);
+    padding: 0.65rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 45px;
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+/* 💛 Icônes dorées */
+.input-group-text i {
+    font-size: 1.1rem;
+    color: var(--accent-color);
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.input-group:hover .input-group-text i {
+    color: var(--accent-color-dark);
+    transform: scale(1.15);
+}
+
+/* Champs texte */
 input, select, textarea {
-    width:100%; 
-    height:42px; 
-    padding:0.375rem 0.75rem;
-    border:1px solid #ccc; 
-    border-radius:0.5rem;
-    transition:border-color 0.3s, box-shadow 0.3s;
-}
-input:focus, select:focus, textarea:focus {
-    border-color:#343a40; 
-    box-shadow:0 0 5px rgba(52,58,64,0.3); 
-    outline:none;
+    width: 100%;
+    padding: 0.6rem 0.8rem;
+    border: none;
+    background: transparent;
+    font-size: 0.95rem;
+    outline: none;
+    color: var(--main-color);
 }
 
-.form-check-input:checked { 
-    background-color:#343a40; 
-    border-color:#343a40; 
+textarea { min-height: 120px; resize: vertical; }
+
+input:focus, select:focus, textarea:focus {
+    background-color: #fff;
+}
+
+/* 🛑 Erreurs */
+.text-error {
+    color: #dc3545;
+    font-size: 0.85rem;
+    margin-top: 0.3rem;
+    font-weight: 500;
+}
+
+/* 🔔 Alertes */
+.alert {
+    background-color: rgba(200, 160, 72, 0.1);
+    color: var(--main-color);
+    border: 1px solid var(--accent-color);
+    border-radius: 6px;
+    padding: 0.6rem 1rem;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    animation: fadeIn 0.4s ease;
+}
+
+/* 🧭 Boutons */
+.btn-group {
+    display: flex;
+    justify-content: space-between;
+    gap: 5%;
+    margin-top: 1.3rem;
+}
+
+.btn-submit, .btn-back {
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    padding: 0.7rem 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 48%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .btn-submit {
-    background-color:#343a40; 
-    border-color:#343a40; 
-    color:#fff; 
-    font-weight:700;
-    transition: all 0.3s;
+    background-color: var(--accent-color);
+    color: var(--main-color);
 }
-.btn-submit:hover { 
-    background-color:#212529; 
-    transform:translateY(-1px); 
+.btn-submit:hover {
+    background-color: var(--accent-color-dark);
+    color: var(--light-color);
+    transform: translateY(-2px);
 }
 
-.text-error { 
-    color:#dc3545; 
-    font-size:0.85rem; 
+.btn-back {
+    background-color: #6c757d;
+    color: #fff;
+}
+.btn-back:hover {
+    background-color: #5a6268;
 }
 
-#preview-image { 
-    max-height:200px; 
-    margin-top:0.5rem; 
-    border-radius:0.5rem; 
-    box-shadow:0 4px 10px rgba(0,0,0,0.1); 
-    display:block; 
-    width:100%; 
-    object-fit:cover;
+/* 📷 Prévisualisation image */
+#preview-image {
+    display: none;
+    max-height: 220px;
+    width: 100%;
+    margin-top: 0.6rem;
+    border-radius: 0.5rem;
+    border: 2px solid #e9ecef;
+    object-fit: cover;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-@media (max-width:576px) { 
-    .form-container { padding:1.5rem; } 
-    .form-title { font-size:1.3rem; } 
+@media (max-width: 576px) {
+    .btn-group { flex-direction: column; gap: 0.8rem; }
+    .btn-submit, .btn-back { width: 100%; }
 }
 </style>
 {% endblock %}
@@ -79,84 +187,64 @@ input:focus, select:focus, textarea:focus {
 <div class="row justify-content-center mt-5">
     <div class="col-md-6 col-lg-5 col-xl-4">
         <div class="form-container">
-            <h4 class="mb-4 form-title">
-                {% if form.instance.pk %}✏️ Modifier l'objet{% else %}📢 Déclarer un objet{% endif %}
-            </h4>
+            <h4 class="form-title">📝 Déclarer un objet</h4>
 
             {% if messages %}
                 {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }} py-2 px-3 small">{{ message }}</div>
+                    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
                 {% endfor %}
             {% endif %}
 
             <form method="post" enctype="multipart/form-data" novalidate>
                 {% csrf_token %}
 
-                <!-- Nom de l'objet -->
-                <div class="mb-3">
-                    <label for="{{ form.nom_objet.id_for_label }}" class="form-label fw-bold">
-                        🏷️ Nom de l'objet <span class="text-danger">*</span>
-                    </label>
-                    {{ form.nom_objet|add_class:"form-control form-control-sm" }}
-                    {% for error in form.nom_objet.errors %}
+                {% for field in form %}
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            {% if "nom_objet" in field.name %}
+                                <i class="bi bi-tag-fill"></i>
+                            {% elif "lieu" in field.name %}
+                                <i class="bi bi-geo-alt-fill"></i>
+                            {% elif "description" in field.name %}
+                                <i class="bi bi-journal-text"></i>
+                            {% elif "image" in field.name %}
+                                <i class="bi bi-image-fill"></i>
+                            {% else %}
+                                <i class="bi bi-pencil-square"></i>
+                            {% endif %}
+                        </span>
+                        {{ field }}
+                    </div>
+                    {% for error in field.errors %}
                         <div class="text-error">{{ error }}</div>
                     {% endfor %}
-                </div>
+                {% endfor %}
 
-                <!-- Lieu -->
-                <div class="mb-3">
-                    <label for="{{ form.lieu.id_for_label }}" class="form-label fw-bold">📍 Lieu</label>
-                    {{ form.lieu|add_class:"form-control form-control-sm" }}
-                    {% for error in form.lieu.errors %}
-                        <div class="text-error">{{ error }}</div>
-                    {% endfor %}
-                </div>
+                {% if form.image %}
+                    <img id="preview-image" src="#" alt="Prévisualisation">
+                {% endif %}
 
-                <!-- Description -->
-                <div class="mb-3">
-                    <label for="{{ form.description.id_for_label }}" class="form-label fw-bold">
-                        ✏️ Description (facultative)
-                    </label>
-                    {{ form.description|add_class:"form-control form-control-sm" }}
-                    {% for error in form.description.errors %}
-                        <div class="text-error">{{ error }}</div>
-                    {% endfor %}
-                </div>
-
-                <!-- Image avec prévisualisation -->
-                <div class="mb-3">
-                    <label for="{{ form.image.id_for_label }}" class="form-label fw-bold">📷 Photo (facultative)</label>
-                    {{ form.image|add_class:"form-control form-control-sm" }}
-                    {% for error in form.image.errors %}
-                        <div class="text-error">{{ error }}</div>
-                    {% endfor %}
-
-                    {% if form.instance.objet and form.instance.objet.image %}
-                        <img id="preview-image" src="{{ form.instance.objet.image.url }}" alt="Prévisualisation">
-                    {% else %}
-                        <img id="preview-image" src="#" alt="Prévisualisation" style="display:none;">
-                    {% endif %}
-                </div>
-
-                <!-- Type de déclaration -->
-                <div class="mb-4">
-                    <label class="form-label fw-bold">📌 Type de déclaration <span class="text-danger">*</span></label>
-                    <div>
-                        {% for radio in form.etat %}
+                {% if form.etat_initial %}
+                    <div class="mb-4 text-center">
+                        <p class="fw-bold mb-2" style="color: var(--accent-color); font-size: 1.05rem;">📍 Type de déclaration</p>
+                        {% for radio in form.etat_initial %}
                             <div class="form-check form-check-inline">
                                 {{ radio.tag }}
                                 <label class="form-check-label" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
                             </div>
                         {% endfor %}
+                        {% for error in form.etat_initial.errors %}
+                            <div class="text-error">{{ error }}</div>
+                        {% endfor %}
                     </div>
-                    {% for error in form.etat.errors %}
-                        <div class="text-error">{{ error }}</div>
-                    {% endfor %}
-                </div>
+                {% endif %}
 
-                <div class="d-grid">
-                    <button type="submit" class="btn btn-submit fw-bold">
-                        {% if form.instance.pk %}✅ Mettre à jour{% else %}✅ Soumettre{% endif %}
+                <div class="btn-group">
+                    <a href="{% url 'home' %}" class="btn btn-back">
+                        <i class="bi bi-arrow-left-circle me-1"></i> Retour
+                    </a>
+                    <button type="submit" class="btn btn-submit">
+                        <i class="bi bi-send-fill me-1"></i> Soumettre
                     </button>
                 </div>
             </form>
@@ -173,14 +261,15 @@ document.addEventListener("DOMContentLoaded", function() {
         const file = this.files[0];
         if (file) {
             const reader = new FileReader();
-            reader.onload = e => { 
-                preview.src = e.target.result; 
-                preview.style.display = "block"; 
+            reader.onload = e => {
+                preview.src = e.target.result;
+                preview.style.display = "block";
+                preview.style.opacity = "1";
             };
             reader.readAsDataURL(file);
         } else {
-            preview.src = "#";
-            preview.style.display = "none";
+            preview.style.opacity = "0";
+            setTimeout(() => preview.style.display = "none", 300);
         }
     });
 });

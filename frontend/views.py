@@ -1521,25 +1521,35 @@ def reclamer_objet(request, restitution_id):
 
 # =============================
 #       Gestion déclarations (citoyen)
-# =============================
-@login_required
+# ===========================
+
 
 def modifier_declaration(request, declaration_id):
-    """Modifier une déclaration par le citoyen."""
+    """
+    Modifier une déclaration par le citoyen.
+    Les champs seront pré-remplis avec les valeurs existantes.
+    """
     declaration = get_object_or_404(Declaration, id=declaration_id, citoyen=request.user)
 
     if request.method == 'POST':
         form = DeclarationForm(request.POST, request.FILES, instance=declaration)
         if form.is_valid():
-            form.save(commit=True)  # Django remplacera automatiquement l'image si uploadée
+            form.save()  # met à jour la déclaration et l'image si uploadée
             messages.success(request, "✅ Objet mis à jour avec succès.")
-            return redirect('objets_perdus')  # ou la page souhaitée
+            return redirect('objets_perdus')
         else:
             messages.error(request, "⚠️ Erreur : vérifiez les informations saisies.")
     else:
-        form = DeclarationForm(instance=declaration)
+        form = DeclarationForm(instance=declaration)  # pré-remplissage automatique
 
-    return render(request, "frontend/citoyen/modifier_declaration.html", {"form": form})
+    # On peut ajouter un flag pour afficher un titre différent dans le template
+    context = {
+        "form": form,
+        "modifier": True,  # utilisé dans le template pour changer le titre ou bouton
+    }
+
+    # On réutilise exactement le même template que pour la déclaration
+    return render(request, "frontend/declarer_objet.html", context)
 
 
 @login_required

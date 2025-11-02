@@ -3,129 +3,33 @@
 
 {% block extra_css %}
 <style>
-:root {
-    --main-color:  #2f3e46;
-    --accent-color: #C8A048;
-    --accent-color-dark: #b88f38;
-    --light-color: #FFFFFF;
-    --border-color: #CED4DA;
-    --shadow-color: rgba(0,0,0,0.1);
-    --main-color-light: rgba(62,76,73,0.1);
-}
-
-body { background: #f7f8fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-
+/* Styles principaux similaires à ton précédent template */
 .form-container {
-    background: var(--light-color);
+    background: #fff;
     padding: 2rem;
     border-radius: 1rem;
-    box-shadow: 0 8px 25px var(--shadow-color);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
 }
-.form-container:hover { transform: translateY(-5px); box-shadow: 0 12px 30px rgba(0,0,0,0.15); }
-
+.form-container:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 28px rgba(0,0,0,0.15);
+}
 .form-title {
-    color: var(--accent-color);
-    font-weight: 700;
-    font-size: 1.75rem;
-    text-align: center;
-    margin-bottom: 2rem;
+    color:#C8A048;
+    font-weight:700;
+    font-size:1.8rem;
+    text-align:center;
+    margin-bottom:1.8rem;
 }
-
-.input-group { margin-bottom: 1rem; }
-.input-group-text {
-    background-color: #f1f3f5;
-    border-radius: 6px 0 0 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    transition: transform 0.2s, color 0.2s;
-}
-.input-group-text i {
-    color: #ffc107; 
-    transition: transform 0.2s, color 0.2s;
-}
-.input-group-text i:hover {
-    color: #ffca2c;
-    transform: scale(1.2);
-}
-
-input, select, textarea {
-    width: 100%;
-    padding: 0.55rem 0.75rem;
-    border: 1px solid var(--border-color);
-    border-radius: 0 6px 6px 0;
-    border-left: none;
-    transition: border-color 0.3s, box-shadow 0.3s, background-color 0.2s;
-    font-size: 0.95rem;
-}
-textarea { min-height: 120px; resize: vertical; }
-input:focus, select:focus, textarea:focus {
-    border-color: var(--accent-color);
-    box-shadow: 0 0 8px rgba(200,160,72,0.4);
-    background-color: #fffdf5;
-}
-
-.form-check-input:checked { background-color: var(--accent-color); border-color: var(--accent-color); }
-.form-check-label { color: var(--main-color); font-weight: 500; }
-
-.btn-submit, .btn-back {
-    position: relative;
-    border: none;
-    border-radius: 0.5rem;
-    font-weight: 700;
-    padding: 0.65rem 1.3rem;
-    cursor: pointer;
-    transition: all 0.3s ease-in-out;
-    width: 48%;
-}
-.btn-submit {
-    background-color: var(--accent-color);
-    color: var(--main-color);
-    overflow: hidden;
-}
-.btn-submit::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: -80%;
-    width: 60%;
-    height: 100%;
-    background: linear-gradient(120deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0.2) 100%);
-    transform: skewX(-20deg);
-}
-.btn-submit:hover::before { left: 130%; transition: left 0.8s ease-in-out; }
-.btn-submit:hover { background-color: var(--accent-color-dark); color: var(--light-color); transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.2); }
-
-.btn-back {
-    background-color: #6c757d;
-    color: #fff;
-}
-.btn-back:hover { background-color: #5a6268; }
-
-.text-error { color: #dc3545; font-size: 0.85rem; margin-top: 0.25rem; }
-
-.alert { background-color: rgba(62,76,73,0.08); color: var(--main-color); border: 1px solid var(--accent-color); border-radius: 0.5rem; padding: 0.5rem 0.75rem; font-size: 0.85rem; margin-bottom: 1rem; }
-
-#preview-image {
-    display: none;
-    max-height: 220px;
-    width: 100%;
-    margin-top: 0.5rem;
-    border-radius: 0.5rem;
-    border: 2px solid var(--main-color-light);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    object-fit: cover;
-    transition: opacity 0.3s ease;
-}
-
-.btn-group { display: flex; justify-content: space-between; gap: 4%; }
-
-@media (max-width: 576px) { 
-    .btn-submit, .btn-back { width: 100%; } 
-    .btn-group { flex-direction: column; gap: 0.8rem; }
-}
+.input-group { display:flex; align-items:center; margin-bottom:1rem; }
+.input-group-text { width:45px; display:flex; justify-content:center; align-items:center; background:#2f3e46; color:#C8A048; }
+.text-error { color:#dc3545; font-size:0.85rem; margin-top:0.3rem; }
+.btn-submit { background:#C8A048; color:#2f3e46; font-weight:600; padding:0.7rem 1.2rem; border:none; border-radius:8px; cursor:pointer; width:48%; }
+.btn-submit:hover { background:#b88f38; color:#fff; transform:translateY(-2px); }
+.btn-back { background:#6c757d; color:#fff; border:none; border-radius:8px; padding:0.7rem 1.2rem; width:48%; display:inline-block; text-align:center; text-decoration:none; }
+.btn-back:hover { background:#5a6268; }
+#preview-image { max-height:220px; width:100%; margin-top:0.6rem; border-radius:0.5rem; object-fit:cover; display:none; }
 </style>
 {% endblock %}
 
@@ -133,7 +37,9 @@ input:focus, select:focus, textarea:focus {
 <div class="row justify-content-center mt-5">
     <div class="col-md-6 col-lg-5 col-xl-4">
         <div class="form-container">
-            <h4 class="form-title">📌 Déclarer un objet</h4>
+            <h4 class="form-title">
+                {% if modifier %}✏️ Modifier l'objet{% else %}📢 Déclarer un objet{% endif %}
+            </h4>
 
             {% if messages %}
                 {% for message in messages %}
@@ -144,35 +50,48 @@ input:focus, select:focus, textarea:focus {
             <form method="post" enctype="multipart/form-data" novalidate>
                 {% csrf_token %}
 
-                {% for field in form %}
-                    <div class="input-group">
-                        <span class="input-group-text">
-                            {% if "nom_objet" in field.name %}
-                                <i class="bi bi-tag-fill"></i>
-                            {% elif "lieu" in field.name %}
-                                <i class="bi bi-geo-alt-fill"></i>
-                            {% elif "description" in field.name %}
-                                <i class="bi bi-journal-text"></i>
-                            {% elif "image" in field.name %}
-                                <i class="bi bi-image-fill"></i>
-                            {% else %}
-                                <i class="bi bi-pencil-fill"></i>
-                            {% endif %}
-                        </span>
-                        {{ field }}
-                    </div>
-                    {% for error in field.errors %}
-                        <div class="text-error">{{ error }}</div>
-                    {% endfor %}
+                <!-- Nom de l'objet -->
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-tag-fill"></i></span>
+                    {{ form.nom_objet }}
+                </div>
+                {% for error in form.nom_objet.errors %}
+                    <div class="text-error">{{ error }}</div>
                 {% endfor %}
 
-                {% if form.image %}
-                    <img id="preview-image" src="#" alt="Prévisualisation">
-                {% endif %}
+                <!-- Lieu -->
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-geo-alt-fill"></i></span>
+                    {{ form.lieu }}
+                </div>
+                {% for error in form.lieu.errors %}
+                    <div class="text-error">{{ error }}</div>
+                {% endfor %}
 
+                <!-- Description (sans icône) -->
+                <div class="mb-3">
+                    {{ form.description }}
+                    {% for error in form.description.errors %}
+                        <div class="text-error">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <!-- Image -->
+                <div class="mb-3">
+                    {{ form.image }}
+                    {% for error in form.image.errors %}
+                        <div class="text-error">{{ error }}</div>
+                    {% endfor %}
+                    {% if form.instance.objet and form.instance.objet.image %}
+                        <img id="preview-image" src="{{ form.instance.objet.image.url }}" alt="Prévisualisation">
+                    {% else %}
+                        <img id="preview-image" src="#" alt="Prévisualisation" style="display:none;">
+                    {% endif %}
+                </div>
+
+                <!-- Type de déclaration -->
                 {% if form.etat_initial %}
                     <div class="mb-4 text-center">
-                        <p class="fw-bold mb-2" style="color: var(--accent-color);">📌 Type de déclaration</p>
                         {% for radio in form.etat_initial %}
                             <div class="form-check form-check-inline">
                                 {{ radio.tag }}
@@ -185,9 +104,11 @@ input:focus, select:focus, textarea:focus {
                     </div>
                 {% endif %}
 
-                <div class="btn-group">
-                    <a href="{% url 'home' %}" class="btn btn-back fw-bold">🔙 Retour</a>
-                    <button type="submit" class="btn btn-submit fw-bold">Soumettre</button>
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'home' %}" class="btn-back"><i class="bi bi-arrow-left-circle me-1"></i> Retour</a>
+                    <button type="submit" class="btn-submit">
+                        {% if modifier %} Mettre à jour{% else %} Soumettre{% endif %}
+                    </button>
                 </div>
             </form>
         </div>
@@ -203,15 +124,14 @@ document.addEventListener("DOMContentLoaded", function() {
         const file = this.files[0];
         if (file) {
             const reader = new FileReader();
-            reader.onload = e => {
-                preview.src = e.target.result;
-                preview.style.display = "block";
-                preview.style.opacity = "1";
-            }
+            reader.onload = e => { 
+                preview.src = e.target.result; 
+                preview.style.display = "block"; 
+            };
             reader.readAsDataURL(file);
         } else {
-            preview.style.opacity = "0";
-            setTimeout(() => preview.style.display = "none", 300);
+            preview.src = "#";
+            preview.style.display = "none";
         }
     });
 });
