@@ -116,6 +116,7 @@ body { background-color: var(--main-bg); font-family: 'Segoe UI', sans-serif; ma
 <div class="sidebar" id="sidebar">
     <h4>Tableau Admin</h4>
     <ul class="nav flex-column">
+         <li class="nav-item mb-2"><a class="nav-link {% if request.resolver_match.url_name == ' gerer_commissariats' %}active{% endif %}" href="{% url 'gerer_commissariats' %}"><i class="bi bi-person-gear"></i> <span> gerer commissariats</span></a></li>
         <li class="nav-item mb-2"><a class="nav-link {% if request.resolver_match.url_name == 'gerer_utilisateurs' %}active{% endif %}" href="{% url 'gerer_utilisateurs' %}"><i class="bi bi-person-gear"></i> <span>Administrateurs</span></a></li>
         <li class="nav-item mb-2"><a class="nav-link {% if request.resolver_match.url_name == 'liste_citoyens' %}active{% endif %}" href="{% url 'liste_citoyens' %}"><i class="bi bi-people"></i> <span>Citoyens</span></a></li>
         <li class="nav-item mb-2"><a class="nav-link {% if request.resolver_match.url_name == 'gerer_policiers' %}active{% endif %}" href="{% url 'gerer_policiers' %}"><i class="bi bi-shield-lock"></i> <span>Policiers</span></a></li>
