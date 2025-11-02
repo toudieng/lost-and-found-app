@@ -8,20 +8,18 @@
 :root {
     --main-bg: #f5f8fa;
     --sidebar-bg: #2f3e46;
-    --sidebar-hover: #3a4d56;
     --primary: #3E4C49;
     --secondary: #C8A048;
+    --success: #20c997;
+    --danger: #fd7e14;
+    --info: #6f42c1;
     --white: #ffffff;
 }
 
-/* GLOBAL */
-body {
-    background-color: var(--main-bg);
-    font-family: 'Segoe UI', sans-serif;
-    margin: 0;
-}
+/* Global layout */
+body { background-color: var(--main-bg); font-family: 'Segoe UI', sans-serif; margin: 0; }
 
-/* SIDEBAR */
+/* Sidebar */
 .sidebar {
     background-color: var(--sidebar-bg);
     color: var(--white);
@@ -33,16 +31,12 @@ body {
     border-bottom-right-radius: 1.5rem;
     box-shadow: 4px 0 15px rgba(0,0,0,0.1);
     transition: all 0.3s ease;
+    z-index: 1000;
     overflow-y: auto;
 }
 .sidebar.collapsed { width: 70px; padding: 2rem 0.5rem; }
-.sidebar h4 {
-    color: var(--secondary);
-    text-align: center;
-    font-weight: 700;
-    margin-bottom: 2rem;
-    font-size: 1.3rem;
-}
+.sidebar h4 { color: var(--secondary); text-align: center; font-weight: 700; margin-bottom: 2rem; font-size: 1.3rem; transition: opacity 0.3s; }
+.sidebar.collapsed h4 { opacity: 0; }
 .sidebar .nav-link {
     color: #dcdcdc;
     border-radius: 8px;
@@ -50,27 +44,20 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    font-weight: 500;
     transition: all 0.2s ease-in-out;
+    font-weight: 500;
+    cursor: pointer;
 }
 .sidebar .nav-link i { font-size: 1.2rem; margin-right: 0.5rem; }
 .sidebar .nav-link span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .sidebar.collapsed .nav-link span { display: none; }
-.sidebar .nav-link:hover, .sidebar .nav-link.active {
-    background-color: var(--secondary);
-    color: var(--white);
-    font-weight: 600;
-}
+.sidebar .nav-link:hover, .sidebar .nav-link.active { background-color: var(--secondary); color: var(--white); font-weight: 600; }
 
-/* MAIN */
-.main-content {
-    margin-left: 260px;
-    padding: 2rem;
-    transition: all 0.3s ease;
-}
+/* Main content */
+.main-content { margin-left: 260px; padding: 2rem; transition: all 0.3s ease; }
 .sidebar.collapsed ~ .main-content { margin-left: 80px; }
 
-/* HEADER */
+/* Header */
 .header {
     background: var(--white);
     padding: 1.5rem 2rem;
@@ -84,135 +71,44 @@ body {
 .header h2 { font-weight: 700; color: var(--primary); margin: 0; }
 .header small { color: #6c757d; }
 
-/* PROFIL */
-.user-profile {
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 0.8rem;
-    cursor: pointer;
-}
-.user-profile img {
-    width: 70px;
-    height: 70px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid var(--secondary);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-.user-profile img:hover {
-    transform: scale(1.1);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-}
+/* Profil utilisateur dropdown */
+.user-profile { position: relative; display: flex; align-items: center; gap: 0.8rem; cursor: pointer; }
+.user-profile img { width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 3px solid var(--secondary); transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.user-profile img:hover { transform: scale(1.1); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
 
-/* DROPDOWN */
+/* Dropdown menu */
 .dropdown-menu-custom {
-    position: absolute;
-    top: 80px;
-    right: 0;
-    background: var(--white);
+    position: absolute; top: 80px; right: 0; background: var(--white);
     box-shadow: 0 5px 20px rgba(0,0,0,0.15);
-    border-radius: 0.7rem;
-    padding: 0.5rem 0;
-    display: none;
-    flex-direction: column;
-    min-width: 220px;
-    opacity: 0;
-    transform: translateY(-10px);
-    transition: all 0.3s ease;
-    z-index: 1100;
+    border-radius: 0.7rem; padding: 0.5rem 0; display: none; flex-direction: column; min-width: 220px;
+    opacity: 0; transform: translateY(-10px); transition: all 0.3s ease; z-index: 1100;
 }
 .dropdown-menu-custom.show { display: flex; opacity: 1; transform: translateY(0); }
-.dropdown-menu-custom a {
-    padding: 0.5rem 1rem;
-    border-radius: 0.4rem;
-    text-decoration: none;
-    color: #333;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    transition: all 0.2s ease;
-}
-.dropdown-menu-custom a:hover {
-    background: var(--secondary);
-    color: var(--white);
-}
+.dropdown-menu-custom a { padding: 0.5rem 1rem; border-radius: 0.4rem; text-decoration: none; color: #333; font-weight: 500; display: flex; align-items: center; transition: all 0.2s ease; }
+.dropdown-menu-custom a:hover { background: var(--secondary); color: var(--white); font-weight: 600; }
 
-/* STAT CARDS */
-.stat-card {
-    background: var(--white);
-    border-radius: 1rem;
-    padding: 1.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    transition: transform 0.2s, box-shadow 0.2s;
-}
-.stat-card:hover {
-    transform: scale(1.03);
-    box-shadow: 0 6px 18px rgba(0,0,0,0.1);
-}
+/* Stat cards */
+.stat-card { background: var(--white); border-radius: 1rem; padding: 1.5rem; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition: transform 0.2s, box-shadow 0.2s; }
+.stat-card:hover { transform: scale(1.03); box-shadow: 0 6px 18px rgba(0,0,0,0.1); }
 .stat-card .icon { font-size: 2.2rem; opacity: 0.85; }
 .stat-card h4 { margin: 0; font-size: 1.3rem; font-weight: bold; color: var(--primary); }
 .stat-card small { color: #6c757d; }
 
+/* Card colors */
 .bg-yellow { border-left: 6px solid #ffc107; }
 .bg-purple { border-left: 6px solid #6f42c1; }
 .bg-orange { border-left: 6px solid #fd7e14; }
 .bg-green  { border-left: 6px solid #20c997; }
 
-/* CHART */
-.chart-container {
-    background: var(--white);
-    border-radius: 1rem;
-    padding: 1.5rem;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    margin-top: 1rem;
-    height: 400px;
-}
+/* Chart section */
+.chart-container { background: var(--white); border-radius: 1rem; padding: 1.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-top: 1rem; height: 400px; }
 
-/* MODAL PROFIL */
-.modal.fade .modal-dialog {
-    transform: translateY(-50px);
-    transition: transform 0.3s ease-out;
-}
-.modal.show .modal-dialog { transform: translateY(0); }
-.modal-content {
-    border-radius: 1rem;
-    border: none;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-}
-.modal-header {
-    background: var(--primary);
-    color: var(--white);
-    border-top-left-radius: 1rem;
-    border-top-right-radius: 1rem;
-}
-.modal-header h5 { font-weight: bold; }
-.modal-body { text-align: center; }
-.modal-body img {
-    width: 110px;
-    height: 110px;
-    border-radius: 50%;
-    border: 4px solid var(--secondary);
-    margin-bottom: 1rem;
-}
-.modal-footer button {
-    border-radius: 8px;
-}
-
-/* RESPONSIVE */
-@media (max-width: 768px) {
-    .sidebar { position: relative; width: 100%; min-height: auto; border-radius: 0; }
-    .main-content { margin-left: 0; padding: 1rem; }
-    .header { flex-direction: column; align-items: flex-start; gap: 1rem; }
-}
+/* Responsive */
+@media (max-width: 768px) { .sidebar { position: relative; width: 100%; min-height: auto; border-radius: 0; } .main-content { margin-left: 0; padding: 1rem; } .header { flex-direction: column; align-items: flex-start; gap: 1rem; } }
 </style>
 {% endblock %}
 
 {% block content %}
-<!-- Sidebar -->
 <div class="sidebar" id="sidebar">
     <h4>Tableau Admin</h4>
     <ul class="nav flex-column">
@@ -220,23 +116,19 @@ body {
         <li class="nav-item mb-2"><a class="nav-link {% if request.resolver_match.url_name == 'liste_citoyens' %}active{% endif %}" href="{% url 'liste_citoyens' %}"><i class="bi bi-people"></i> <span>Citoyens</span></a></li>
         <li class="nav-item mb-2"><a class="nav-link {% if request.resolver_match.url_name == 'gerer_policiers' %}active{% endif %}" href="{% url 'gerer_policiers' %}"><i class="bi bi-shield-lock"></i> <span>Policiers</span></a></li>
         <li class="nav-item mb-2"><a class="nav-link {% if request.resolver_match.url_name == 'voir_stats' %}active{% endif %}" href="{% url 'voir_stats' %}"><i class="bi bi-graph-up"></i> <span>Statistiques</span></a></li>
-        <li class="nav-item mb-2"><a class="nav-link {% if request.resolver_match.url_name == 'liste_messages' %}active{% endif %}" href="{% url 'liste_messages' %}"><i class="bi bi-chat-text"></i> <span>Messages</span></a></li>
     </ul>
 </div>
 
-<!-- Main content -->
+<button id="toggleSidebar" class="btn btn-secondary position-fixed top-0 start-100 translate-middle-y m-2 z-1100">☰</button>
+
 <div class="main-content">
     <div class="header">
         <div>
-            <h2>Bienvenue, {{ request.user.first_name }}</h2>
-            <small>Gérez les utilisateurs et les objets depuis votre tableau de bord administrateur.</small>
+            <h2>Bienvenue, {{ request.user.usename }}</h2>
+            <p>Gérez les utilisateurs et les objets depuis ce tableau de bord.</p>
         </div>
         <div class="user-profile" id="profileMenu">
-            {% if request.user.photo %}
-                <img src="{{ request.user.photo.url }}" alt="{{ request.user.get_full_name }}">
-            {% else %}
-                <img src="{% static 'frontend/img/default-user.png' %}" alt="Profil">
-            {% endif %}
+            {% if request.user.photo %}<img src="{{ request.user.photo.url }}"> {% else %}<img src="{% static 'frontend/img/default-user.png' %}">{% endif %}
             <div class="dropdown-menu-custom" id="dropdownMenu">
                 <a href="#" data-bs-toggle="modal" data-bs-target="#profilModal">👤 Voir profil</a>
                 <a href="{% url 'logout' %}">🚪 Déconnexion</a>
@@ -244,22 +136,17 @@ body {
         </div>
     </div>
 
-    <!-- Statistiques -->
     <div class="row g-3 mb-4">
         {% for card in stats_cards %}
         <div class="col-lg-3 col-md-6 col-sm-6">
             <div class="stat-card {% cycle 'bg-yellow' 'bg-purple' 'bg-orange' 'bg-green' %}">
-                <div>
-                    <h4>{{ card.count|default:"0" }}</h4>
-                    <small>{{ card.label }}</small>
-                </div>
+                <div><h4>{{ card.count|default:"0" }}</h4><small>{{ card.label }}</small></div>
                 <div class="icon">{{ card.icon }}</div>
             </div>
         </div>
         {% endfor %}
     </div>
 
-    <!-- Chart -->
     <div class="chart-container">
         <h4>Évolution des objets</h4>
         <canvas id="chartObjets"></canvas>
@@ -267,28 +154,17 @@ body {
 </div>
 
 <!-- Modal Profil -->
-<div class="modal fade" id="profilModal" tabindex="-1" aria-labelledby="profilModalLabel" aria-hidden="true">
+<div class="modal fade" id="profilModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="profilModalLabel">Profil Administrateur</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
+    <div class="modal-content text-center">
+      <div class="modal-header"><h5>Profil Administrateur</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
       <div class="modal-body">
-        {% if request.user.photo %}
-            <img src="{{ request.user.photo.url }}" alt="{{ request.user.get_full_name }}">
-        {% else %}
-            <img src="{% static 'frontend/img/default-user.png' %}" alt="Profil">
-        {% endif %}
-        <h5 class="mt-2">{{ request.user.get_full_name }}</h5>
-        <p class="text-muted mb-1">{{ request.user.email }}</p>
-        <p><strong>Rôle :</strong> Administrateur</p>
-        <p><strong>Date d’inscription :</strong> {{ request.user.date_joined|date:"d/m/Y" }}</p>
+        {% if request.user.photo %}<img src="{{ request.user.photo.url }}" class="mb-3" style="width:120px; height:120px; border-radius:50%; border:3px solid var(--secondary); object-fit:cover;">{% else %}<img src="{% static 'frontend/img/default-user.png' %}" class="mb-3" style="width:120px; height:120px; border-radius:50%;">{% endif %}
+        <h5>{{ request.user.get_full_name }}</h5>
+        <p><strong>Email:</strong> {{ request.user.email }}</p>
+        <p><strong>Rôle:</strong> Administrateur</p>
       </div>
-      <div class="modal-footer">
-        <a href="{% url 'modifier_profil_admin' %}" class="btn btn-warning">Modifier</a>
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-      </div>
+      <div class="modal-footer"><a class="btn btn-primary" href="{% url 'modifier_profil_admin' %}">Modifier le profil</a></div>
     </div>
   </div>
 </div>
@@ -303,7 +179,11 @@ const dropdownMenu = document.getElementById('dropdownMenu');
 profileMenu.addEventListener('click', () => dropdownMenu.classList.toggle('show'));
 document.addEventListener('click', e => { if (!profileMenu.contains(e.target)) dropdownMenu.classList.remove('show'); });
 
-/* Chart.js */
+/* Sidebar toggle */
+const sidebar = document.getElementById('sidebar');
+document.getElementById('toggleSidebar').addEventListener('click', () => sidebar.classList.toggle('collapsed'));
+
+/* Chart.js ligne avec points, hover, tooltip et légende interactive */
 const ctx = document.getElementById('chartObjets').getContext('2d');
 new Chart(ctx, {
     type: 'line',
@@ -316,7 +196,11 @@ new Chart(ctx, {
                 borderColor: '#FFC107',
                 backgroundColor: 'rgba(255,193,7,0.2)',
                 tension: 0.4,
-                fill: true
+                fill: true,
+                pointRadius: 6,
+                pointHoverRadius: 8,
+                borderWidth: 3,
+                pointBackgroundColor: '#FFC107'
             },
             {
                 label: 'Objets trouvés',
@@ -324,23 +208,54 @@ new Chart(ctx, {
                 borderColor: '#6F42C1',
                 backgroundColor: 'rgba(111,66,193,0.2)',
                 tension: 0.4,
-                fill: true
+                fill: true,
+                pointRadius: 6,
+                pointHoverRadius: 8,
+                borderWidth: 3,
+                pointBackgroundColor: '#6F42C1'
             },
             {
-                label: 'Objets en attente',
-                data: {{ chart_attente|safe }},
-                borderColor: '#FD7E14',
-                backgroundColor: 'rgba(253,126,20,0.2)',
+                label: 'Objets restitués',
+                data: {{ chart_restitues|safe }},
+                borderColor: '#20C997',
+                backgroundColor: 'rgba(32,201,151,0.2)',
                 tension: 0.4,
-                fill: true
+                fill: true,
+                pointRadius: 6,
+                pointHoverRadius: 8,
+                borderWidth: 3,
+                pointBackgroundColor: '#20C997'
             }
         ]
     },
     options: {
         responsive: true,
         maintainAspectRatio: false,
-        plugins: { legend: { position: 'top' } },
-        scales: { y: { beginAtZero: true } }
+        plugins: {
+            legend: {
+                position: 'top',
+                labels: { usePointStyle: true, pointStyle: 'circle', padding: 20, font: { size: 14 } },
+                onClick: (e, legendItem, legend) => {
+                    const index = legendItem.datasetIndex;
+                    const ci = legend.chart;
+                    const meta = ci.getDatasetMeta(index);
+                    meta.hidden = meta.hidden === null ? !ci.data.datasets[index].hidden : null;
+                    ci.update();
+                }
+            },
+            tooltip: {
+                mode: 'index',
+                intersect: false,
+                backgroundColor: 'rgba(0,0,0,0.75)',
+                titleFont: { size: 14, weight: 'bold' },
+                bodyFont: { size: 13 }
+            }
+        },
+        interaction: { mode: 'nearest', intersect: false },
+        scales: {
+            y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 13 } }, grid: { color: 'rgba(0,0,0,0.05)' } },
+            x: { ticks: { font: { size: 13 } }, grid: { color: 'rgba(0,0,0,0.05)' } }
+        }
     }
 });
 </script>

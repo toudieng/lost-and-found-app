@@ -896,6 +896,7 @@ from django.db.models import Count
 from django.db.models.functions import TruncMonth
 
 
+
 @login_required(login_url='login')
 def dashboard_admin(request):
     """
@@ -930,20 +931,24 @@ def dashboard_admin(request):
 
     # Préparer labels et datasets pour les graphiques
     labels = sorted({d['mois'].strftime('%b %Y') for d in declarations_par_mois})
-    perdus, trouves, attente = [], [], []
+    chart_perdus, chart_trouves, chart_attente, chart_restitues = [], [], [], []
 
     for mois in labels:
-        perdus.append(sum(
+        chart_perdus.append(sum(
             d['total'] for d in declarations_par_mois
             if d['etat_initial'] == EtatObjet.PERDU and d['mois'].strftime('%b %Y') == mois
         ))
-        trouves.append(sum(
+        chart_trouves.append(sum(
             d['total'] for d in declarations_par_mois
             if d['etat_initial'] == EtatObjet.TROUVE and d['mois'].strftime('%b %Y') == mois
         ))
-        attente.append(sum(
+        chart_attente.append(sum(
             d['total'] for d in declarations_par_mois
             if d['etat_initial'] == EtatObjet.EN_ATTENTE and d['mois'].strftime('%b %Y') == mois
+        ))
+        chart_restitues.append(sum(
+            d['total'] for d in declarations_par_mois
+            if d['etat_initial'] == EtatObjet.RESTITUE and d['mois'].strftime('%b %Y') == mois
         ))
 
     # === 4️⃣ Statistiques pour les cartes ===
@@ -966,9 +971,10 @@ def dashboard_admin(request):
         'notifications': notifications,
         'messages_recus': messages_recus,
         'chart_labels': labels,
-        'chart_perdus': perdus,
-        'chart_trouves': trouves,
-        'chart_attente': attente,
+        'chart_perdus': chart_perdus,
+        'chart_trouves': chart_trouves,
+        'chart_attente': chart_attente,
+        'chart_restitues': chart_restitues,
         'declarations_recents': declarations_recents,
     }
 
