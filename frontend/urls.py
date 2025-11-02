@@ -53,7 +53,7 @@ urlpatterns = [
 
     # Commissariats
     path("dashboard/admin/commissariats/", views.gerer_commissariats, name="gerer_commissariats"),
-    path("dashboard/admin/commissariats/ajouter/", views.ajouter_commissariat, name="ajouter_commissariat"),
+
 
     # Utilisateurs (admins)
     path("dashboard/admin/utilisateurs/", views.gerer_utilisateurs, name="gerer_utilisateurs"),
@@ -94,6 +94,10 @@ urlpatterns = [
         views.objets_trouves_reclames,
         name="objets_trouves_reclames"
     ),
+    
+    path('commissariats/ajax/ajouter/', views.ajax_ajouter_commissariat, name='ajax_ajouter_commissariat'),
+    path('commissariats/ajax/modifier/<int:pk>/', views.ajax_modifier_commissariat, name='ajax_modifier_commissariat'),
+    path('commissariats/ajax/supprimer/<int:pk>/', views.ajax_supprimer_commissariat, name='ajax_supprimer_commissariat'),
 
     
 ]

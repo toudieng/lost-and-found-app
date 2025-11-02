@@ -1089,20 +1089,60 @@ def voir_stats(request):
     return render(request, "frontend/admin/voir_stats.html", context)
 
 
-@admin_required
-def ajouter_commissariat(request):
-    form = CommissariatForm(request.POST or None)
-    if request.method == 'POST' and form.is_valid():
-        form.save()
-        messages.success(request, "✅ Commissariat ajouté avec succès.")
-        return redirect('gerer_commissariats')
-    return render(request, 'frontend/admin/ajouter_commissariat.html', {'form': form})
 
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.core.mail import send_mail
 from django.conf import settings
 from django.utils.crypto import get_random_string
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from django.shortcuts import get_object_or_404
+from django.contrib import messages
+
+# Ajouter un commissariat via AJAX
+@admin_required
+@require_POST
+def ajax_ajouter_commissariat(request):
+    form = CommissariatForm(request.POST)
+    if form.is_valid():
+        c = form.save()
+        return JsonResponse({
+            "success": True,
+            "id": c.id,
+            "nom": c.nom,
+            "adresse": c.adresse,
+            "message": "✅ Commissariat ajouté avec succès."
+        })
+    return JsonResponse({"success": False, "errors": form.errors})
+
+# Modifier un commissariat via AJAX
+@admin_required
+@require_POST
+def ajax_modifier_commissariat(request, pk):
+    c = get_object_or_404(Commissariat, pk=pk)
+    form = CommissariatForm(request.POST, instance=c)
+    if form.is_valid():
+        c = form.save()
+        return JsonResponse({
+            "success": True,
+            "id": c.id,
+            "nom": c.nom,
+            "adresse": c.adresse,
+            "message": f"✅ Commissariat '{c.nom}' modifié avec succès."
+        })
+    return JsonResponse({"success": False, "errors": form.errors})
+
+# Supprimer un commissariat via AJAX
+@admin_required
+@require_POST
+def ajax_supprimer_commissariat(request, pk):
+    c = get_object_or_404(Commissariat, pk=pk)
+    c.delete()
+    return JsonResponse({
+        "success": True,
+        "message": f"✅ Commissariat '{c.nom}' supprimé avec succès."
+    })
 
 
 

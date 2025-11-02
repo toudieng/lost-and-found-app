@@ -1,0 +1,64 @@
+{% extends "frontend/admin/base_admin.html" %}
+{% block title %}Supprimer Commissariat{% endblock %}
+
+{% block extra_css %}
+<style>
+h2 {
+    text-align: center;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    color: #3E4C49;
+}
+.confirm-box {
+    max-width: 500px;
+    margin: auto;
+    text-align: center;
+    background: #fff;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+button {
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    margin: 5px;
+}
+.btn-delete {
+    background-color: #f44336;
+    color: #fff;
+}
+.btn-delete:hover {
+    background-color: #d32f2f;
+}
+a.btn-cancel {
+    background: #888;
+    color: #fff;
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    margin: 5px;
+    display: inline-block;
+}
+a.btn-cancel:hover {
+    background: #555;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<h2>🗑️ Supprimer Commissariat: {{ commissariat.nom }}</h2>
+
+<div class="confirm-box">
+    <p>Êtes-vous sûr de vouloir supprimer ce commissariat ?</p>
+    <p><strong>Cette action est irréversible !</strong></p>
+    
+    <form method="post" style="display:inline-block;">
+        {% csrf_token %}
+        <button type="submit" class="btn-delete">🗑️ Supprimer</button>
+    </form>
+    <a href="{% url 'gerer_commissariats' %}" class="btn-cancel">↩️ Annuler</a>
+</div>
+{% endblock %}
