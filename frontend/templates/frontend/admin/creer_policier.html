@@ -8,6 +8,7 @@
 :root {
     --main-color: #3E4C49;
     --accent-color: #C8A048;
+    --accent-color-dark: #b88f38;
     --light-color: #FFFFFF;
 }
 
@@ -80,7 +81,7 @@ body {
 }
 
 .btn-submit:hover {
-    background-color: #A88433;
+    background-color: var(--accent-color-dark);
     transform: translateY(-2px);
     box-shadow: 0 6px 15px rgba(200,160,72,0.3);
 }
@@ -111,7 +112,7 @@ body {
 
 {% block content %}
 <div class="form-container">
-    <h4 class="form-title">👮 Créer un policier</h4>
+    <h4 class="form-title"> Créer un policier</h4>
 
     {% if messages %}
         {% for message in messages %}
@@ -119,9 +120,19 @@ body {
         {% endfor %}
     {% endif %}
 
-    <form method="POST" novalidate>
+    <form method="POST" enctype="multipart/form-data" novalidate>
         {% csrf_token %}
 
+        <!-- Username -->
+        <div class="input-group">
+            <i class="fa fa-user"></i>
+            {{ form.username }}
+            {% for error in form.username.errors %}
+                <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <!-- Email -->
         <div class="input-group">
             <i class="fa fa-envelope"></i>
             {{ form.email }}
@@ -130,6 +141,7 @@ body {
             {% endfor %}
         </div>
 
+        <!-- Prénom -->
         <div class="input-group">
             <i class="fa fa-user"></i>
             {{ form.first_name }}
@@ -138,6 +150,7 @@ body {
             {% endfor %}
         </div>
 
+        <!-- Nom -->
         <div class="input-group">
             <i class="fa fa-user"></i>
             {{ form.last_name }}
@@ -146,6 +159,7 @@ body {
             {% endfor %}
         </div>
 
+        <!-- Téléphone -->
         <div class="input-group">
             <i class="fa fa-phone"></i>
             {{ form.telephone }}
@@ -154,10 +168,20 @@ body {
             {% endfor %}
         </div>
 
+        <!-- Commissariat -->
         <div class="input-group">
             <i class="fa fa-building"></i>
             {{ form.commissariat }}
             {% for error in form.commissariat.errors %}
+                <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <!-- Photo -->
+        <div class="input-group">
+            <i class="fa fa-image"></i>
+            {{ form.photo }}
+            {% for error in form.photo.errors %}
                 <div class="text-danger">{{ error }}</div>
             {% endfor %}
         </div>

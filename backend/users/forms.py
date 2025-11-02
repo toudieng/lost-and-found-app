@@ -46,18 +46,15 @@ class CommissariatForm(forms.ModelForm):
 # =========================
 # 👮 Formulaire de création de policier
 # =========================
-
-    from django import forms
-from django.utils.crypto import get_random_string
-from django.core.mail import send_mail
-from .models import Utilisateur, Commissariat
-from django.conf import settings
-
 class PolicierForm(forms.ModelForm):
     class Meta:
         model = Utilisateur
-        fields = ["email", "first_name", "last_name", "telephone", "commissariat"]
+        fields = ["username", "email", "first_name", "last_name", "telephone", "commissariat", "photo"]
         widgets = {
+            "username": forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Nom d’utilisateur'
+            }),
             "email": forms.EmailInput(attrs={
                 'class': 'form-control', 
                 'placeholder': 'Adresse e-mail'
@@ -77,6 +74,9 @@ class PolicierForm(forms.ModelForm):
             "commissariat": forms.Select(attrs={
                 'class': 'form-control'
             }),
+            "photo": forms.ClearableFileInput(attrs={
+                'class': 'form-control'
+            }),
         }
 
     def __init__(self, *args, **kwargs):
@@ -92,6 +92,7 @@ class PolicierForm(forms.ModelForm):
             user.save()
         return user
 
+  
 
 # =========================
 # 🧑‍💼 Formulaire de création d’administrateur

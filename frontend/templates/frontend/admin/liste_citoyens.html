@@ -4,7 +4,6 @@
 {% block title %}Gestion des Citoyens{% endblock %}
 
 {% block extra_css %}
-<!-- DataTables CSS -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
 
 <style>
@@ -20,14 +19,15 @@
 .page-title {
     font-weight: 700;
     color: var(--main-color);
-    font-size: 1.4rem;
+    font-size: 1.5rem;
 }
 
 /* Card */
 .card {
     border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
     padding: 1rem;
+    background-color: #fff;
 }
 
 /* Table */
@@ -37,22 +37,31 @@
 }
 .table tbody tr:hover {
     background-color: var(--main-color-light);
+    transition: all 0.2s;
+}
+.table-responsive {
+    overflow-x: auto;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
 /* Badges */
 .badge {
     font-size: 0.75rem;
     padding: 4px 8px;
+    border-radius: 8px;
+    transition: all 0.2s;
 }
 
 /* Boutons */
 .btn-blacklist, .btn-unban {
-    padding: 6px 12px;
-    border-radius: 6px;
+    padding: 6px 14px;
+    border-radius: 8px;
     font-size: 0.85rem;
-    border: none;
     font-weight: 500;
-    transition: 0.2s;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
 }
 .btn-blacklist {
     background-color: #dc3545;
@@ -82,6 +91,13 @@
 @media (max-width: 768px) {
     .search-bar input {
         width: 100%;
+    }
+    .btn-blacklist, .btn-unban {
+        width: 100%;
+        margin-top: 4px;
+    }
+    table {
+        font-size: 0.9rem;
     }
 }
 </style>
@@ -154,12 +170,10 @@
 {% endblock %}
 
 {% block extra_js %}
-<!-- DataTables JS -->
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 
 <script>
-// Initialiser DataTable
 $(document).ready(function() {
     const table = $('#citoyensTable').DataTable({
         paging: true,
@@ -181,11 +195,10 @@ $(document).ready(function() {
             }
         },
         columnDefs: [
-            { orderable: false, targets: 6 } // Action non triable
+            { orderable: false, targets: 6 }
         ]
     });
 
-    // Recherche globale personnalisée
     $('#globalSearch').on('keyup', function(){
         table.search(this.value).draw();
     });
