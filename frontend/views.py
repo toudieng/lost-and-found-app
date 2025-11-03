@@ -895,10 +895,13 @@ from django.utils.timezone import now
 from django.db.models import Count
 from django.db.models.functions import TruncMonth
 from datetime import timedelta
+from dateutil.relativedelta import relativedelta
+
 from backend.objets.models import Declaration, Objet, EtatObjet
+from backend.users.models import Utilisateur  # Import correct du modèle utilisateur
 
 def dashboard_admin(request):
-    # Statistiques globales
+    # --- Statistiques globales ---
     nb_objets_perdus = Declaration.objects.filter(etat_initial=EtatObjet.PERDU).count()
     nb_objets_trouves = Declaration.objects.filter(etat_initial=EtatObjet.TROUVE).count()
     nb_objets_en_attente = Declaration.objects.filter(etat_initial=EtatObjet.EN_ATTENTE).count()
@@ -911,31 +914,48 @@ def dashboard_admin(request):
         {'label': 'Objets restitués', 'count': nb_objets_restitues, 'icon': '✅'},
     ]
 
-    # Données pour le graphique
+    # --- Données pour le graphique (6 derniers mois) ---
     date_limite = now() - timedelta(days=180)
     declarations = Declaration.objects.filter(date_declaration__gte=date_limite)
     restitutions = Objet.objects.filter(etat=EtatObjet.RESTITUE, restitutions__date_restitution__gte=date_limite)
 
     # Groupement par mois
     declarations_par_mois = declarations.annotate(mois=TruncMonth('date_declaration')) \
-        .values('mois', 'etat_initial').annotate(total=Count('id')).order_by('mois')
+                                        .values('mois', 'etat_initial') \
+                                        .annotate(total=Count('id')) \
+                                        .order_by('mois')
 
     restitutions_par_mois = restitutions.annotate(mois=TruncMonth('restitutions__date_restitution')) \
-        .values('mois').annotate(total=Count('id')).order_by('mois')
+                                       .values('mois') \
+                                       .annotate(total=Count('id')) \
+                                       .order_by('mois')
 
-    # Labels du graphique
-    mois_labels = sorted({d['mois'].strftime('%b %Y') for d in declarations_par_mois} | {r['mois'].strftime('%b %Y') for r in restitutions_par_mois})
+    # Générer la liste des 6 derniers mois (chronologique)
+    mois_labels = [(now() - relativedelta(months=i)).strftime('%b %Y') for i in reversed(range(6))]
 
+    # Initialiser les datasets
     chart_perdus = []
     chart_trouves = []
     chart_attente = []
     chart_restitues = []
 
     for mois in mois_labels:
-        chart_perdus.append(sum(d['total'] for d in declarations_par_mois if d['etat_initial'] == EtatObjet.PERDU and d['mois'].strftime('%b %Y') == mois))
-        chart_trouves.append(sum(d['total'] for d in declarations_par_mois if d['etat_initial'] == EtatObjet.TROUVE and d['mois'].strftime('%b %Y') == mois))
-        chart_attente.append(sum(d['total'] for d in declarations_par_mois if d['etat_initial'] == EtatObjet.EN_ATTENTE and d['mois'].strftime('%b %Y') == mois))
-        chart_restitues.append(sum(r['total'] for r in restitutions_par_mois if r['mois'].strftime('%b %Y') == mois))
+        chart_perdus.append(
+            sum(d['total'] for d in declarations_par_mois 
+                if d['etat_initial'] == EtatObjet.PERDU and d['mois'].strftime('%b %Y') == mois)
+        )
+        chart_trouves.append(
+            sum(d['total'] for d in declarations_par_mois 
+                if d['etat_initial'] == EtatObjet.TROUVE and d['mois'].strftime('%b %Y') == mois)
+        )
+        chart_attente.append(
+            sum(d['total'] for d in declarations_par_mois 
+                if d['etat_initial'] == EtatObjet.EN_ATTENTE and d['mois'].strftime('%b %Y') == mois)
+        )
+        chart_restitues.append(
+            sum(r['total'] for r in restitutions_par_mois 
+                if r['mois'].strftime('%b %Y') == mois)
+        )
 
     context = {
         'stats_cards': stats_cards,
@@ -944,10 +964,10 @@ def dashboard_admin(request):
         'chart_trouves': chart_trouves,
         'chart_attente': chart_attente,
         'chart_restitues': chart_restitues,
+        'user': request.user,  # pour accéder à l'utilisateur connecté dans le template
     }
+
     return render(request, "frontend/admin/dashboard_admin.html", context)
-
-
 
 @admin_required
 def gerer_commissariats(request):
