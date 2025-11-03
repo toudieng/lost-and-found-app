@@ -123,7 +123,7 @@ body { background-color: var(--main-bg); font-family: 'Segoe UI', sans-serif; ma
             <h2>Bienvenue, {{ request.user.first_name }}</h2>
             <p>Gérez les objets et planifiez les restitutions depuis ce tableau de bord.</p>
             {% if request.user.commissariat %}
-                <small><strong>Commissariat:</strong> {{ request.user.commissariat.nom }}</small>
+                <strong style="color: #C8A048;">Commissariat:</strong> {{ request.user.commissariat.nom }}
             {% endif %}
         </div>
 
