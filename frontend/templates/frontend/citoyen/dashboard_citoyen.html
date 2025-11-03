@@ -5,7 +5,6 @@
 
 {% block extra_css %}
 <style>
-
 :root {
     --main-color:#2f3e46;          
     --accent-color: #C8A048;        
@@ -14,7 +13,6 @@
     --main-color-light: rgba(62,76,73,0.1); 
     --shadow-color: rgba(0,0,0,0.12);
 }
-
 
 body {
     display: flex;
@@ -176,7 +174,7 @@ body {
 
     <!-- Contenu principal -->
     <div class="main-content">
-        <h2 class="welcome-title">Bienvenue, {{ user.first_name|default:user.username }} 👋</h2>
+        <h2 class="welcome-title">Bienvenue, {{ user.first_name|default:user.username }}</h2>
         <p class="text-muted">Voici un aperçu de vos objets perdus et trouvés.</p>
 
         <!-- Statistiques -->
@@ -212,7 +210,7 @@ body {
 
         <!-- Notifications -->
         <div class="notifications-card">
-            <h5>🔔 Notifications récentes</h5>
+            <h5>🔔 Dernières déclarations</h5>
             {% if notifications %}
                 <ul class="list-group list-group-flush mt-2">
                     {% for notif in notifications %}
@@ -223,7 +221,7 @@ body {
                     {% endfor %}
                 </ul>
             {% else %}
-                <p class="text-muted text-center mt-2">Aucune notification pour le moment.</p>
+                <p class="text-muted text-center mt-2">Aucune déclaration pour le moment.</p>
             {% endif %}
         </div>
     </div>

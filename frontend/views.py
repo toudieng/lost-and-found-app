@@ -507,24 +507,6 @@ def objets_reclames(request):
     return render(request, "frontend/objets/objets_reclames.html", {
         "declarations": declarations
     })
-from django.shortcuts import render
-from django.db.models import Q
-from backend.objets.models import Declaration, EtatObjet
-
-
-
-
-
-
-from django.shortcuts import render
-from backend.objets.models import Declaration, EtatObjet
-
-from django.shortcuts import render
-from backend.objets.models import Declaration, EtatObjet
-
-from django.shortcuts import render
-from backend.objets.models import Declaration, EtatObjet
-
 
 
 def objets_trouves_reclames(request):
@@ -1334,7 +1316,6 @@ def ca_m_appartient(request, declaration_id):
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from backend.objets.models import Declaration, Restitution, EtatObjet, StatutRestitution
-
 @login_required
 def dashboard_citoyen(request):
     user = request.user
@@ -1356,7 +1337,7 @@ def dashboard_citoyen(request):
         statut=StatutRestitution.EFFECTUEE
     ).count()
 
-    # 5 dernières notifications (déclarations)
+    # 5 dernières notifications (toutes les déclarations, sans filtre "lu")
     notifications = Declaration.objects.filter(
         citoyen=user
     ).order_by('-date_declaration')[:5]
@@ -1369,7 +1350,6 @@ def dashboard_citoyen(request):
         'notifications': notifications,
     }
     return render(request, "frontend/citoyen/dashboard_citoyen.html", context)
-
 
 
 
