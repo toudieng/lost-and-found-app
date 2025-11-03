@@ -225,7 +225,14 @@ body { background-color: var(--main-bg); font-family: 'Segoe UI', sans-serif; ma
         <p><strong>Téléphone:</strong> {{ request.user.telephone|default:"Non défini" }}</p>
         <p><strong>Rôle:</strong> Administrateur</p>
       </div>
-      <div class="modal-footer"><a class="btn btn-primary" href="{% url 'modifier_profil_admin' %}">Modifier le profil</a></div>
+     
+<div class="modal-footer">
+    <a href="{% url 'modifier_profil_admin' %}" class="btn btn-primary mt-3">
+        ✏️ Modifier Profil
+    </a>
+</div>
+
+</div>
     </div>
   </div>
 </div>
