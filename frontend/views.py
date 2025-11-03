@@ -278,16 +278,14 @@ def supprimer_objet(request, objet_id):
 #       DASHBOARD POLICIER
 # =============================
 from django.shortcuts import render
-from django.urls import reverse
 from django.utils import timezone
 from dateutil.relativedelta import relativedelta
-
+from django.urls import reverse
 import json
 
 @policier_required
 def dashboard_policier(request):
     today = timezone.now()
-    current_year = today.year
 
     # --- Labels des 6 derniers mois ---
     months_labels = []
@@ -317,13 +315,33 @@ def dashboard_policier(request):
     ).count()
 
     stats_cards = [
-        {"label": "Objets perdus & trouvés", "count": nb_objets_perdus_trouves, "icon": "📌", "url": reverse("objets_perdus_trouves")},
-        {"label": "Objets trouvés & réclamés", "count": nb_objets_trouves_reclames, "icon": "📌", "url": reverse("objets_trouves_reclames")},
-        {"label": "Objets retrouvés (en attente)", "count": nb_objets_trouves_attente, "icon": "📦", "url": reverse("objets_trouves_attente")},
-        {"label": "Historique", "count": nb_restitutions, "icon": "📂", "url": reverse("historique_restitutions")},
+        {
+            "label": "Objets perdus & trouvés",
+            "count": nb_objets_perdus_trouves,
+            "icon": "📌",
+            "url": reverse("objets_perdus_trouves")
+        },
+        {
+            "label": "Objets trouvés & réclamés",
+            "count": nb_objets_trouves_reclames,
+            "icon": "📌",
+            "url": reverse("objets_trouves_reclames")
+        },
+        {
+            "label": "Objets retrouvés (en attente)",
+            "count": nb_objets_trouves_attente,
+            "icon": "📦",
+            "url": reverse("objets_trouves_attente")
+        },
+        {
+            "label": "Objets restitués",
+            "count": nb_restitutions,
+            "icon": "📂",
+            "url": reverse("historique_restitutions")
+        },
     ]
 
-    # --- Fonction pour obtenir les données des 6 derniers mois ---
+    # --- Données par mois pour le graphique ---
     def data_by_last_6_months(queryset):
         data = []
         for y, m in last_6_months:
@@ -340,14 +358,9 @@ def dashboard_policier(request):
     data_attente = data_by_last_6_months(
         Declaration.objects.filter(objet__etat=EtatObjet.EN_ATTENTE)
     )
-
-    # --- Assurer que toutes les séries ont 6 valeurs ---
-    def pad_to_6(lst):
-        return lst + [0]*(6 - len(lst))
-
-    data_perdus_trouves = pad_to_6(data_perdus_trouves)
-    data_trouves_reclames = pad_to_6(data_trouves_reclames)
-    data_attente = pad_to_6(data_attente)
+    data_restitues = data_by_last_6_months(
+        Declaration.objects.filter(objet__etat=EtatObjet.RESTITUE)
+    )
 
     context = {
         "stats_cards": stats_cards,
@@ -355,11 +368,10 @@ def dashboard_policier(request):
         "chart_perdus": json.dumps(data_perdus_trouves),
         "chart_trouves": json.dumps(data_trouves_reclames),
         "chart_attente": json.dumps(data_attente),
-        "current_year": current_year,
+        "chart_restitues": json.dumps(data_restitues),  # <-- nouveau dataset
     }
 
     return render(request, "frontend/policier/dashboard_policier.html", context)
-
 
 @policier_required
 def liste_objets_declares(request):
