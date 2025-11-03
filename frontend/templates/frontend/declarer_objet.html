@@ -9,6 +9,7 @@
     --gray: #6c757d;
     --light-gray: #f8f9fa;
     --error: #dc3545;
+    --transition: 0.3s ease;
 }
 
 body {
@@ -16,12 +17,13 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+/* Container card */
 .form-container {
     background: #fff;
     padding: 2.5rem 2rem;
     border-radius: 1rem;
     box-shadow: 0 8px 32px rgba(0,0,0,0.12);
-    transition: all 0.3s ease;
+    transition: all var(--transition);
     border-top: 4px solid var(--primary);
 }
 .form-container:hover {
@@ -37,35 +39,69 @@ body {
     margin-bottom: 2rem;
 }
 
-.input-group {
-    display: flex;
-    align-items: center;
-    margin-bottom: 1.2rem;
-    border-radius: 0.8rem;
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    transition: all 0.2s ease;
+/* Floating labels */
+.floating-label {
+    position: relative;
+    margin-bottom: 1.5rem;
 }
-.input-group:hover {
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+.floating-label input,
+.floating-label textarea {
+    width: 100%;
+    padding: 0.75rem 0.75rem 0.75rem 0.75rem;
+    font-size: 0.95rem;
+    border: 1px solid #ccc;
+    border-radius: 0.6rem;
+    outline: none;
+    background: #fdfdfd;
+    transition: border-color var(--transition);
 }
-
-.input-group-text {
-    background: var(--secondary);
+.floating-label input:focus,
+.floating-label textarea:focus {
+    border-color: var(--primary);
+}
+.floating-label label {
+    position: absolute;
+    top: 50%;
+    left: 0.9rem;
+    transform: translateY(-50%);
+    color: #888;
+    pointer-events: none;
+    transition: all var(--transition);
+    background: #fff;
+    padding: 0 0.25rem;
+}
+.floating-label input:focus + label,
+.floating-label input:not(:placeholder-shown) + label,
+.floating-label textarea:focus + label,
+.floating-label textarea:not(:placeholder-shown) + label {
+    top: -0.6rem;
+    font-size: 0.8rem;
     color: var(--primary);
-    width: 50px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 1.1rem;
 }
 
-.text-error {
-    color: var(--error);
-    font-size: 0.85rem;
-    margin-top: 0.3rem;
+/* Radio buttons */
+.form-check-inline {
+    margin-right: 1rem;
+    font-size: 0.95rem;
 }
 
+/* Preview image */
+#preview-image {
+    max-height: 220px;
+    width: 100%;
+    margin-top: 0.6rem;
+    border-radius: 0.5rem;
+    object-fit: cover;
+    display: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: transform var(--transition), box-shadow var(--transition);
+}
+#preview-image:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
+
+/* Buttons */
 .btn-submit, .btn-back {
     border-radius: 0.8rem;
     padding: 0.7rem 1.2rem;
@@ -73,7 +109,7 @@ body {
     width: 48%;
     text-align: center;
     display: inline-block;
-    transition: all 0.2s ease;
+    transition: all var(--transition);
     border: none;
 }
 .btn-submit {
@@ -93,24 +129,11 @@ body {
     background: #5a6268;
 }
 
-#preview-image {
-    max-height: 220px;
-    width: 100%;
-    margin-top: 0.6rem;
-    border-radius: 0.5rem;
-    object-fit: cover;
-    display: none;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-#preview-image:hover {
-    transform: scale(1.02);
-    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
-}
-
-.form-check-inline {
-    margin-right: 1rem;
-    font-size: 0.95rem;
+/* Error messages */
+.text-error {
+    color: var(--error);
+    font-size: 0.85rem;
+    margin-top: 0.3rem;
 }
 </style>
 {% endblock %}
@@ -133,26 +156,27 @@ body {
                 {% csrf_token %}
 
                 <!-- Nom de l'objet -->
-                <div class="input-group">
-                    <span class="input-group-text"><i class="bi bi-tag-fill"></i></span>
+                <div class="floating-label">
                     {{ form.nom_objet }}
+                    <label>Nom de l'objet</label>
+                    {% for error in form.nom_objet.errors %}
+                        <div class="text-error">{{ error }}</div>
+                    {% endfor %}
                 </div>
-                {% for error in form.nom_objet.errors %}
-                    <div class="text-error">{{ error }}</div>
-                {% endfor %}
 
                 <!-- Lieu -->
-                <div class="input-group">
-                    <span class="input-group-text"><i class="bi bi-geo-alt-fill"></i></span>
+                <div class="floating-label">
                     {{ form.lieu }}
+                    <label>Lieu où l'objet a été perdu ou trouvé</label>
+                    {% for error in form.lieu.errors %}
+                        <div class="text-error">{{ error }}</div>
+                    {% endfor %}
                 </div>
-                {% for error in form.lieu.errors %}
-                    <div class="text-error">{{ error }}</div>
-                {% endfor %}
 
                 <!-- Description -->
-                <div class="mb-3">
+                <div class="floating-label">
                     {{ form.description }}
+                    <label>Description détaillée (facultatif)</label>
                     {% for error in form.description.errors %}
                         <div class="text-error">{{ error }}</div>
                     {% endfor %}
