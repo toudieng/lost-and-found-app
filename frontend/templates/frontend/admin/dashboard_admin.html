@@ -67,6 +67,7 @@ body { background-color: var(--main-bg); font-family: 'Segoe UI', sans-serif; ma
 
 /* Main content */
 .main-content { margin-left: 260px; padding: 2rem; transition: all 0.3s ease; }
+.main-content.expanded { margin-left: 80px; }
 .sidebar.collapsed ~ .main-content { margin-left: 80px; }
 
 /* Header */
@@ -123,7 +124,7 @@ body { background-color: var(--main-bg); font-family: 'Segoe UI', sans-serif; ma
 .bg-green  { border-left: 6px solid var(--card-green); }
 
 /* Chart container */
-.chart-container { background: var(--white); border-radius: 1rem; padding: 1.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-top: 1rem; height: 400px; }
+.chart-container { background: var(--white); border-radius: 1rem; padding: 1.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-top: 1rem; height: 450px; }
 
 /* Responsive */
 @media (max-width: 768px) {
@@ -139,10 +140,26 @@ body { background-color: var(--main-bg); font-family: 'Segoe UI', sans-serif; ma
 <div class="sidebar" id="sidebar">
     <h4>Tableau Admin</h4>
     <ul class="nav flex-column">
-        <li class="nav-item mb-2"><a class="nav-link {% if request.resolver_match.url_name == 'gerer_commissariats' %}active{% endif %}" href="{% url 'gerer_commissariats' %}"><i class="bi bi-building"></i> <span>Commissariats</span></a></li>
-        <li class="nav-item mb-2"><a class="nav-link {% if request.resolver_match.url_name == 'gerer_utilisateurs' %}active{% endif %}" href="{% url 'gerer_utilisateurs' %}"><i class="bi bi-person-gear"></i> <span>Administrateurs</span></a></li>
-        <li class="nav-item mb-2"><a class="nav-link {% if request.resolver_match.url_name == 'liste_citoyens' %}active{% endif %}" href="{% url 'liste_citoyens' %}"><i class="bi bi-people"></i> <span>Citoyens</span></a></li>
-        <li class="nav-item mb-2"><a class="nav-link {% if request.resolver_match.url_name == 'gerer_policiers' %}active{% endif %}" href="{% url 'gerer_policiers' %}"><i class="bi bi-shield-lock"></i> <span>Policiers</span></a></li>
+        <li class="nav-item mb-2">
+            <a class="nav-link {% if request.resolver_match.url_name == 'gerer_commissariats' %}active{% endif %}" href="{% url 'gerer_commissariats' %}">
+                <i class="bi bi-building"></i> <span>Commissariats</span>
+            </a>
+        </li>
+        <li class="nav-item mb-2">
+            <a class="nav-link {% if request.resolver_match.url_name == 'gerer_utilisateurs' %}active{% endif %}" href="{% url 'gerer_utilisateurs' %}">
+                <i class="bi bi-person-gear"></i> <span>Administrateurs</span>
+            </a>
+        </li>
+        <li class="nav-item mb-2">
+            <a class="nav-link {% if request.resolver_match.url_name == 'liste_citoyens' %}active{% endif %}" href="{% url 'liste_citoyens' %}">
+                <i class="bi bi-people"></i> <span>Citoyens</span>
+            </a>
+        </li>
+        <li class="nav-item mb-2">
+            <a class="nav-link {% if request.resolver_match.url_name == 'gerer_policiers' %}active{% endif %}" href="{% url 'gerer_policiers' %}">
+                <i class="bi bi-shield-lock"></i> <span>Policiers</span>
+            </a>
+        </li>
     </ul>
 </div>
 
@@ -154,7 +171,7 @@ body { background-color: var(--main-bg); font-family: 'Segoe UI', sans-serif; ma
     <!-- Header -->
     <div class="header">
         <div>
-            <h2>Bienvenue, {{ request.user.get_full_name }}</h2>
+            <h2>Bienvenue, {{ request.user.username }}</h2>
             <p>Gérez les utilisateurs et les objets depuis ce tableau de bord.</p>
         </div>
         <div class="user-profile" id="profileMenu">
@@ -175,7 +192,10 @@ body { background-color: var(--main-bg); font-family: 'Segoe UI', sans-serif; ma
         {% for card in stats_cards %}
         <div class="col-lg-3 col-md-6 col-sm-6">
             <div class="stat-card {% cycle 'bg-yellow' 'bg-purple' 'bg-orange' 'bg-green' %}">
-                <div><h4>{{ card.count|default:"0" }}</h4><small>{{ card.label }}</small></div>
+                <div>
+                    <h4>{{ card.count|default:"0" }}</h4>
+                    <small>{{ card.label }}</small>
+                </div>
                 <div class="icon">{{ card.icon }}</div>
             </div>
         </div>
@@ -184,7 +204,7 @@ body { background-color: var(--main-bg); font-family: 'Segoe UI', sans-serif; ma
 
     <!-- Chart -->
     <div class="chart-container">
-        <h4>Évolution des objets</h4>
+        <h4>Évolution des objets (6 derniers mois)</h4>
         <canvas id="chartObjets"></canvas>
     </div>
 </div>
@@ -201,7 +221,9 @@ body { background-color: var(--main-bg); font-family: 'Segoe UI', sans-serif; ma
             <img src="{% static 'frontend/img/default-user.png' %}" class="mb-3" style="width:120px; height:120px; border-radius:50%;">
         {% endif %}
         <h5>{{ request.user.get_full_name }}</h5>
+        <p><strong>Username:</strong> {{ request.user.username }}</p>
         <p><strong>Email:</strong> {{ request.user.email }}</p>
+        <p><strong>Téléphone:</strong> {{ request.user.telephone|default:"Non défini" }}</p>
         <p><strong>Rôle:</strong> Administrateur</p>
       </div>
       <div class="modal-footer"><a class="btn btn-primary" href="{% url 'modifier_profil_admin' %}">Modifier le profil</a></div>
@@ -212,6 +234,7 @@ body { background-color: var(--main-bg); font-family: 'Segoe UI', sans-serif; ma
 
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 <script>
 // Dropdown profil
 const profileMenu = document.getElementById('profileMenu');
@@ -227,41 +250,42 @@ document.getElementById('toggleSidebar').addEventListener('click', () => {
     mainContent.classList.toggle('expanded');
 });
 
-// Chart.js
+// Dégradé pour datasets
+function createGradient(ctx, color) {
+    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, color + '80');
+    gradient.addColorStop(1, color + '10');
+    return gradient;
+}
+
+// Chart.js avec datalabels
 const ctx = document.getElementById('chartObjets').getContext('2d');
 new Chart(ctx, {
     type: 'line',
     data: {
         labels: {{ chart_labels|safe }},
         datasets: [
-            { label: 'Objets perdus', data: {{ chart_perdus|safe }}, borderColor: '#FFC107', backgroundColor: 'rgba(255,193,7,0.2)', tension: 0.4, fill: true, pointRadius: 6, pointHoverRadius: 8, borderWidth: 3, pointBackgroundColor: '#FFC107' },
-            { label: 'Objets trouvés', data: {{ chart_trouves|safe }}, borderColor: '#6F42C1', backgroundColor: 'rgba(111,66,193,0.2)', tension: 0.4, fill: true, pointRadius: 6, pointHoverRadius: 8, borderWidth: 3, pointBackgroundColor: '#6F42C1' },
-            { label: 'Objets restitués', data: {{ chart_restitues|safe }}, borderColor: '#20C997', backgroundColor: 'rgba(32,201,151,0.2)', tension: 0.4, fill: true, pointRadius: 6, pointHoverRadius: 8, borderWidth: 3, pointBackgroundColor: '#20C997' }
+            { label: 'Objets perdus', data: {{ chart_perdus|safe }}, borderColor: '#FFC107', backgroundColor: createGradient(ctx, '#FFC107'), tension: 0.4, fill: true, pointRadius: 6, pointHoverRadius: 8, borderWidth: 3, pointBackgroundColor: '#FFC107' },
+            { label: 'Objets trouvés', data: {{ chart_trouves|safe }}, borderColor: '#6F42C1', backgroundColor: createGradient(ctx, '#6F42C1'), tension: 0.4, fill: true, pointRadius: 6, pointHoverRadius: 8, borderWidth: 3, pointBackgroundColor: '#6F42C1' },
+            { label: 'Objets en attente', data: {{ chart_attente|safe }}, borderColor: '#FD7E14', backgroundColor: createGradient(ctx, '#FD7E14'), tension: 0.4, fill: true, pointRadius: 6, pointHoverRadius: 8, borderWidth: 3, pointBackgroundColor: '#FD7E14' },
+            { label: 'Objets restitués', data: {{ chart_restitues|safe }}, borderColor: '#20C997', backgroundColor: createGradient(ctx, '#20C997'), tension: 0.4, fill: true, pointRadius: 6, pointHoverRadius: 8, borderWidth: 3, pointBackgroundColor: '#20C997' }
         ]
     },
     options: {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-            legend: {
-                position: 'top',
-                labels: { usePointStyle: true, pointStyle: 'circle', padding: 20, font: { size: 14 } },
-                onClick: (e, legendItem, legend) => {
-                    const index = legendItem.datasetIndex;
-                    const ci = legend.chart;
-                    const meta = ci.getDatasetMeta(index);
-                    meta.hidden = meta.hidden === null ? !ci.data.datasets[index].hidden : null;
-                    ci.update();
-                }
-            },
-            tooltip: { mode: 'index', intersect: false, backgroundColor: 'rgba(0,0,0,0.75)', titleFont: { size: 14, weight: 'bold' }, bodyFont: { size: 13 } }
+            legend: { position: 'top', labels: { usePointStyle: true, pointStyle: 'circle', padding: 20, font: { size: 14 } } },
+            tooltip: { mode: 'index', intersect: false, backgroundColor: 'rgba(0,0,0,0.75)', titleFont: { size: 14, weight: 'bold' }, bodyFont: { size: 13 } },
+            datalabels: { display: true, color: '#000', font: { weight: 'bold', size: 12 }, align: 'top', formatter: value => value }
         },
         interaction: { mode: 'nearest', intersect: false },
         scales: {
             y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 13 } }, grid: { color: 'rgba(0,0,0,0.05)' } },
             x: { ticks: { font: { size: 13 } }, grid: { color: 'rgba(0,0,0,0.05)' } }
         }
-    }
+    },
+    plugins: [ChartDataLabels]
 });
 </script>
 {% endblock %}

@@ -890,94 +890,62 @@ def preuve_restitution_pdf(request, pk):
 # =============================
 
 
-from datetime import timedelta
+from django.shortcuts import render
 from django.utils.timezone import now
 from django.db.models import Count
 from django.db.models.functions import TruncMonth
+from datetime import timedelta
+from backend.objets.models import Declaration, Objet, EtatObjet
 
-
-@login_required(login_url='login')
 def dashboard_admin(request):
-    """
-    Tableau de bord Administrateur :
-    Affiche les statistiques globales, notifications et graphiques des objets.
-    """
-
-    # === 1️⃣ Statistiques globales ===
-    nb_commissariats = Commissariat.objects.count()
-    nb_policiers = Utilisateur.objects.filter(role='policier').count()
-    nb_citoyens = Utilisateur.objects.filter(role='citoyen').count()
-
+    # Statistiques globales
     nb_objets_perdus = Declaration.objects.filter(etat_initial=EtatObjet.PERDU).count()
     nb_objets_trouves = Declaration.objects.filter(etat_initial=EtatObjet.TROUVE).count()
     nb_objets_en_attente = Declaration.objects.filter(etat_initial=EtatObjet.EN_ATTENTE).count()
     nb_objets_restitues = Objet.objects.filter(etat=EtatObjet.RESTITUE).count()
 
-    # === 2️⃣ Notifications et messages récents ===
-    notifications = Notification.objects.order_by('-date')[:5]
-    messages_recus = Message.objects.order_by('-date_envoi')[:5]
-
-    # === 3️⃣ Statistiques mensuelles pour graphique ===
-    date_limite = now() - timedelta(days=180)  # 6 derniers mois
-    declarations_par_mois = (
-        Declaration.objects.filter(date_declaration__gte=date_limite)
-        .annotate(mois=TruncMonth('date_declaration'))
-        .values('mois', 'etat_initial')
-        .annotate(total=Count('id'))
-        .order_by('mois')
-    )
-
-    # Préparer labels et datasets
-    labels = sorted({d['mois'].strftime('%b %Y') for d in declarations_par_mois})
-    chart_perdus, chart_trouves, chart_attente, chart_restitues = [], [], [], []
-
-    for mois in labels:
-        chart_perdus.append(sum(
-            d['total'] for d in declarations_par_mois
-            if d['etat_initial'] == EtatObjet.PERDU and d['mois'].strftime('%b %Y') == mois
-        ))
-        chart_trouves.append(sum(
-            d['total'] for d in declarations_par_mois
-            if d['etat_initial'] == EtatObjet.TROUVE and d['mois'].strftime('%b %Y') == mois
-        ))
-        chart_attente.append(sum(
-            d['total'] for d in declarations_par_mois
-            if d['etat_initial'] == EtatObjet.EN_ATTENTE and d['mois'].strftime('%b %Y') == mois
-        ))
-        chart_restitues.append(sum(
-            d['total'] for d in declarations_par_mois
-            if d['etat_initial'] == EtatObjet.RESTITUE and d['mois'].strftime('%b %Y') == mois
-        ))
-
-    # === 4️⃣ Stat cards pour affichage rapide ===
     stats_cards = [
-        {'label': 'Commissariats', 'count': nb_commissariats, 'icon': '🏢'},
-        {'label': 'Policiers', 'count': nb_policiers, 'icon': '👮'},
-        {'label': 'Citoyens', 'count': nb_citoyens, 'icon': '🧍'},
         {'label': 'Objets perdus', 'count': nb_objets_perdus, 'icon': '📦'},
         {'label': 'Objets trouvés', 'count': nb_objets_trouves, 'icon': '🔍'},
         {'label': 'Objets en attente', 'count': nb_objets_en_attente, 'icon': '⏳'},
         {'label': 'Objets restitués', 'count': nb_objets_restitues, 'icon': '✅'},
     ]
 
-    # === 5️⃣ Déclarations récentes ===
-    declarations_recents = Declaration.objects.order_by('-date_declaration')[:6]
+    # Données pour le graphique
+    date_limite = now() - timedelta(days=180)
+    declarations = Declaration.objects.filter(date_declaration__gte=date_limite)
+    restitutions = Objet.objects.filter(etat=EtatObjet.RESTITUE, restitutions__date_restitution__gte=date_limite)
 
-    # === 6️⃣ Contexte pour le template ===
+    # Groupement par mois
+    declarations_par_mois = declarations.annotate(mois=TruncMonth('date_declaration')) \
+        .values('mois', 'etat_initial').annotate(total=Count('id')).order_by('mois')
+
+    restitutions_par_mois = restitutions.annotate(mois=TruncMonth('restitutions__date_restitution')) \
+        .values('mois').annotate(total=Count('id')).order_by('mois')
+
+    # Labels du graphique
+    mois_labels = sorted({d['mois'].strftime('%b %Y') for d in declarations_par_mois} | {r['mois'].strftime('%b %Y') for r in restitutions_par_mois})
+
+    chart_perdus = []
+    chart_trouves = []
+    chart_attente = []
+    chart_restitues = []
+
+    for mois in mois_labels:
+        chart_perdus.append(sum(d['total'] for d in declarations_par_mois if d['etat_initial'] == EtatObjet.PERDU and d['mois'].strftime('%b %Y') == mois))
+        chart_trouves.append(sum(d['total'] for d in declarations_par_mois if d['etat_initial'] == EtatObjet.TROUVE and d['mois'].strftime('%b %Y') == mois))
+        chart_attente.append(sum(d['total'] for d in declarations_par_mois if d['etat_initial'] == EtatObjet.EN_ATTENTE and d['mois'].strftime('%b %Y') == mois))
+        chart_restitues.append(sum(r['total'] for r in restitutions_par_mois if r['mois'].strftime('%b %Y') == mois))
+
     context = {
         'stats_cards': stats_cards,
-        'notifications': notifications,
-        'messages_recus': messages_recus,
-        'chart_labels': labels,
+        'chart_labels': mois_labels,
         'chart_perdus': chart_perdus,
         'chart_trouves': chart_trouves,
         'chart_attente': chart_attente,
         'chart_restitues': chart_restitues,
-        'declarations_recents': declarations_recents,
     }
-
     return render(request, "frontend/admin/dashboard_admin.html", context)
-
 
 
 
