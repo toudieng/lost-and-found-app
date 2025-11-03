@@ -37,6 +37,32 @@
 /* === BOUTON TOGGLE === */
 .btn-toggle { background-color: var(--main-color); color: var(--light-color); border: none; padding: 0.4rem 0.7rem; border-radius: 0.4rem; font-size: 0.85rem; transition: all 0.3s ease; }
 .btn-toggle:hover { background-color: var(--accent-color); color: var(--main-color); }
+
+/* === BARRE DE RECHERCHE === */
+.search-bar {
+    position: relative;
+    margin-bottom: 2rem;
+}
+.search-bar input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.8rem;
+    border-radius: 2rem;
+    border: 1px solid rgba(62, 76, 73, 0.3);
+    outline: none;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+.search-bar input:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 6px rgba(200, 160, 72, 0.5);
+}
+.search-bar i {
+    position: absolute;
+    top: 50%;
+    left: 1rem;
+    transform: translateY(-50%);
+    color: var(--main-color);
+}
 </style>
 {% endblock %}
 
@@ -44,10 +70,16 @@
 <div class="container mt-4 mb-5">
     <h2 class="fw-bold mb-4" style="color: var(--accent-color);">📦 Objets en attente de restitution</h2>
 
+    <!-- Barre de recherche -->
+    <div class="search-bar">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchInput" placeholder="Rechercher un objet, un citoyen, un commissariat..." onkeyup="filterCards()">
+    </div>
+
     {% if restitutions %}
-        <div class="row g-3">
+        <div class="row g-3" id="objetsContainer">
             {% for r in restitutions %}
-            <div class="col-md-6 col-lg-4">
+            <div class="col-md-6 col-lg-4 objet-card">
                 <div class="card objet-attente h-100">
                     {% if r.objet.image %}
                         <img src="{{ r.objet.image.url }}" class="card-img-top" alt="{{ r.objet.nom }}" style="height:200px; object-fit:cover; border-radius:0.8rem 0.8rem 0 0;">
@@ -70,46 +102,8 @@
 
                             {% if r.objet.declarations_prefetch %}
                                 {% for dec in r.objet.declarations_prefetch %}
-                                    {% if dec.etat_initial == 'trouve' %}
-                                        {% if dec.trouve_par.all %}
-                                            <p><b>Déclarant :</b></p>
-                                            <ul>
-                                            {% for user in dec.trouve_par.all %}
-                                                <li>{{ user.username }} — Email: {{ user.email|default:"-" }} — Tel: {{ user.numero|default:"-" }}</li>
-                                            {% endfor %}
-                                            </ul>
-                                        {% endif %}
-                                        {% if dec.reclame_par.all %}
-                                            <p><b>Réclamant :</b></p>
-                                            <ul>
-                                            {% for user in dec.reclame_par.all %}
-                                                <li>{{ user.username }} — Email: {{ user.email|default:"-" }} — Tel: {{ user.numero|default:"-" }}</li>
-                                            {% endfor %}
-                                            </ul>
-                                        {% endif %}
-                                    {% elif dec.etat_initial == 'perdu' %}
-                                        {% if dec.reclame_par.all %}
-                                            <p><b>Déclarant :</b></p>
-                                            <ul>
-                                            {% for user in dec.reclame_par.all %}
-                                                <li>{{ user.username }} — Email: {{ user.email|default:"-" }} — Tel: {{ user.numero|default:"-" }}</li>
-                                            {% endfor %}
-                                            </ul>
-                                        {% endif %}
-                                        {% if dec.trouve_par.all %}
-                                            <p><b>Trouveur :</b></p>
-                                            <ul>
-                                            {% for user in dec.trouve_par.all %}
-                                                <li>{{ user.username }} — Email: {{ user.email|default:"-" }} — Tel: {{ user.numero|default:"-" }}</li>
-                                            {% endfor %}
-                                            </ul>
-                                        {% endif %}
-                                    {% endif %}
                                     <p><b>État de la déclaration :</b> {{ dec.get_etat_initial_display }}</p>
-                                    <hr>
                                 {% endfor %}
-                            {% else %}
-                                <p>Aucune déclaration trouvée pour cet objet.</p>
                             {% endif %}
 
                             <p><b>🏢 Commissariat :</b> {{ r.commissariat.nom|default:"-" }}</p>
@@ -145,6 +139,7 @@
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Détails déroulants
     document.querySelectorAll('.btn-toggle').forEach(btn => {
         const target = document.querySelector(btn.dataset.target);
         btn.addEventListener('click', () => {
@@ -161,5 +156,16 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+// Filtrage dynamique
+function filterCards() {
+    const input = document.getElementById('searchInput').value.toLowerCase();
+    const cards = document.querySelectorAll('.objet-card');
+
+    cards.forEach(card => {
+        const text = card.textContent.toLowerCase();
+        card.style.display = text.includes(input) ? '' : 'none';
+    });
+}
 </script>
 {% endblock %}
