@@ -12,7 +12,6 @@
     --secondary: #C8A048;
     --success: #20c997;
     --danger: #fd7e14;
-    --info: #6f42c1;
     --white: #ffffff;
 
     --card-yellow: #ffc107;
@@ -40,14 +39,30 @@ body { background-color: var(--main-bg); font-family: 'Segoe UI', sans-serif; ma
     overflow-y: auto;
 }
 .sidebar.collapsed { width: 70px; padding: 2rem 0.5rem; }
-.sidebar h4 { color: var(--secondary); text-align: center; font-weight: 700; margin-bottom: 2rem; font-size: 1.3rem; transition: opacity 0.3s; }
+.sidebar h4 {
+    color: var(--secondary);
+    text-align: center;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    font-size: 1.3rem;
+    transition: opacity 0.3s;
+}
 .sidebar.collapsed h4 { opacity: 0; }
-.sidebar .nav-link { color: #dcdcdc; border-radius: 8px; padding: 0.8rem 1rem; display: flex; align-items: center; justify-content: space-between; transition: all 0.2s ease-in-out; font-weight: 500; cursor: pointer; }
+.sidebar .nav-link {
+    color: #dcdcdc;
+    border-radius: 8px;
+    padding: 0.8rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.2s ease-in-out;
+    font-weight: 500;
+    cursor: pointer;
+}
 .sidebar .nav-link i { font-size: 1.2rem; margin-right: 0.5rem; }
 .sidebar .nav-link span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .sidebar.collapsed .nav-link span { display: none; }
 .sidebar .nav-link:hover, .sidebar .nav-link.active { background-color: var(--secondary); color: var(--white); font-weight: 600; }
-.sidebar .nav-badge { background: var(--danger); color: #fff; padding: 0.1rem 0.5rem; border-radius: 12px; font-size: 0.75rem; }
 
 /* Main content */
 .main-content { margin-left: 260px; padding: 2rem; transition: all 0.3s ease; }
@@ -55,24 +70,50 @@ body { background-color: var(--main-bg); font-family: 'Segoe UI', sans-serif; ma
 .sidebar.collapsed ~ .main-content { margin-left: 80px; }
 
 /* Header */
-.header { background: var(--white); padding: 1.5rem 2rem; border-radius: 1rem; box-shadow: 0 4px 20px rgba(0,0,0,0.05); margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; }
+.header {
+    background: var(--white);
+    padding: 1.5rem 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 .header h2 { font-weight: 700; color: var(--primary); margin: 0; }
 .header p { color: #6c757d; margin: 0; }
 
-/* User profile dropdown */
+/* Profil utilisateur dropdown */
 .user-profile { position: relative; display: flex; align-items: center; gap: 0.8rem; cursor: pointer; }
-.user-profile img { width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 3px solid var(--secondary); transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.user-profile img {
+    width: 70px; height: 70px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--secondary);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
 .user-profile img:hover { transform: scale(1.1); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
-.dropdown-menu-custom { position: absolute; top: 80px; right: 0; background: var(--white); box-shadow: 0 5px 20px rgba(0,0,0,0.15); border-radius: 0.7rem; padding: 0.5rem 0; display: none; flex-direction: column; min-width: 220px; opacity: 0; transform: translateY(-10px); transition: all 0.3s ease; z-index: 1100; }
+
+/* Dropdown menu */
+.dropdown-menu-custom {
+    position: absolute; top: 80px; right: 0; background: var(--white);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    border-radius: 0.7rem; padding: 0.5rem 0; display: none; flex-direction: column; min-width: 220px;
+    opacity: 0; transform: translateY(-10px); transition: all 0.3s ease; z-index: 1100;
+}
 .dropdown-menu-custom.show { display: flex; opacity: 1; transform: translateY(0); }
 .dropdown-menu-custom a { padding: 0.5rem 1rem; border-radius: 0.4rem; text-decoration: none; color: #333; font-weight: 500; display: flex; align-items: center; transition: all 0.2s ease; }
 .dropdown-menu-custom a:hover { background: var(--secondary); color: var(--white); font-weight: 600; }
 
 /* Stat cards */
-.stat-card { background: var(--white); border-radius: 1rem; padding: 1.5rem; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition: transform 0.3s, box-shadow 0.3s; }
+.stat-card {
+    background: var(--white); border-radius: 1rem; padding: 1.5rem;
+    display: flex; align-items: center; justify-content: space-between;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition: transform 0.2s, box-shadow 0.2s;
+}
 .stat-card:hover { transform: scale(1.03); box-shadow: 0 6px 18px rgba(0,0,0,0.1); }
 .stat-card .icon { font-size: 2.2rem; opacity: 0.85; }
-.stat-card h4 { margin: 0; font-size: 1.3rem; font-weight: bold; color: var(--primary); transition: all 1s ease; }
+.stat-card h4 { margin: 0; font-size: 1.3rem; font-weight: bold; color: var(--primary); }
 .stat-card small { color: #6c757d; }
 
 /* Card colors */
@@ -101,25 +142,21 @@ body { background-color: var(--main-bg); font-family: 'Segoe UI', sans-serif; ma
         <li class="nav-item mb-2">
             <a class="nav-link {% if request.resolver_match.url_name == 'gerer_commissariats' %}active{% endif %}" href="{% url 'gerer_commissariats' %}">
                 <i class="bi bi-building"></i> <span>Commissariats</span>
-                <span class="nav-badge">{{ nb_commissariats }}</span>
             </a>
         </li>
         <li class="nav-item mb-2">
             <a class="nav-link {% if request.resolver_match.url_name == 'gerer_utilisateurs' %}active{% endif %}" href="{% url 'gerer_utilisateurs' %}">
                 <i class="bi bi-person-gear"></i> <span>Administrateurs</span>
-                <span class="nav-badge">{{ nb_admins }}</span>
             </a>
         </li>
         <li class="nav-item mb-2">
             <a class="nav-link {% if request.resolver_match.url_name == 'liste_citoyens' %}active{% endif %}" href="{% url 'liste_citoyens' %}">
                 <i class="bi bi-people"></i> <span>Citoyens</span>
-                <span class="nav-badge">{{ nb_citoyens }}</span>
             </a>
         </li>
         <li class="nav-item mb-2">
             <a class="nav-link {% if request.resolver_match.url_name == 'gerer_policiers' %}active{% endif %}" href="{% url 'gerer_policiers' %}">
                 <i class="bi bi-shield-lock"></i> <span>Policiers</span>
-                <span class="nav-badge">{{ nb_policiers }}</span>
             </a>
         </li>
     </ul>
@@ -155,7 +192,7 @@ body { background-color: var(--main-bg); font-family: 'Segoe UI', sans-serif; ma
         <div class="col-lg-3 col-md-6 col-sm-6">
             <div class="stat-card {% cycle 'bg-yellow' 'bg-purple' 'bg-orange' 'bg-green' %}">
                 <div>
-                    <h4 class="stat-count" data-count="{{ card.count|default:"0" }}">0</h4>
+                    <h4>{{ card.count|default:"0" }}</h4>
                     <small>{{ card.label }}</small>
                 </div>
                 <div class="icon">{{ card.icon }}</div>
@@ -187,9 +224,6 @@ body { background-color: var(--main-bg); font-family: 'Segoe UI', sans-serif; ma
         <p><strong>Email:</strong> {{ request.user.email }}</p>
         <p><strong>Téléphone:</strong> {{ request.user.telephone|default:"Non défini" }}</p>
         <p><strong>Rôle:</strong> Administrateur</p>
-        <hr>
-        <p><strong>Objets traités:</strong> {{ nb_objets_total }}</p>
-        <p><strong>Restitutions validées:</strong> {{ nb_objets_restitues }}</p>
       </div>
       <div class="modal-footer"><a class="btn btn-primary" href="{% url 'modifier_profil_admin' %}">Modifier le profil</a></div>
     </div>
@@ -215,17 +249,6 @@ document.getElementById('toggleSidebar').addEventListener('click', () => {
     mainContent.classList.toggle('expanded');
 });
 
-// Animate stat cards counts
-document.querySelectorAll('.stat-count').forEach(el => {
-    let count = parseInt(el.dataset.count);
-    let i = 0;
-    let interval = setInterval(() => {
-        el.textContent = i;
-        i++;
-        if(i > count) clearInterval(interval);
-    }, 40);
-});
-
 // Dégradé pour datasets
 function createGradient(ctx, color) {
     const gradient = ctx.createLinearGradient(0, 0, 0, 400);
@@ -234,34 +257,34 @@ function createGradient(ctx, color) {
     return gradient;
 }
 
-// Chart.js
+// Chart.js avec datalabels
 const ctx = document.getElementById('chartObjets').getContext('2d');
 new Chart(ctx, {
     type: 'line',
     data: {
         labels: {{ chart_labels|safe }},
         datasets: [
-            { label: 'Objets perdus', data: {{ chart_perdus|safe }}, borderColor: '#FFC107', backgroundColor: createGradient(ctx,'#FFC107'), tension:0.4, fill:true, pointRadius:6, pointHoverRadius:8, borderWidth:3, pointBackgroundColor:'#FFC107' },
-            { label: 'Objets trouvés', data: {{ chart_trouves|safe }}, borderColor: '#6F42C1', backgroundColor: createGradient(ctx,'#6F42C1'), tension:0.4, fill:true, pointRadius:6, pointHoverRadius:8, borderWidth:3, pointBackgroundColor:'#6F42C1' },
-            { label: 'Objets en attente', data: {{ chart_attente|safe }}, borderColor: '#FD7E14', backgroundColor: createGradient(ctx,'#FD7E14'), tension:0.4, fill:true, pointRadius:6, pointHoverRadius:8, borderWidth:3, pointBackgroundColor:'#FD7E14' },
-            { label: 'Objets restitués', data: {{ chart_restitues|safe }}, borderColor: '#20C997', backgroundColor: createGradient(ctx,'#20C997'), tension:0.4, fill:true, pointRadius:6, pointHoverRadius:8, borderWidth:3, pointBackgroundColor:'#20C997' }
+            { label: 'Objets perdus', data: {{ chart_perdus|safe }}, borderColor: '#FFC107', backgroundColor: createGradient(ctx, '#FFC107'), tension: 0.4, fill: true, pointRadius: 6, pointHoverRadius: 8, borderWidth: 3, pointBackgroundColor: '#FFC107' },
+            { label: 'Objets trouvés', data: {{ chart_trouves|safe }}, borderColor: '#6F42C1', backgroundColor: createGradient(ctx, '#6F42C1'), tension: 0.4, fill: true, pointRadius: 6, pointHoverRadius: 8, borderWidth: 3, pointBackgroundColor: '#6F42C1' },
+            { label: 'Objets en attente', data: {{ chart_attente|safe }}, borderColor: '#FD7E14', backgroundColor: createGradient(ctx, '#FD7E14'), tension: 0.4, fill: true, pointRadius: 6, pointHoverRadius: 8, borderWidth: 3, pointBackgroundColor: '#FD7E14' },
+            { label: 'Objets restitués', data: {{ chart_restitues|safe }}, borderColor: '#20C997', backgroundColor: createGradient(ctx, '#20C997'), tension: 0.4, fill: true, pointRadius: 6, pointHoverRadius: 8, borderWidth: 3, pointBackgroundColor: '#20C997' }
         ]
     },
     options: {
-        responsive:true,
-        maintainAspectRatio:false,
+        responsive: true,
+        maintainAspectRatio: false,
         plugins: {
-            legend:{ position:'top', labels:{ usePointStyle:true, pointStyle:'circle', padding:20, font:{size:14} } },
-            tooltip:{ mode:'index', intersect:false, backgroundColor:'rgba(0,0,0,0.75)', titleFont:{size:14, weight:'bold'}, bodyFont:{size:13} },
-            datalabels:{ display:true, color:'#000', font:{weight:'bold', size:12}, align:'top', formatter:value => value }
+            legend: { position: 'top', labels: { usePointStyle: true, pointStyle: 'circle', padding: 20, font: { size: 14 } } },
+            tooltip: { mode: 'index', intersect: false, backgroundColor: 'rgba(0,0,0,0.75)', titleFont: { size: 14, weight: 'bold' }, bodyFont: { size: 13 } },
+            datalabels: { display: true, color: '#000', font: { weight: 'bold', size: 12 }, align: 'top', formatter: value => value }
         },
-        interaction:{ mode:'nearest', intersect:false },
-        scales:{
-            y:{ beginAtZero:true, ticks:{ stepSize:1, font:{size:13} }, grid:{ color:'rgba(0,0,0,0.05)' } },
-            x:{ ticks:{ font:{size:13} }, grid:{ color:'rgba(0,0,0,0.05)' } }
+        interaction: { mode: 'nearest', intersect: false },
+        scales: {
+            y: { beginAtZero:true, ticks:{ stepSize:1, font:{size:13} }, grid:{ color:'rgba(0,0,0,0.05)' } },
+            x: { ticks:{ font:{size:13} }, grid:{ color:'rgba(0,0,0,0.05)' } }
         }
     },
-    plugins:[ChartDataLabels]
+    plugins: [ChartDataLabels]
 });
 </script>
 {% endblock %}
