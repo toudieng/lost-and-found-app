@@ -3,33 +3,115 @@
 
 {% block extra_css %}
 <style>
-/* Styles principaux similaires à ton précédent template */
+:root {
+    --primary: #C8A048;
+    --secondary: #2f3e46;
+    --gray: #6c757d;
+    --light-gray: #f8f9fa;
+    --error: #dc3545;
+}
+
+body {
+    background: var(--light-gray);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
 .form-container {
     background: #fff;
-    padding: 2rem;
+    padding: 2.5rem 2rem;
     border-radius: 1rem;
-    box-shadow: 0 6px 24px rgba(0,0,0,0.1);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12);
     transition: all 0.3s ease;
+    border-top: 4px solid var(--primary);
 }
 .form-container:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 28px rgba(0,0,0,0.15);
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.15);
 }
+
 .form-title {
-    color:#C8A048;
-    font-weight:700;
-    font-size:1.8rem;
-    text-align:center;
-    margin-bottom:1.8rem;
+    color: var(--primary);
+    font-weight: 700;
+    font-size: 2rem;
+    text-align: center;
+    margin-bottom: 2rem;
 }
-.input-group { display:flex; align-items:center; margin-bottom:1rem; }
-.input-group-text { width:45px; display:flex; justify-content:center; align-items:center; background:#2f3e46; color:#C8A048; }
-.text-error { color:#dc3545; font-size:0.85rem; margin-top:0.3rem; }
-.btn-submit { background:#C8A048; color:#2f3e46; font-weight:600; padding:0.7rem 1.2rem; border:none; border-radius:8px; cursor:pointer; width:48%; }
-.btn-submit:hover { background:#b88f38; color:#fff; transform:translateY(-2px); }
-.btn-back { background:#6c757d; color:#fff; border:none; border-radius:8px; padding:0.7rem 1.2rem; width:48%; display:inline-block; text-align:center; text-decoration:none; }
-.btn-back:hover { background:#5a6268; }
-#preview-image { max-height:220px; width:100%; margin-top:0.6rem; border-radius:0.5rem; object-fit:cover; display:none; }
+
+.input-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.2rem;
+    border-radius: 0.8rem;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    transition: all 0.2s ease;
+}
+.input-group:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.input-group-text {
+    background: var(--secondary);
+    color: var(--primary);
+    width: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.1rem;
+}
+
+.text-error {
+    color: var(--error);
+    font-size: 0.85rem;
+    margin-top: 0.3rem;
+}
+
+.btn-submit, .btn-back {
+    border-radius: 0.8rem;
+    padding: 0.7rem 1.2rem;
+    font-weight: 600;
+    width: 48%;
+    text-align: center;
+    display: inline-block;
+    transition: all 0.2s ease;
+    border: none;
+}
+.btn-submit {
+    background: var(--primary);
+    color: var(--secondary);
+}
+.btn-submit:hover {
+    background: #b88f38;
+    color: #fff;
+    transform: translateY(-2px);
+}
+.btn-back {
+    background: var(--gray);
+    color: #fff;
+}
+.btn-back:hover {
+    background: #5a6268;
+}
+
+#preview-image {
+    max-height: 220px;
+    width: 100%;
+    margin-top: 0.6rem;
+    border-radius: 0.5rem;
+    object-fit: cover;
+    display: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+#preview-image:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
+
+.form-check-inline {
+    margin-right: 1rem;
+    font-size: 0.95rem;
+}
 </style>
 {% endblock %}
 
@@ -68,7 +150,7 @@
                     <div class="text-error">{{ error }}</div>
                 {% endfor %}
 
-                <!-- Description (sans icône) -->
+                <!-- Description -->
                 <div class="mb-3">
                     {{ form.description }}
                     {% for error in form.description.errors %}
@@ -82,11 +164,9 @@
                     {% for error in form.image.errors %}
                         <div class="text-error">{{ error }}</div>
                     {% endfor %}
-                    {% if form.instance.objet and form.instance.objet.image %}
-                        <img id="preview-image" src="{{ form.instance.objet.image.url }}" alt="Prévisualisation">
-                    {% else %}
-                        <img id="preview-image" src="#" alt="Prévisualisation" style="display:none;">
-                    {% endif %}
+                    <img id="preview-image"
+                         src="{% if form.instance.objet and form.instance.objet.image %}{{ form.instance.objet.image.url }}{% endif %}"
+                         alt="Prévisualisation">
                 </div>
 
                 <!-- Type de déclaration -->
@@ -123,17 +203,18 @@ document.addEventListener("DOMContentLoaded", function() {
     imageInput.addEventListener("change", function() {
         const file = this.files[0];
         if (file) {
-            const reader = new FileReader();
-            reader.onload = e => { 
-                preview.src = e.target.result; 
-                preview.style.display = "block"; 
-            };
-            reader.readAsDataURL(file);
+            preview.src = URL.createObjectURL(file);
+            preview.style.display = "block";
         } else {
             preview.src = "#";
             preview.style.display = "none";
         }
     });
+
+    // Affiche l'image existante si présente
+    if(preview.src) {
+        preview.style.display = "block";
+    }
 });
 </script>
 {% endblock %}

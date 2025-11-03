@@ -4,7 +4,110 @@
 {% block title %}Modifier Policier{% endblock %}
 
 {% block extra_css %}
-{{ block.super }}
+<style>
+:root {
+    --main-color: #3E4C49;
+    --accent-color: #C8A048;
+    --accent-color-dark: #b88f38;
+    --light-color: #FFFFFF;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    color: var(--main-color);
+    background: linear-gradient(135deg, var(--light-color), #f3f3f3);
+}
+
+.form-container {
+    background: var(--light-color);
+    border-radius: 1rem;
+    box-shadow: 0 12px 25px rgba(0,0,0,0.1);
+    padding: 2.5rem 2rem;
+    max-width: 500px;
+    margin: 3rem auto;
+}
+
+.form-title {
+    color: var(--accent-color);
+    font-weight: 700;
+    font-size: 2rem;
+    text-align: center;
+    margin-bottom: 1.8rem;
+}
+
+.input-group {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.input-group input,
+.input-group select {
+    width: 100%;
+    height: 45px;
+    border-radius: 0.6rem;
+    border: 1px solid rgba(62,76,73,0.3);
+    padding-left: 2.5rem;
+    background: var(--light-color);
+    color: var(--main-color);
+    transition: 0.3s;
+}
+
+.input-group input:focus,
+.input-group select:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 10px rgba(200,160,72,0.35);
+    outline: none;
+    transform: scale(1.02);
+}
+
+.input-group i {
+    position: absolute;
+    top: 50%;
+    left: 0.75rem;
+    transform: translateY(-50%);
+    font-size: 1.2rem;
+    color: var(--main-color);
+}
+
+.btn-submit {
+    background-color: var(--accent-color);
+    color: var(--light-color);
+    border: none;
+    border-radius: 0.6rem;
+    height: 45px;
+    width: 100%;
+    font-weight: 700;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.btn-submit:hover {
+    background-color: var(--accent-color-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(200,160,72,0.3);
+}
+
+.btn-back {
+    background-color: #6c757d;
+    color: #fff;
+    font-weight: 600;
+    padding: 0.55rem 1rem;
+    border-radius: 0.6rem;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.btn-back:hover {
+    background-color: #5a6268;
+}
+
+.alert {
+    border-radius: 0.6rem;
+    font-size: 0.9rem;
+    text-align: center;
+    margin-bottom: 1rem;
+    padding: 0.65rem 0.8rem;
+}
+</style>
 {% endblock %}
 
 {% block content %}
@@ -84,7 +187,7 @@
         </div>
 
         <button type="submit" class="btn-submit">💾 Sauvegarder</button>
-        <a href="{% url 'gerer_policiers' %}" class="btn-back">❌ Annuler</a>
+        <a href="{% url 'gerer_policiers' %}" class="btn-back">🔙 Retour</a>
     </form>
 </div>
 
