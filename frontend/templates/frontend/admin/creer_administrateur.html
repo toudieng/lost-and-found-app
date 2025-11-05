@@ -19,7 +19,6 @@ body {
     color: var(--main-color);
 }
 
-/* FORM CONTAINER */
 .form-container {
     background: var(--light-color);
     border-radius: 1rem;
@@ -43,7 +42,6 @@ body {
     margin-bottom: 2rem;
 }
 
-/* INPUT GROUP */
 .input-group {
     position: relative;
     margin-bottom: 1.6rem;
@@ -58,8 +56,7 @@ body {
     font-size: 1.1rem;
 }
 
-.input-group input,
-.input-group select {
+.input-group input {
     width: 100%;
     height: 48px;
     border-radius: 0.6rem;
@@ -71,21 +68,18 @@ body {
     transition: all 0.3s ease;
 }
 
-.input-group input:focus,
-.input-group select:focus {
+.input-group input:focus {
     border-color: var(--accent-color);
     box-shadow: 0 0 10px rgba(200,160,72,0.25);
     outline: none;
     transform: scale(1.01);
 }
 
-/* ERRORS */
 .text-danger {
     font-size: 0.85rem;
     margin-top: 3px;
 }
 
-/* BUTTONS */
 .btn-submit {
     background-color: var(--accent-color);
     color: var(--light-color);
@@ -123,7 +117,6 @@ body {
     transform: translateY(-2px);
 }
 
-/* ALERTS */
 .alert {
     border-radius: 0.6rem;
     font-size: 0.9rem;
@@ -132,7 +125,6 @@ body {
     padding: 0.7rem 0.9rem;
 }
 
-/* RESPONSIVE */
 @media (max-width: 576px) {
     .form-container {
         margin: 2rem 1rem;
@@ -159,25 +151,17 @@ body {
         {% csrf_token %}
 
         <div class="input-group">
+            <i class="fa fa-user"></i>
+            {{ form.username }}
+            {% for error in form.username.errors %}
+                <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="input-group">
             <i class="fa fa-envelope"></i>
             {{ form.email }}
             {% for error in form.email.errors %}
-                <div class="text-danger">{{ error }}</div>
-            {% endfor %}
-        </div>
-
-        <div class="input-group">
-            <i class="fa fa-user"></i>
-            {{ form.first_name }}
-            {% for error in form.first_name.errors %}
-                <div class="text-danger">{{ error }}</div>
-            {% endfor %}
-        </div>
-
-        <div class="input-group">
-            <i class="fa fa-user"></i>
-            {{ form.last_name }}
-            {% for error in form.last_name.errors %}
                 <div class="text-danger">{{ error }}</div>
             {% endfor %}
         </div>

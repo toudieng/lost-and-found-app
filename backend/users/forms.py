@@ -98,27 +98,41 @@ class PolicierForm(forms.ModelForm):
 # 🧑‍💼 Formulaire de création d’administrateur
 # =========================
 
+from django import forms
+from django.core.mail import send_mail
+from django.utils.crypto import get_random_string
+from .models import Utilisateur
+
 class AdministrateurCreationForm(forms.ModelForm):
     class Meta:
         model = Utilisateur
-        fields = ['email', 'first_name', 'last_name', 'telephone']
+        fields = ['username', 'email', 'telephone']  # username + email + téléphone visibles
         widgets = {
-            "email": forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email'}),
-            "first_name": forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Prénom'}),
-            "last_name": forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nom'}),
-            "telephone": forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Téléphone'}),
+            'username': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Nom d’utilisateur'
+            }),
+            'email': forms.EmailInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Email'
+            }),
+            'telephone': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Téléphone'
+            }),
         }
 
     def save(self, commit=True):
         user = super().save(commit=False)
         user.role = 'admin'
 
-        # Génération automatique du username
-        base_username = f"{self.cleaned_data['first_name']}.{self.cleaned_data['last_name']}".lower()
-        username = ''.join(c for c in base_username if c.isalnum() or c in ('@', '.', '+', '-', '_'))
-        user.username = username[:150]
+        # Remplir prénom et nom par défaut basés sur le username si vide
+        if not user.first_name:
+            user.first_name = user.username.split('.')[0].capitalize()
+        if not user.last_name:
+            user.last_name = user.username.split('.')[-1].capitalize()
 
-        # Mot de passe aléatoire
+        # Création d'un mot de passe aléatoire
         password = get_random_string(10)
         user.set_password(password)
 
@@ -127,14 +141,17 @@ class AdministrateurCreationForm(forms.ModelForm):
             # Envoi du mot de passe par email
             send_mail(
                 subject="Vos identifiants administrateur",
-                message=f"Bonjour {user.first_name} {user.last_name},\n\n"
-                        f"Votre compte administrateur a été créé.\n"
-                        f"Email: {user.email}\nMot de passe: {password}\n\nMerci.",
+                message=(
+                    f"Bonjour {user.first_name} {user.last_name},\n\n"
+                    f"Votre compte administrateur a été créé.\n"
+                    f"Username: {user.username}\nEmail: {user.email}\nTéléphone: {user.telephone}\nMot de passe: {password}\n\nMerci."
+                ),
                 from_email="noreply@lostfound.com",
                 recipient_list=[user.email],
                 fail_silently=False,
             )
         return user
+
 
 # =========================
 # 👤 Formulaire de profil utilisateur
@@ -173,16 +190,29 @@ class ProfilForm(forms.ModelForm):
 # =========================
 # 🧾 Formulaire administrateur (modification)
 # =========================
+from django import forms
+from .models import Utilisateur
+
 class AdministrateurForm(forms.ModelForm):
     class Meta:
         model = Utilisateur
-        fields = ['first_name', 'last_name', 'email', 'telephone']
+        # Garder username, email et telephone
+        fields = ['username', 'email', 'telephone']
         widgets = {
-            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
-            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
-            'email': forms.EmailInput(attrs={'class': 'form-control'}),
-            'telephone': forms.TextInput(attrs={'class': 'form-control'}),
+            'username': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': "Nom d’utilisateur"
+            }),
+            'email': forms.EmailInput(attrs={
+                'class': 'form-control',
+                'placeholder': "Adresse email"
+            }),
+            'telephone': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': "Numéro de téléphone"
+            }),
         }
+
 
 # =========================
 # 📨 Formulaire de contact
