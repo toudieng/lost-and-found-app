@@ -10,21 +10,29 @@
     --accent-color: #C8A048;
     --accent-color-dark: #b88f38;
     --light-color: #FFFFFF;
+    --gray-light: #f8f9fa;
 }
 
 body {
     font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, var(--gray-light), #ececec);
     color: var(--main-color);
-    background: linear-gradient(135deg, var(--light-color), #f3f3f3);
 }
 
+/* ----------- FORM CONTAINER ----------- */
 .form-container {
     background: var(--light-color);
     border-radius: 1rem;
     box-shadow: 0 12px 25px rgba(0,0,0,0.1);
     padding: 2.5rem 2rem;
     max-width: 500px;
-    margin: 3rem auto;
+    margin: 4rem auto;
+    animation: fadeIn 0.7s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .form-title {
@@ -32,52 +40,68 @@ body {
     font-weight: 700;
     font-size: 2rem;
     text-align: center;
-    margin-bottom: 1.8rem;
+    margin-bottom: 2rem;
 }
 
+/* ----------- INPUT GROUP ----------- */
 .input-group {
     position: relative;
-    margin-bottom: 1.5rem;
-}
-
-.input-group input,
-.input-group select {
-    width: 100%;
-    height: 45px;
-    border-radius: 0.6rem;
-    border: 1px solid rgba(62,76,73,0.3);
-    padding-left: 2.5rem;
-    background: var(--light-color);
-    color: var(--main-color);
-    transition: 0.3s;
-}
-
-.input-group input:focus,
-.input-group select:focus {
-    border-color: var(--accent-color);
-    box-shadow: 0 0 10px rgba(200,160,72,0.35);
-    outline: none;
-    transform: scale(1.02);
+    margin-bottom: 1.6rem;
 }
 
 .input-group i {
     position: absolute;
     top: 50%;
-    left: 0.75rem;
+    left: 0.9rem;
     transform: translateY(-50%);
-    font-size: 1.2rem;
-    color: var(--main-color);
+    color: var(--accent-color);
+    font-size: 1.1rem;
+    transition: color 0.3s;
 }
 
+.input-group input,
+.input-group select {
+    width: 100%;
+    height: 48px;
+    border-radius: 0.6rem;
+    border: 1px solid rgba(62,76,73,0.3);
+    padding-left: 2.8rem;
+    background: var(--light-color);
+    color: var(--main-color);
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+}
+
+.input-group input:focus,
+.input-group select:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 10px rgba(200,160,72,0.25);
+    outline: none;
+    transform: scale(1.01);
+}
+
+.input-group input:focus + i,
+.input-group select:focus + i {
+    color: var(--accent-color-dark);
+}
+
+.text-danger {
+    font-size: 0.8rem;
+    color: #dc3545;
+    margin-top: 3px;
+}
+
+/* ----------- BUTTONS ----------- */
 .btn-submit {
     background-color: var(--accent-color);
     color: var(--light-color);
     border: none;
     border-radius: 0.6rem;
-    height: 45px;
+    height: 48px;
     width: 100%;
     font-weight: 700;
-    transition: background 0.3s ease, transform 0.2s ease;
+    transition: all 0.3s ease;
+    letter-spacing: 0.5px;
 }
 
 .btn-submit:hover {
@@ -87,32 +111,50 @@ body {
 }
 
 .btn-back {
+    display: block;
+    text-align: center;
     background-color: #6c757d;
     color: #fff;
     font-weight: 600;
-    padding: 0.55rem 1rem;
     border-radius: 0.6rem;
+    height: 45px;
+    line-height: 45px;
     width: 100%;
-    margin-top: 10px;
+    margin-top: 0.8rem;
+    transition: all 0.3s ease;
+    text-decoration: none;
 }
 
 .btn-back:hover {
     background-color: #5a6268;
+    transform: translateY(-2px);
 }
 
+/* ----------- ALERT ----------- */
 .alert {
     border-radius: 0.6rem;
     font-size: 0.9rem;
     text-align: center;
     margin-bottom: 1rem;
-    padding: 0.65rem 0.8rem;
+    padding: 0.7rem 0.9rem;
+}
+
+/* ----------- RESPONSIVE ----------- */
+@media (max-width: 576px) {
+    .form-container {
+        margin: 2rem 1rem;
+        padding: 2rem 1.5rem;
+    }
+    .form-title {
+        font-size: 1.6rem;
+    }
 }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="form-container">
-    <h4 class="form-title"> Créer un policier</h4>
+    <h4 class="form-title">Créer un Policier 👮‍♂️</h4>
 
     {% if messages %}
         {% for message in messages %}
@@ -143,7 +185,7 @@ body {
 
         <!-- Prénom -->
         <div class="input-group">
-            <i class="fa fa-user"></i>
+            <i class="fa fa-user-tag"></i>
             {{ form.first_name }}
             {% for error in form.first_name.errors %}
                 <div class="text-danger">{{ error }}</div>
@@ -186,7 +228,7 @@ body {
             {% endfor %}
         </div>
 
-        <button type="submit" class="btn-submit">Créer</button>
+        <button type="submit" class="btn-submit">💾 Enregistrer</button>
         <a href="{% url 'gerer_policiers' %}" class="btn-back">🔙 Retour</a>
     </form>
 </div>

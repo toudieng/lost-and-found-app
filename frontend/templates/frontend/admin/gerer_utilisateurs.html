@@ -1,4 +1,5 @@
 {% extends "frontend/admin/base_admin.html" %}
+
 {% block title %}Gérer les Administrateurs{% endblock %}
 
 {% block extra_css %}
@@ -8,97 +9,183 @@
     --accent-color: #C8A048;
     --accent-color-dark: #b88f38;
     --light-color: #FFFFFF;
-    --main-color-light: rgba(62,76,73,0.1);
+    --main-color-light: rgba(62,76,73,0.08);
 }
 
-/* TITRE */
-h2 {
+/* PAGE */
+.container {
+    animation: fadeIn 0.4s ease-in-out;
+}
+@keyframes fadeIn {
+    from {opacity: 0; transform: translateY(10px);}
+    to {opacity: 1; transform: translateY(0);}
+}
+
+/* EN-TÊTE */
+.page-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+}
+.page-header h2 {
     font-weight: 700;
-    margin-bottom: 1rem;
+    color: var(--main-color);
+    margin: 0;
+}
+
+/* BOUTONS */
+.btn-add, .btn-dashboard {
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 6px;
+    transition: 0.3s;
+    border: none;
+    text-decoration: none;
+}
+.btn-add {
+    background-color: var(--accent-color);
+    color: var(--main-color);
+}
+.btn-add:hover {
+    background-color: var(--accent-color-dark);
+    color: #fff;
+}
+.btn-dashboard {
+    background-color: var(--main-color);
+    color: var(--light-color);
+}
+.btn-dashboard:hover {
+    background-color: var(--accent-color);
     color: var(--main-color);
 }
 
 /* BARRE DE RECHERCHE */
 .search-bar {
+    margin-bottom: 1rem;
+    width: 100%;
+}
+.search-bar form {
     display: flex;
     justify-content: flex-end;
-    margin-bottom: 1rem;
-    flex-wrap: wrap;
     gap: 0.5rem;
+    flex-wrap: wrap;
 }
 .search-bar input {
-    width: 250px;
-    padding: 6px 10px;
+    width: 260px;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
     border-radius: 6px;
-    border: 1px solid #ced4da;
+    transition: 0.3s;
+}
+.search-bar input:focus {
+    border-color: var(--accent-color);
+    outline: none;
+    box-shadow: 0 0 4px var(--main-color-light);
 }
 .search-bar button {
-    padding: 6px 12px;
+    background-color: var(--main-color);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 12px;
+    transition: 0.3s;
+}
+.search-bar button:hover {
+    background-color: var(--accent-color);
+    color: var(--main-color);
 }
 
 /* TABLEAU */
-.table {
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+.table-responsive {
+    border-radius: 12px;
+    overflow-x: auto;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+    background: var(--light-color);
 }
-.table-hover tbody tr:hover {
-    background-color: var(--main-color-light);
-    transform: translateY(-1px);
-    transition: all 0.2s;
+
+.table {
+    border-radius: 12px;
+    width: 100%;
+    margin-bottom: 0;
 }
 thead {
     background-color: var(--main-color);
     color: var(--light-color);
 }
+thead th {
+    padding: 0.8rem;
+    font-weight: 600;
+    text-align: center;
+}
+tbody tr {
+    transition: all 0.2s ease-in-out;
+}
+tbody tr:hover {
+    background-color: var(--main-color-light);
+    transform: scale(1.005);
+}
+tbody td {
+    text-align: center;
+    vertical-align: middle;
+    padding: 0.75rem;
+}
 
-/* BOUTONS */
+/* BOUTONS D’ACTION */
+.btn-action {
+    font-size: 0.85rem;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.25s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
 .btn-warning {
     background-color: var(--accent-color);
     color: var(--main-color);
     border: none;
-    transition: all 0.3s;
 }
 .btn-warning:hover {
     background-color: var(--accent-color-dark);
     color: var(--light-color);
 }
-
 .btn-danger {
     background-color: #dc3545;
     color: #fff;
     border: none;
-    transition: all 0.3s;
 }
 .btn-danger:hover {
     background-color: #b02a37;
 }
-
 .btn-primary {
     background-color: var(--accent-color);
     color: var(--main-color);
     border: none;
-    transition: all 0.3s;
 }
 .btn-primary:hover {
     background-color: var(--accent-color-dark);
     color: var(--light-color);
 }
 
-/* TEXTES VIDES */
+/* AUCUN RÉSULTAT */
 .text-muted {
     font-style: italic;
-    color: #888;
+    color: #777;
 }
 
 /* RESPONSIVE */
 @media (max-width: 768px) {
-    .search-bar input {
-        width: 100%;
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
     }
-    .btn {
-        font-size: 0.85rem;
-        padding: 6px 10px;
+    .btn-dashboard, .btn-add {
+        width: 100%;
     }
     table {
         font-size: 0.9rem;
@@ -109,23 +196,33 @@ thead {
 
 {% block content %}
 <div class="container mt-4">
-  <h2 class="mb-4">👤 Gestion des Administrateurs</h2>
+  <!-- En-tête de page -->
+  <div class="page-header">
+    <h2>👤 Gestion des Administrateurs</h2>
+    <div>
+      <a href="{% url 'dashboard_admin' %}" class="btn-dashboard me-2">🏠 Retour au Dashboard</a>
+      <a href="{% url 'creer_administrateur' %}" class="btn-add">➕ Ajouter un administrateur</a>
+    </div>
+  </div>
 
+  <!-- Barre de recherche -->
   <div class="search-bar">
-    <form method="get" class="d-flex align-items-center">
-      <input type="text" name="q" placeholder="Rechercher un admin..." value="{{ request.GET.q }}">
-      <button type="submit" class="btn btn-secondary ms-2">🔍</button>
+    <form method="get">
+      <input type="text" name="q" placeholder="🔍 Rechercher un administrateur..." value="{{ request.GET.q }}">
+      <button type="submit">Rechercher</button>
     </form>
   </div>
 
+  <!-- Tableau des administrateurs -->
   <div class="table-responsive">
     <table class="table table-hover align-middle shadow-sm">
       <thead>
         <tr>
-          <th>#</th>
+          <th>ID</th>
           <th>Nom d'utilisateur</th>
           <th>Email</th>
-          <th class="text-center">Actions</th>
+          <th>Téléphone</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -134,27 +231,20 @@ thead {
           <td>{{ admin.id }}</td>
           <td>{{ admin.username }}</td>
           <td>{{ admin.email }}</td>
-          <td class="text-center">
-            <a href="{% url 'modifier_administrateur' admin.id %}" class="btn btn-sm btn-warning me-2">✏️ Modifier</a>
-            <a href="{% url 'supprimer_administrateur' admin.id %}" class="btn btn-sm btn-danger"
-               onclick="return confirm('Voulez-vous vraiment supprimer cet administrateur ?');">
-               🗑️ Supprimer
-            </a>
+          <td>{{ admin.telephone|default:"—" }}</td>
+          <td>
+            <a href="{% url 'modifier_administrateur' admin.id %}" class="btn-action btn-warning">✏️</a>
+            <a href="{% url 'supprimer_administrateur' admin.id %}" class="btn-action btn-danger"
+               onclick="return confirm('Voulez-vous vraiment supprimer cet administrateur ?')">🗑️</a>
           </td>
         </tr>
         {% empty %}
         <tr>
-          <td colspan="4" class="text-center text-muted">Aucun administrateur trouvé.</td>
+          <td colspan="5" class="text-center text-muted py-3">Aucun administrateur trouvé.</td>
         </tr>
         {% endfor %}
       </tbody>
     </table>
-  </div>
-
-  <div class="text-center mt-4">
-    <a href="{% url 'creer_administrateur' %}" class="btn btn-lg btn-primary px-4">
-      ➕ Ajouter un administrateur
-    </a>
   </div>
 </div>
 {% endblock %}

@@ -15,18 +15,21 @@
 body {
     font-family: 'Poppins', sans-serif;
     color: var(--main-color);
-    background: linear-gradient(135deg, var(--light-color), #f3f3f3);
+    background: linear-gradient(135deg, var(--light-color), #f7f7f7);
 }
 
+/* ----------- CONTAINER ----------- */
 .form-container {
     background: var(--light-color);
     border-radius: 1rem;
     box-shadow: 0 12px 25px rgba(0,0,0,0.1);
     padding: 2.5rem 2rem;
-    max-width: 500px;
+    max-width: 520px;
     margin: 3rem auto;
+    animation: fadeIn 0.6s ease-in-out;
 }
 
+/* ----------- TITRE ----------- */
 .form-title {
     color: var(--accent-color);
     font-weight: 700;
@@ -35,9 +38,10 @@ body {
     margin-bottom: 1.8rem;
 }
 
+/* ----------- GROUPES DE CHAMPS ----------- */
 .input-group {
     position: relative;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.4rem;
 }
 
 .input-group input,
@@ -49,7 +53,7 @@ body {
     padding-left: 2.5rem;
     background: var(--light-color);
     color: var(--main-color);
-    transition: 0.3s;
+    transition: all 0.3s ease;
 }
 
 .input-group input:focus,
@@ -69,6 +73,29 @@ body {
     color: var(--main-color);
 }
 
+/* ----------- PHOTO ----------- */
+.photo-preview {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.photo-preview img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    margin-bottom: 0.5rem;
+    transition: transform 0.3s ease;
+}
+
+.photo-preview img:hover {
+    transform: scale(1.05);
+}
+
+/* ----------- BOUTONS ----------- */
 .btn-submit {
     background-color: var(--accent-color);
     color: var(--light-color);
@@ -86,20 +113,39 @@ body {
     box-shadow: 0 6px 15px rgba(200,160,72,0.3);
 }
 
+.btn-back, .btn-dashboard {
+    display: inline-block;
+    text-align: center;
+    border: none;
+    border-radius: 0.6rem;
+    padding: 0.6rem 1rem;
+    font-weight: 600;
+    width: 100%;
+    margin-top: 10px;
+    transition: all 0.3s ease;
+}
+
 .btn-back {
     background-color: #6c757d;
     color: #fff;
-    font-weight: 600;
-    padding: 0.55rem 1rem;
-    border-radius: 0.6rem;
-    width: 100%;
-    margin-top: 10px;
 }
-
 .btn-back:hover {
     background-color: #5a6268;
+    transform: translateY(-2px);
 }
 
+.btn-dashboard {
+    background-color: var(--main-color);
+    color: var(--light-color);
+}
+.btn-dashboard:hover {
+    background-color: var(--accent-color);
+    color: var(--main-color);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(200,160,72,0.3);
+}
+
+/* ----------- ALERTES ----------- */
 .alert {
     border-radius: 0.6rem;
     font-size: 0.9rem;
@@ -107,12 +153,18 @@ body {
     margin-bottom: 1rem;
     padding: 0.65rem 0.8rem;
 }
+
+/* ----------- ANIMATION ----------- */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="form-container">
-    <h4 class="form-title">✏️ Modifier Policier : {{ policier.username }}</h4>
+    <h4 class="form-title">✏️ Modifier le Policier : <br><span style="color:var(--main-color);">{{ policier.username }}</span></h4>
 
     {% if messages %}
         {% for message in messages %}
@@ -178,6 +230,16 @@ body {
         </div>
 
         <!-- Photo -->
+        <div class="photo-preview">
+            {% if policier.photo %}
+                <img id="photoPreview" src="{{ policier.photo.url }}" alt="Photo du policier">
+                <p class="text-muted" style="font-size: 0.85rem;">Photo actuelle</p>
+            {% else %}
+                <img id="photoPreview" src="{% static 'images/default-avatar.png' %}" alt="Aucune photo">
+                <p class="text-muted" style="font-size: 0.85rem;">Aucune photo enregistrée</p>
+            {% endif %}
+        </div>
+
         <div class="input-group">
             <i class="fa fa-image"></i>
             {{ form.photo }}
@@ -187,9 +249,31 @@ body {
         </div>
 
         <button type="submit" class="btn-submit">💾 Sauvegarder</button>
-        <a href="{% url 'gerer_policiers' %}" class="btn-back">🔙 Retour</a>
+        <a href="{% url 'gerer_policiers' %}" class="btn-back">🔙 Retour à la gestion</a>
+        
     </form>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+
+<!-- Aperçu automatique de la nouvelle photo -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const inputPhoto = document.querySelector('input[type="file"][name="photo"]');
+    const photoPreview = document.getElementById("photoPreview");
+
+    if (inputPhoto) {
+        inputPhoto.addEventListener("change", function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    photoPreview.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+});
+</script>
 {% endblock %}
