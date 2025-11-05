@@ -254,9 +254,17 @@ section {
 <section class="hero-actions fade-up">
   <a href="{% url 'objets_perdus' %}" class="btn-action btn-lost">🔍 Voir objets perdus</a>
   <a href="{% url 'objets_trouves' %}" class="btn-action btn-found">📦 Voir objets trouvés</a>
-  {% if user.is_authenticated and user.role == 'citoyen' %}
-    <a href="{% url 'dashboard_citoyen' %}" class="btn-action btn-dashboard">📊 Mon Dashboard</a>
-  {% endif %}
+  
+  {% if user.is_authenticated %}
+    {% if user.role == 'citoyen' %}
+        <a href="{% url 'dashboard_citoyen' %}" class="btn-action btn-dashboard">📊 Mon Dashboard</a>
+    {% elif user.role == 'policier' %}
+        <a href="{% url 'dashboard_policier' %}" class="btn-action btn-dashboard">📊 Dashboard Policier</a>
+    {% elif user.role == 'admin' %}
+        <a href="{% url 'dashboard_admin' %}" class="btn-action btn-dashboard">📊 Dashboard Admin</a>
+    {% endif %}
+{% endif %}
+
 </section>
 
 <!-- CAROUSEL -->
