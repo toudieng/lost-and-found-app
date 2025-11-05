@@ -8,13 +8,14 @@
 :root {
     --main-color: #3E4C49;
     --accent-color: #C8A048;
+    --accent-color-dark: #b88f38;
     --light-color: #FFFFFF;
+    --gray-light: #f8f9fa;
 }
 
-/* BODY */
 body {
-    background: linear-gradient(135deg, var(--light-color), #f3f3f3);
     font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, var(--gray-light), #ececec);
     color: var(--main-color);
 }
 
@@ -22,73 +23,104 @@ body {
 .form-container {
     background: var(--light-color);
     border-radius: 1rem;
-    box-shadow: 0 12px 25px rgba(0,0,0,0.1);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
     padding: 2.5rem 2rem;
     max-width: 500px;
-    margin: 3rem auto;
+    margin: 4rem auto;
+    animation: fadeIn 0.7s ease-in-out;
 }
 
-/* FORM TITLE */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
 .form-title {
     color: var(--accent-color);
     font-weight: 700;
     font-size: 2rem;
     text-align: center;
-    margin-bottom: 1.8rem;
+    margin-bottom: 2rem;
 }
 
-/* INPUT GROUPS */
+/* INPUT GROUP */
 .input-group {
     position: relative;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.6rem;
+}
+
+.input-group i {
+    position: absolute;
+    top: 50%;
+    left: 0.9rem;
+    transform: translateY(-50%);
+    color: var(--accent-color);
+    font-size: 1.1rem;
 }
 
 .input-group input,
 .input-group select {
     width: 100%;
-    height: 45px;
+    height: 48px;
     border-radius: 0.6rem;
     border: 1px solid rgba(62,76,73,0.3);
-    padding-left: 2.5rem;
+    padding-left: 2.8rem;
     background: var(--light-color);
     color: var(--main-color);
-    transition: 0.3s;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
 }
 
 .input-group input:focus,
 .input-group select:focus {
     border-color: var(--accent-color);
-    box-shadow: 0 0 10px rgba(200,160,72,0.35);
+    box-shadow: 0 0 10px rgba(200,160,72,0.25);
     outline: none;
-    transform: scale(1.02);
+    transform: scale(1.01);
 }
 
-/* ICONS */
-.input-group i {
-    position: absolute;
-    top: 50%;
-    left: 0.75rem;
-    transform: translateY(-50%);
-    font-size: 1.2rem;
-    color: var(--main-color);
+/* ERRORS */
+.text-danger {
+    font-size: 0.85rem;
+    margin-top: 3px;
 }
 
-/* BUTTON */
+/* BUTTONS */
 .btn-submit {
     background-color: var(--accent-color);
     color: var(--light-color);
     border: none;
     border-radius: 0.6rem;
-    height: 45px;
+    height: 48px;
     width: 100%;
     font-weight: 700;
-    transition: background 0.3s ease, transform 0.2s ease;
+    transition: all 0.3s ease;
 }
 
 .btn-submit:hover {
-    background-color: #A88433;
+    background-color: var(--accent-color-dark);
     transform: translateY(-2px);
     box-shadow: 0 6px 15px rgba(200,160,72,0.3);
+}
+
+.btn-back {
+    display: block;
+    text-align: center;
+    background-color: #6c757d;
+    color: #fff;
+    font-weight: 600;
+    border-radius: 0.6rem;
+    height: 45px;
+    line-height: 45px;
+    width: 100%;
+    margin-top: 0.8rem;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.btn-back:hover {
+    background-color: #5a6268;
+    transform: translateY(-2px);
 }
 
 /* ALERTS */
@@ -97,21 +129,18 @@ body {
     font-size: 0.9rem;
     text-align: center;
     margin-bottom: 1rem;
-    padding: 0.65rem 0.8rem;
+    padding: 0.7rem 0.9rem;
 }
 
-/* BACK BUTTON */
-.btn-back {
-    background-color: #6c757d;
-    color: #fff;
-    font-weight: 600;
-    padding: 0.55rem 1rem;
-    border-radius: 0.6rem;
-    width: 100%;
-    margin-top: 10px;
-}
-.btn-back:hover {
-    background-color: #5a6268;
+/* RESPONSIVE */
+@media (max-width: 576px) {
+    .form-container {
+        margin: 2rem 1rem;
+        padding: 2rem 1.5rem;
+    }
+    .form-title {
+        font-size: 1.6rem;
+    }
 }
 </style>
 {% endblock %}
@@ -161,7 +190,7 @@ body {
             {% endfor %}
         </div>
 
-        <button type="submit" class="btn-submit">Créer</button>
+        <button type="submit" class="btn-submit">💾 Créer</button>
         <a href="{% url 'gerer_utilisateurs' %}" class="btn-back">🔙 Retour</a>
     </form>
 </div>
