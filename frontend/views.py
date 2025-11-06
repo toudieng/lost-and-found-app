@@ -8,6 +8,7 @@ import string
 from venv import logger
 from dateutil.relativedelta import relativedelta
 
+from django import forms
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -26,7 +27,7 @@ from backend.objets.models import (
 from backend.objets.forms import DeclarationForm, RestitutionForm
 from backend.users.models import Message, Utilisateur, Notification
 from backend.users.forms import (
-    AdministrateurForm, CommissariatForm, ContactForm, PolicierForm,
+    AdministrateurForm, CommissariatForm, ContactForm, MotifForm, PolicierForm,
     AdministrateurCreationForm, UtilisateurCreationForm
 )
 from frontend import models
@@ -1181,23 +1182,61 @@ def liste_citoyens(request):
         )
     return render(request, 'frontend/admin/liste_citoyens.html', {'citoyens': citoyens})
 
+def is_admin(user):
+    return user.is_authenticated and user.role == 'admin'
 
 @login_required
 @user_passes_test(is_admin)
 def bannir_citoyen(request, pk):
     citoyen = get_object_or_404(Utilisateur, id=pk, role='citoyen')
-    citoyen.est_banni = True
-    citoyen.save()
-    return redirect('liste_citoyens')
 
+    if request.method == "POST":
+        motif = request.POST.get('motif', '').strip()
+        if not motif:
+            return JsonResponse({'status': 'error', 'message': 'Le motif est obligatoire.'}, status=400)
+
+        citoyen.est_banni = True
+        citoyen.save()
+
+        # Envoi email
+        send_mail(
+            subject="Notification de bannissement",
+            message=f"Bonjour {citoyen.username},\n\nVous avez été banni.\nMotif : {motif}",
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[citoyen.email],
+        )
+
+        messages.success(request, f"{citoyen.username}  a été banni avec succès.")
+        return JsonResponse({'status': 'banni'})
+
+    return JsonResponse({'status': 'error', 'message': 'Méthode non autorisée.'}, status=405)
 
 @login_required
 @user_passes_test(is_admin)
 def debannir_citoyen(request, pk):
     citoyen = get_object_or_404(Utilisateur, id=pk, role='citoyen')
-    citoyen.est_banni = False
-    citoyen.save()
-    return redirect('liste_citoyens')
+
+    if request.method == "POST":
+        citoyen.est_banni = False
+        citoyen.save()
+
+        # Envoi email
+        send_mail(
+            subject="Notification de débannissement",
+            message=f"Bonjour {citoyen.username},\n\nVous avez été débanni.",
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[citoyen.email],
+        )
+
+        messages.success(request, f"{citoyen.username} a été débanni avec succès.")
+        return JsonResponse({'status': 'actif'})
+
+    return JsonResponse({'status': 'error', 'message': 'Méthode non autorisée.'}, status=405)
+
+
+
+
+
 
 
 # =============================
@@ -1313,9 +1352,7 @@ def ca_m_appartient(request, declaration_id):
 # =============================
 #       DASHBOARD CITOYEN
 # =============================
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
-from backend.objets.models import Declaration, Restitution, EtatObjet, StatutRestitution
+
 @login_required
 def dashboard_citoyen(request):
     user = request.user
@@ -1387,7 +1424,7 @@ def mes_objets_perdus(request):
     """
     query = request.GET.get('q', '')
 
-    # Filtrer les déclarations du citoyen où l'objet est perdu
+    
     declarations = Declaration.objects.filter(
         citoyen=request.user,
         etat_initial=EtatObjet.PERDU,
@@ -1423,7 +1460,7 @@ def modifier_objet_trouve(request, objet_id):
 @login_required
 def supprimer_objet_trouve(request, objet_id):
     declaration = get_object_or_404(Declaration, citoyen=request.user, objet_id=objet_id)
-    # Allow POST or GET (template button). Consider changing to POST-only for safety.
+   
     if request.method in ('POST', 'GET'):
         declaration.delete()
         messages.success(request, "✅ Objet supprimé avec succès.")
@@ -1437,16 +1474,15 @@ def historique_objets_restitues(request):
     """
     Affiche l'historique des objets restitués pour le citoyen connecté.
     """
-    # On récupère toutes les restitutions où l'objet est restitué et appartenant à l'utilisateur
+   
     restitutions = Restitution.objects.filter(
         citoyen=request.user,
         objet__etat=EtatObjet.RESTITUE
     ).order_by('-date_restitution', '-heure_restitution')
 
-    # Préparer les données pour le template
-    # On peut ajouter des propriétés pour faciliter l'affichage
+   
     for r in restitutions:
-        # utilisateur(s) ayant trouvé l'objet
+      
         r.trouveurs = r.objet.declarations.filter(type_declaration='trouve').values_list('citoyen', flat=True)
         # propriétaire
         r.proprietaire = r.citoyen
@@ -1514,21 +1550,20 @@ def modifier_declaration(request, declaration_id):
     if request.method == 'POST':
         form = DeclarationForm(request.POST, request.FILES, instance=declaration)
         if form.is_valid():
-            form.save()  # met à jour la déclaration et l'image si uploadée
+            form.save()  
             messages.success(request, "✅ Objet mis à jour avec succès.")
             return redirect('objets_perdus')
         else:
             messages.error(request, "⚠️ Erreur : vérifiez les informations saisies.")
     else:
-        form = DeclarationForm(instance=declaration)  # pré-remplissage automatique
-
-    # On peut ajouter un flag pour afficher un titre différent dans le template
+        form = DeclarationForm(instance=declaration)  
+    
     context = {
         "form": form,
-        "modifier": True,  # utilisé dans le template pour changer le titre ou bouton
+        "modifier": True,  
     }
 
-    # On réutilise exactement le même template que pour la déclaration
+    
     return render(request, "frontend/declarer_objet.html", context)
 
 

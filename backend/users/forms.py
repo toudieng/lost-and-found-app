@@ -227,3 +227,5 @@ class ContactForm(forms.ModelForm):
             'contenu': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Votre message...', 'rows': 4}),
         }
         labels = {'contenu': 'Message'}
+class MotifForm(forms.Form):
+    motif = forms.CharField(widget=forms.Textarea, label="Motif du bannissement/débannissement")
