@@ -159,6 +159,11 @@ body { background-color: var(--main-bg); font-family: 'Segoe UI', sans-serif; ma
                 <i class="bi bi-shield-lock"></i> <span>Policiers</span>
             </a>
         </li>
+        <li class="nav-item mb-2">
+            <a class="nav-link {% if request.resolver_match.url_name == 'historique_restitutions' %}active{% endif %}" href="{% url 'historique_restitutions' %}">
+                <i class="bi bi-folder2-open"></i> <span>Historique</span>
+            </a>
+        </li>
     </ul>
 </div>
 

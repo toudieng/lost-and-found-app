@@ -68,7 +68,7 @@
 
 {% block content %}
 <div class="container mt-4 mb-5">
-    <h2 class="fw-bold mb-4" style="color: var(--accent-color);">📦 Objets en attente de restitution</h2>
+    <h2 class="fw-bold mb-4" style="color: var(--accent-color);"> Objets en attente de restitution</h2>
 
     <!-- Barre de recherche -->
     <div class="search-bar">
@@ -114,11 +114,11 @@
                     <div class="card-footer bg-light text-end">
                         <form method="POST" action="{% url 'marquer_restitue' r.id %}" class="d-inline">
                             {% csrf_token %}
-                            <button type="submit" class="btn btn-sm btn-success btn-action">✅ Restitué</button>
+                            <button type="submit" class="btn btn-sm btn-success btn-action">Restitué</button>
                         </form>
                         <form method="POST" action="{% url 'annuler_restitution' r.id %}" class="d-inline ms-2">
                             {% csrf_token %}
-                            <button type="submit" class="btn btn-sm btn-danger btn-action">❌ Annuler</button>
+                            <button type="submit" class="btn btn-sm btn-danger btn-action">Annuler</button>
                         </form>
                         <a href="{% url 'preuve_restitution_pdf' r.id %}" target="_blank" class="btn btn-sm btn-primary btn-action ms-2">
                             📄 Preuve PDF

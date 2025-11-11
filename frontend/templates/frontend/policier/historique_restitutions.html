@@ -86,8 +86,11 @@
                     <div class="card-body">
                         <h5 class="card-title fw-bold">
                             {{ r.objet.nom }}
-                            <span class="badge-restaure ms-1">✅ Restitué</span>
+                            <span class="badge-restaure ms-1"> Restitué</span>
                         </h5>
+                         <a href="{% url 'preuve_restitution_pdf' r.id %}" target="_blank" class="btn btn-sm btn-primary btn-action ms-2">
+                            📄 Preuve PDF
+                        </a>
 
                         <button class="btn btn-sm btn-toggle mb-2 w-100 text-center" type="button" data-target="#details-{{ r.id }}">
                             ℹ️ Voir les détails
@@ -123,6 +126,7 @@
                         </div>
                     </div>
                 </div>
+                
             </div>
             {% endfor %}
         </div>

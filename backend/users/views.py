@@ -23,7 +23,7 @@ def login_view(request):
             elif role == 'policier':
                 return redirect('dashboard_policier')
             else:
-                return redirect('dashboard_citoyen')
+                return redirect('home')
         else:
             messages.error(request, "Adresse e-mail ou mot de passe incorrect.")
     
