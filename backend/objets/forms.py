@@ -3,9 +3,6 @@ from django.utils import timezone
 from .models import Declaration, Objet, EtatObjet
 from backend.objets.models import Commissariat, Restitution
 
-
-
-
 class DeclarationForm(forms.ModelForm):
     nom_objet = forms.CharField(
         max_length=100,
@@ -20,7 +17,6 @@ class DeclarationForm(forms.ModelForm):
     )
     image = forms.ImageField(required=False, label="Photo (facultative)")
 
-    # Champ pour l'état initial choisi par le déclarant
     etat_initial = forms.ChoiceField(
         choices=[(EtatObjet.PERDU, "Objet perdu"), (EtatObjet.TROUVE, "Objet trouvé")],
         widget=forms.RadioSelect(attrs={'class':'form-check-input'}),
@@ -32,7 +28,10 @@ class DeclarationForm(forms.ModelForm):
         model = Declaration
         fields = ['nom_objet', 'lieu', 'etat_initial', 'description', 'image']
         widgets = {
-            'lieu': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Lieu où l’objet a été perdu ou trouvé'}),
+            'lieu': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Lieu où l’objet a été perdu ou trouvé'
+            }),
         }
 
     def save(self, citoyen=None, commit=True):
@@ -41,12 +40,14 @@ class DeclarationForm(forms.ModelForm):
         if citoyen:
             declaration.citoyen = citoyen
 
-        # Création ou mise à jour de l'objet lié
+        # Champs du formulaire
         nom_objet = self.cleaned_data.get('nom_objet')
         description = self.cleaned_data.get('description')
         image = self.cleaned_data.get('image')
         etat_initial = self.cleaned_data.get('etat_initial')
+        lieu = self.cleaned_data.get('lieu')  # ✅ récupéré ici
 
+        # Création ou mise à jour de l'objet
         if declaration.objet:
             objet = declaration.objet
             objet.nom = nom_objet
@@ -64,6 +65,8 @@ class DeclarationForm(forms.ModelForm):
             )
             declaration.objet = objet
 
+        # ✅ Affecter le lieu à la déclaration
+        declaration.lieu = lieu
         declaration.etat_initial = etat_initial
         declaration.date_declaration = timezone.now()
 
@@ -71,6 +74,10 @@ class DeclarationForm(forms.ModelForm):
             declaration.save()
 
         return declaration
+
+
+
+
 
 class RestitutionForm(forms.ModelForm):
     class Meta:
