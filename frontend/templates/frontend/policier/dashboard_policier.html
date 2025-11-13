@@ -88,11 +88,11 @@ body { background-color: var(--main-bg); font-family: 'Segoe UI', sans-serif; ma
 {% block content %}
 <!-- Sidebar -->
 <div class="sidebar" id="sidebar">
-    <h4>Tableau Policier</h4>
+    <h4>#Tableau Policier</h4>
     <ul class="nav flex-column">
         <li class="nav-item mb-2">
             <a class="nav-link {% if request.resolver_match.url_name == 'objets_perdus_trouves' %}active{% endif %}" href="{% url 'objets_perdus_trouves' %}">
-                <i class="bi bi-box-seam"></i> <span>Objets perdus & trouvés</span>
+                <i class="bi bi-box-seam"></i> <span>Objets perdus &  réclamés</span>
             </a>
         </li>
         <li class="nav-item mb-2">

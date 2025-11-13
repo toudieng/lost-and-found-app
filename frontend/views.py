@@ -613,13 +613,6 @@ def objets_trouves_attente(request):
 
 
 
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib import messages
-from django.core.mail import send_mail
-from django.conf import settings
-from django.utils import timezone
-from backend.objets.models import Declaration, Restitution, EtatObjet, StatutRestitution
-from backend.users.models import Commissariat
 
 def planifier_restitution(request, objet_id, type_objet="declaration"):
     """
@@ -822,7 +815,7 @@ def annuler_restitution(request, pk):
         messages.error(request, "Impossible de déterminer l'état initial de l'objet.")
 
     return redirect('objets_trouves_attente')
-# frontend/views.py
+
 
 import base64
 from io import BytesIO

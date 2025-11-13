@@ -20,10 +20,10 @@ def declarer_objet(request):
 
             # Message de confirmation
             if declaration.etat_initial == EtatObjet.PERDU:
-                messages.success(request, "✅ Votre déclaration d'objet perdu a été enregistrée avec succès.")
-                return redirect('mes_objets_perdus')
+                messages.success(request, " Votre déclaration d'objet perdu a été enregistrée avec succès.")
+                return redirect('declarer_objet')
             else:
-                messages.success(request, "✅ Votre déclaration d'objet trouvé a été enregistrée avec succès.")
+                messages.success(request, " Votre déclaration d'objet trouvé a été enregistrée avec succès.")
                 return redirect('declarer_objet')
 
         else:
