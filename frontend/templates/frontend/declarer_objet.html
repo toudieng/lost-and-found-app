@@ -13,7 +13,6 @@
 }
 body { background: var(--light-gray); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
-/* Form container */
 .form-container {
     background: #fff;
     padding: 2.5rem 2rem;
@@ -23,7 +22,6 @@ body { background: var(--light-gray); font-family: 'Segoe UI', Tahoma, Geneva, V
 }
 .form-title { color: var(--primary); font-weight: 700; font-size: 2rem; text-align: center; margin-bottom: 2rem; }
 
-/* Floating labels */
 .floating-label { position: relative; margin-bottom: 1.5rem; }
 .floating-label input, .floating-label textarea {
     width: 100%; padding: 0.75rem; font-size: 0.95rem;
@@ -42,20 +40,16 @@ body { background: var(--light-gray); font-family: 'Segoe UI', Tahoma, Geneva, V
     top: -0.6rem; font-size: 0.8rem; color: var(--primary);
 }
 
-/* Buttons */
 .btn-submit, .btn-back { border-radius: 0.8rem; padding: 0.7rem 1.2rem; font-weight: 600; width: 48%; text-align:center; border:none; transition: all var(--transition);}
 .btn-submit { background: var(--primary); color: var(--secondary); }
 .btn-submit:hover { background: #b88f38; color:#fff; transform: translateY(-2px); }
 .btn-back { background: var(--gray); color:#fff; }
 .btn-back:hover { background:#5a6268; }
 
-/* Error messages */
 .text-error { color: var(--error); font-size: 0.85rem; margin-top:0.3rem; }
 
-/* Carte */
 #map { height: 300px; border-radius: 0.8rem; margin-top:0.8rem; }
 
-/* Image preview */
 #preview-image { max-height: 220px; width:100%; margin-top:0.6rem; border-radius:0.5rem; object-fit:cover; display:none; box-shadow:0 2px 8px rgba(0,0,0,0.1); }
 #preview-image:hover { transform:scale(1.02); box-shadow:0 4px 16px rgba(0,0,0,0.15); }
 </style>
@@ -78,13 +72,11 @@ body { background: var(--light-gray); font-family: 'Segoe UI', Tahoma, Geneva, V
             <form method="post" enctype="multipart/form-data" novalidate>
                 {% csrf_token %}
 
-                <!-- Nom de l'objet -->
                 <div class="floating-label">
                     {{ form.nom_objet }}<label>Nom de l'objet</label>
                     {% for error in form.nom_objet.errors %}<div class="text-error">{{ error }}</div>{% endfor %}
                 </div>
 
-                <!-- Lieu -->
                 <div class="floating-label">
                     {{ form.lieu }}<label>Lieu (cliquez sur la carte)</label>
                     {% for error in form.lieu.errors %}<div class="text-error">{{ error }}</div>{% endfor %}
@@ -93,20 +85,17 @@ body { background: var(--light-gray); font-family: 'Segoe UI', Tahoma, Geneva, V
                 <div id="map"></div>
                 <small class="text-muted">📍 Déplacez le marker ou utilisez la recherche.</small>
 
-                <!-- Description -->
                 <div class="floating-label mt-3">
                     {{ form.description }}
                     {% for error in form.description.errors %}<div class="text-error">{{ error }}</div>{% endfor %}
                 </div>
 
-                <!-- Image -->
                 <div class="mb-3">
                     {{ form.image }}
                     {% for error in form.image.errors %}<div class="text-error">{{ error }}</div>{% endfor %}
                     <img id="preview-image" src="{% if form.instance.objet and form.instance.objet.image %}{{ form.instance.objet.image.url }}{% endif %}" alt="Prévisualisation">
                 </div>
 
-                <!-- Type de déclaration -->
                 {% if form.etat_initial %}
                     <div class="mb-4 text-center">
                         {% for radio in form.etat_initial %}
@@ -127,7 +116,6 @@ body { background: var(--light-gray); font-family: 'Segoe UI', Tahoma, Geneva, V
     </div>
 </div>
 
-<!-- GOOGLE MAPS -->
 <script>
 function initMap() {
     const lieuInput = document.getElementById("{{ form.lieu.id_for_label }}");
@@ -137,55 +125,79 @@ function initMap() {
         zoom: 13,
     });
 
+    const geocoder = new google.maps.Geocoder();
+
     let marker = new google.maps.Marker({
         position: { lat: 14.6937, lng: -17.4441 },
         map: map,
         draggable: true
     });
 
-    // Coordonnées existantes
-    if(lieuInput.value && lieuInput.value.includes(',')) {
-        const coords = lieuInput.value.split(',').map(Number);
-        if(coords.length===2 && !isNaN(coords[0]) && !isNaN(coords[1])){
-            const pos={lat:coords[0],lng:coords[1]};
-            marker.setPosition(pos);
-            map.setCenter(pos);
-        }
+    // Coordonnées existantes ou adresse
+    if(lieuInput.value) {
+        geocoder.geocode({ address: lieuInput.value }, (results, status) => {
+            if(status === "OK" && results[0]){
+                marker.setPosition(results[0].geometry.location);
+                map.setCenter(results[0].geometry.location);
+            }
+        });
     }
 
-    // Déplacement marker ou clic sur carte
-    marker.addListener('dragend',()=>{ const pos=marker.getPosition(); lieuInput.value=`${pos.lat().toFixed(6)}, ${pos.lng().toFixed(6)}`; });
-    map.addListener('click', e=>{ marker.setPosition(e.latLng); lieuInput.value=`${e.latLng.lat().toFixed(6)}, ${e.latLng.lng().toFixed(6)}`; });
+    // Déplacement marker
+    marker.addListener('dragend', ()=>{
+        const pos = marker.getPosition();
+        geocoder.geocode({ location: pos }, (results, status) => {
+            if(status === "OK" && results[0]){
+                lieuInput.value = results[0].formatted_address;
+            } else {
+                lieuInput.value = `${pos.lat().toFixed(6)}, ${pos.lng().toFixed(6)}`;
+            }
+        });
+    });
 
-    // Autocomplete Google Places
+    // Clic sur la carte
+    map.addListener('click', e => {
+        marker.setPosition(e.latLng);
+        geocoder.geocode({ location: e.latLng }, (results, status) => {
+            if(status === "OK" && results[0]){
+                lieuInput.value = results[0].formatted_address;
+            } else {
+                lieuInput.value = `${e.latLng.lat().toFixed(6)}, ${e.latLng.lng().toFixed(6)}`;
+            }
+        });
+    });
+
+    // Autocomplete
     const input = document.createElement('input');
-    input.type="text"; input.placeholder="Rechercher une adresse..."; 
-    input.style.cssText="position:absolute;top:10px;left:10px;width:90%;padding:5px;z-index:5;";
+    input.type = "text";
+    input.placeholder = "Rechercher une adresse...";
+    input.style.cssText = "position:absolute;top:10px;left:10px;width:90%;padding:5px;z-index:5;";
     map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
 
     const autocomplete = new google.maps.places.Autocomplete(input);
     autocomplete.bindTo("bounds", map);
-    autocomplete.addListener("place_changed", ()=>{
+    autocomplete.addListener("place_changed", () => {
         const place = autocomplete.getPlace();
-        if(!place.geometry) return;
+        if (!place.geometry) return;
         map.setCenter(place.geometry.location);
         map.setZoom(15);
         marker.setPosition(place.geometry.location);
-        lieuInput.value = `${place.geometry.location.lat().toFixed(6)}, ${place.geometry.location.lng().toFixed(6)}`;
+        lieuInput.value = place.formatted_address || `${place.geometry.location.lat().toFixed(6)}, ${place.geometry.location.lng().toFixed(6)}`;
     });
 
     // Prévisualisation image
     const imageInput = document.getElementById("{{ form.image.id_for_label }}");
     if(imageInput){
-        imageInput.addEventListener("change",function(){
-            const file=this.files[0];
-            if(file){ preview.src=URL.createObjectURL(file); preview.style.display="block"; }
-            else{ preview.src="#"; preview.style.display="none"; }
+        imageInput.addEventListener("change", function(){
+            const file = this.files[0];
+            if(file){ preview.src = URL.createObjectURL(file); preview.style.display="block"; }
+            else{ preview.src = "#"; preview.style.display="none"; }
         });
     }
     if(preview.src && !preview.src.includes("undefined")) preview.style.display="block";
 }
 </script>
 
-<script async src="https://maps.googleapis.com/maps/api/js?key=VOTRE_API_KEY&libraries=places&callback=initMap"></script>
+<script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDNnzprHe8eLMy8XFGu4tM9bxavuXVGGkg&libraries=places&callback=initMap"></script>
+
 {% endblock %}

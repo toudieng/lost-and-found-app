@@ -1545,7 +1545,7 @@ def modifier_declaration(request, declaration_id):
         if form.is_valid():
             form.save()  
             messages.success(request, "✅ Objet mis à jour avec succès.")
-            return redirect('objets_perdus')
+            return redirect('mes_objets_perdus')
         else:
             messages.error(request, "⚠️ Erreur : vérifiez les informations saisies.")
     else:
@@ -1567,5 +1567,5 @@ def supprimer_declaration(request, declaration_id):
         declaration.objet.delete()
         declaration.delete()
         messages.success(request, "✅ Objet supprimé avec succès.")
-        return redirect('objets_perdus')
+        return redirect('mes_objets_perdus')
     return render(request, "frontend/citoyen/confirmer_suppression.html", {"declaration": declaration})
