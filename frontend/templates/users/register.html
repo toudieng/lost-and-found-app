@@ -17,7 +17,7 @@
     --light-color: #FFFFFF;
 }
 
-/* BODY */
+/* ----------- BODY ----------- */
 body {
     background: linear-gradient(135deg, var(--light-color), #f3f3f3);
     min-height: 100vh;
@@ -28,7 +28,7 @@ body {
     color: var(--main-color);
 }
 
-/* FORM CONTAINER */
+/* ----------- CONTAINER ----------- */
 .form-container {
     background: var(--light-color);
     border-radius: 1rem;
@@ -41,9 +41,9 @@ body {
     transform: translateY(40px);
     animation: fadeInUp 0.8s forwards;
 }
-
 @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
 
+/* ----------- TITRE ----------- */
 .form-title {
     color: var(--accent-color);
     font-weight: 700;
@@ -56,36 +56,32 @@ body {
 }
 @keyframes titleFade { to { opacity: 1; transform: translateY(0); } }
 
-/* INPUTS */
+/* ----------- CHAMPS ----------- */
 .input-group {
     position: relative;
     margin-bottom: 1.5rem;
-    opacity: 0;
-    transform: translateX(-30px);
-    animation: inputFade 0.6s forwards;
 }
-.input-group:nth-child(1) { animation-delay: 0.5s; }
-.input-group:nth-child(2) { animation-delay: 0.6s; }
-@keyframes inputFade { to { opacity: 1; transform: translateX(0); } }
-
 .input-group input.form-control {
     width: 100%;
     height: 45px;
     border-radius: 0.6rem;
     border: 1px solid rgba(62, 76, 73, 0.3);
-    padding: 0.375rem 2.8rem 0.375rem 2.5rem; /* espace pour icône */
+    padding: 0.375rem 2.8rem 0.375rem 2.5rem;
     background: var(--light-color);
-    transition: 0.3s;
     color: var(--main-color);
+    transition: 0.3s;
 }
 .input-group input.form-control:focus {
     border-color: var(--accent-color);
     box-shadow: 0 0 10px rgba(200,160,72,0.35);
-    outline: none;
     transform: scale(1.02);
 }
+.input-group:focus-within i {
+    color: var(--accent-color);
+    transition: color 0.3s ease;
+}
 
-/* Icônes */
+/* Icônes à gauche */
 .input-group i.fa-user,
 .input-group i.fa-envelope,
 .input-group i.fa-lock,
@@ -110,7 +106,7 @@ body {
     color: var(--main-color);
 }
 
-/* BUTTON */
+/* ----------- BOUTON ----------- */
 .btn-submit {
     background-color: var(--accent-color);
     color: var(--light-color);
@@ -119,27 +115,28 @@ body {
     height: 45px;
     width: 100%;
     font-weight: 700;
-    transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-    opacity: 0;
-    transform: translateY(20px);
-    animation: buttonFade 0.6s forwards 0.8s;
+    transition: all 0.3s ease;
 }
 .btn-submit:hover {
     background-color: #A88433;
     transform: translateY(-2px);
     box-shadow: 0 6px 15px rgba(200,160,72,0.3);
 }
-@keyframes buttonFade { to { opacity: 1; transform: translateY(0); } }
+.btn-submit:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
 
-/* ALERTS */
-.alert { border-radius: 0.6rem; font-size: 0.9rem; text-align: center; margin-bottom: 1rem; padding: 0.65rem 0.8rem; }
-
-/* REGISTER LINK */
-.register-link { text-align: center; margin-top: 1.2rem; font-size: 0.9rem; }
-.register-link a { color: var(--accent-color); font-weight: 600; text-decoration: none; transition: color 0.3s ease; }
+/* ----------- LIEN ----------- */
+.register-link {
+    text-align: center;
+    margin-top: 1.2rem;
+    font-size: 0.9rem;
+}
+.register-link a { color: var(--accent-color); font-weight: 600; text-decoration: none; }
 .register-link a:hover { color: var(--main-color); }
 
-/* RESPONSIVE */
+/* ----------- RESPONSIVE ----------- */
 @media (max-width: 576px) {
     .form-container { padding: 2rem 1rem; }
     .form-title { font-size: 1.6rem; }
@@ -149,7 +146,7 @@ body {
 <body>
 
 <div class="form-container">
-    <h4 class="form-title">📝 Inscription</h4>
+    <h4 class="form-title"><i class="fa fa-user-plus me-2"></i>Inscription</h4>
 
     {% if messages %}
         {% for message in messages %}
@@ -157,52 +154,47 @@ body {
         {% endfor %}
     {% endif %}
 
-    <form method="POST" novalidate>
+    <form method="POST" novalidate id="registerForm">
         {% csrf_token %}
 
         <div class="input-group">
             <i class="fa fa-id-badge"></i>
             {{ form.username }}
-            {% for error in form.username.errors %}
-                <span class="text-danger">{{ error }}</span>
-            {% endfor %}
         </div>
 
         <div class="input-group">
             <i class="fa fa-envelope"></i>
             {{ form.email }}
-            {% for error in form.email.errors %}
-                <span class="text-danger">{{ error }}</span>
-            {% endfor %}
         </div>
 
         <div class="input-group">
             <i class="fa fa-phone"></i>
             {{ form.telephone }}
-            {% for error in form.telephone.errors %}
-                <span class="text-danger">{{ error }}</span>
-            {% endfor %}
         </div>
 
         <div class="input-group">
             <i class="fa fa-lock"></i>
             {{ form.password1 }}
             <i class="fa fa-eye-slash toggle-password" onclick="togglePassword('id_password1', this)"></i>
-            {% for error in form.password1.errors %}
-                <span class="text-danger">{{ error }}</span>
-            {% endfor %}
         </div>
 
         <div class="input-group">
             <i class="fa fa-lock"></i>
             {{ form.password2 }}
             <i class="fa fa-eye-slash toggle-password" onclick="togglePassword('id_password2', this)"></i>
-            {% for error in form.password2.errors %}
-                <span class="text-danger">{{ error }}</span>
-            {% endfor %}
         </div>
 
-        <button type="submit" class="btn-submit">S'inscrire</button>
+        <!-- ✅ Conditions d'utilisation -->
+        <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" id="termsCheck">
+            <label class="form-check-label" for="termsCheck">
+                J’accepte les <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">conditions d’utilisation</a>.
+            </label>
+        </div>
+
+        <button type="submit" class="btn-submit" id="submitBtn" disabled>
+            <i class="fa fa-user-plus me-2"></i>S'inscrire
+        </button>
     </form>
 
     <p class="register-link">
@@ -210,7 +202,29 @@ body {
     </p>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+<!-- ✅ Modal Conditions d’utilisation -->
+<div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content p-3">
+      <div class="modal-header">
+        <h5 class="modal-title" id="termsModalLabel"><i class="fa fa-file-contract me-2"></i>Conditions d’utilisation</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+      </div>
+      <div class="modal-body" style="max-height:400px; overflow-y:auto;">
+        <p><strong>1. Protection des données :</strong> Vos informations personnelles sont traitées avec confidentialité et ne seront jamais partagées sans votre consentement.</p>
+        <p><strong>2. Responsabilité :</strong> Vous êtes responsable des informations que vous fournissez. Toute fausse déclaration pourra entraîner la suspension de votre compte.</p>
+        <p><strong>3. Sécurité :</strong> Ne partagez jamais votre mot de passe. Notre équipe ne vous le demandera jamais.</p>
+        <p><strong>4. Respect des règles :</strong> En créant un compte, vous acceptez de respecter les règles de bonne conduite et les lois en vigueur.</p>
+        <p><strong>5. Droit d’accès :</strong> Vous pouvez à tout moment demander la suppression ou la modification de vos données.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 function togglePassword(fieldId, icon) {
     const input = document.getElementById(fieldId);
@@ -222,6 +236,11 @@ function togglePassword(fieldId, icon) {
         icon.classList.replace('fa-eye','fa-eye-slash');
     }
 }
+
+// ✅ Activer le bouton seulement si les conditions sont cochées
+document.getElementById('termsCheck').addEventListener('change', function() {
+    document.getElementById('submitBtn').disabled = !this.checked;
+});
 </script>
 </body>
 </html>
