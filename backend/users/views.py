@@ -43,7 +43,7 @@ def register_view(request):
             user = form.save(commit=False)
             user.role = 'citoyen'  # rôle par défaut
             user.save()
-            messages.success(request, "✅ Compte citoyen créé avec succès ! Vous pouvez maintenant vous connecter.")
+            messages.success(request, "Compte citoyen créé avec succès ! Vous pouvez maintenant vous connecter.")
             return redirect('login')
         else:
             for field, errors in form.errors.items():
@@ -88,7 +88,7 @@ def profil_view(request, template, form_redirect=None):
         form = ProfilForm(request.POST, request.FILES, instance=user)
         if form.is_valid():
             form.save()
-            messages.success(request, "✅ Profil mis à jour avec succès.")
+            messages.success(request, " Profil mis à jour avec succès.")
             if form_redirect:
                 return redirect(form_redirect)
     else:

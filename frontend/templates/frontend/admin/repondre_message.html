@@ -4,75 +4,75 @@
 {% block extra_css %}
 <style>
 :root {
-    --main-color: #3E4C49;           /* vert-gris foncé */
-    --accent-color: #C8A048;         /* doré */
-    --accent-color-dark: #b88f38;    /* doré foncé pour hover */
-    --light-color: #FFFFFF;           /* blanc */
-    --main-color-light: rgba(62,76,73,0.1);
-}
-
-/* Titres */
-h3 {
-    color: var(--main-color);
-    font-weight: 700;
+    --main-color: #3E4C49;
+    --accent-color: #C8A048;
+    --accent-color-dark: #b88f38;
+    --light-color: #FFFFFF;
+    --main-color-light: rgba(62,76,73,0.10);
 }
 
 /* Card */
 .card {
-    border-radius: 12px;
+    border-radius: 14px;
+    border: none;
     box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    background: var(--light-color);
+}
+
+/* Header titre */
+h3 {
+    color: var(--main-color);
+    font-weight: 700;
 }
 
 /* Boutons */
 .btn-success {
     background-color: var(--accent-color);
     border-color: var(--accent-color);
-    color: var(--light-color);
-    transition: 0.2s;
+    color: #fff;
+    font-weight: 600;
 }
 .btn-success:hover {
     background-color: var(--accent-color-dark);
     border-color: var(--accent-color-dark);
-    color: var(--light-color);
-}
-.btn-secondary {
-    background-color: #6c757d;
-    border-color: #6c757d;
-    color: #fff;
-}
-.btn-secondary:hover {
-    background-color: #5a6268;
-    border-color: #5a6268;
-}
-
-/* Texte du message */
-.card p {
-    color: #343a40;
-}
-.card small {
-    color: #6c757d;
 }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="container py-4">
+
+    <!-- Titre -->
     <h3 class="mb-4">✉️ Répondre à {{ message_obj.nom }}</h3>
 
-    <div class="card shadow p-3 mb-4">
-        <p><strong>Message reçu :</strong></p>
-        <p>{{ message_obj.contenu }}</p>
-        <small>Envoyé le {{ message_obj.date_envoi|date:"d/m/Y H:i" }}</small>
+    <!-- Message reçu -->
+    <div class="card p-3 mb-4">
+        <p class="mb-1"><strong>Message reçu :</strong></p>
+        <p class="mb-2">{{ message_obj.contenu }}</p>
+        <small class="text-muted">
+            📅 {{ message_obj.date_envoi|date:"d/m/Y H:i" }}
+        </small>
     </div>
 
-    <form method="post" class="card shadow p-4">
+    <!-- Formulaire de réponse -->
+    <form method="post" class="card p-4">
         {% csrf_token %}
+
         <div class="mb-3">
             <label for="reponse" class="form-label">Votre réponse</label>
-            <textarea name="reponse" id="reponse" rows="4" class="form-control" required></textarea>
+            <textarea name="reponse" id="reponse" rows="4"
+                      class="form-control"
+                      placeholder="Écrire votre réponse ici..."
+                      required></textarea>
         </div>
-        <button type="submit" class="btn btn-success">Envoyer la réponse</button>
-        <a href="{% url 'liste_messages' %}" class="btn btn-secondary ms-2">Annuler</a>
+
+        <button type="submit" class="btn btn-success">
+            Envoyer la réponse
+        </button>
+
+        <a href="{% url 'liste_messages' %}" class="btn btn-secondary ms-2">
+            Annuler
+        </a>
     </form>
 </div>
 {% endblock %}

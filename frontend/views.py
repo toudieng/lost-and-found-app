@@ -1505,7 +1505,7 @@ def reclamer_objet(request, restitution_id):
 
     restitution.objet.etat = EtatObjet.RECLAME
     restitution.objet.save()
-    messages.success(request, f"✅ Vous avez réclamé l'objet '{restitution.objet.nom}'.")
+    messages.success(request, f" Vous avez réclamé l'objet '{restitution.objet.nom}'.")
 
     destinataires = []
     if restitution.policier and restitution.policier.email:
